@@ -19,7 +19,7 @@ public class SimplePlayerMovement : NetworkBehaviour
     void Update()
     {
         // Sadece local player kendi inputunu kontrol etsin
-        if (!IsOwner) return;
+        //if (!IsOwner) return;
 
         float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sað ok
         float v = Input.GetAxis("Vertical");   // W, S veya Yukarý/Aþaðý ok
