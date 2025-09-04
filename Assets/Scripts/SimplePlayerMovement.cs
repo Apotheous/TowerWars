@@ -7,6 +7,15 @@ public class SimplePlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
 
+    public override void OnNetworkSpawn()
+    {
+        if (true)
+        {
+
+        }
+    }
+
+
     void Update()
     {
         // Sadece local player kendi inputunu kontrol etsin
