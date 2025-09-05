@@ -34,7 +34,7 @@ public class RelayManager : MonoBehaviour
         await StartClientWithRelay(joinCodeInputField.text);
     }
 
-    private async Task<string> StartHostWithRelay(int maxConnections = 3)
+    private async Task<string> StartHostWithRelay(int maxConnections = 2)
     {
 
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
