@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-public class Player : NetworkBehaviour
+public class PlayerSC : NetworkBehaviour
 {
     [SerializeField] float movementSpeedBase = 5;
 

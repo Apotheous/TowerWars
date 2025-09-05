@@ -1,6 +1,6 @@
-Library: C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
+Library: C:\Users\bruco\TowerWars\Temp\StagingArea\Data\Plugins\x86_64\lib_burst_generated
 --platform=Windows
---backend=burst-llvm-18
+--backend=burst-llvm-16
 --target=X64_SSE2
 --global-safety-checks-setting=Off
 --meta-data-generation=False
@@ -10,9 +10,9 @@ Library: C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst
 --linker-options=PdbAltPath="TowerWars_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\bruco\TowerWars\Temp\Burst
---key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.62f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
+--key-folder=C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=C:\Users\bruco\TowerWars\Library\Burst
---output=C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
+--output=C:\Users\bruco\TowerWars\Temp\StagingArea\Data\Plugins\x86_64\lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
 
 --method=Unity.Burst.BurstCompiler+BurstCompilerHelper, Unity.Burst, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::IsBurstEnabled()--8c2be93e18276203cbd918daa2748a10
@@ -94,7 +94,7 @@ Library: C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst
 --method=Unity.Jobs.IJobExtensions+JobStruct`1[[Unity.Collections.NativeStream+ConstructJob, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(Unity.Collections.NativeStream+ConstructJob&, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--b78f808503c8b5fe97a83e833bd5871d
 --method=Unity.Networking.Transport.FragmentationPipelineStage, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Send(Unity.Networking.Transport.NetworkPipelineContext&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Networking.Transport.InboundSendBuffer&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Networking.Transport.NetworkPipelineStage+Requests&, Unity.Networking.Transport, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--3134d6572ef8ceff1d5057c9272f12fe
 --platform=Windows
---backend=burst-llvm-18
+--backend=burst-llvm-16
 --target=AVX2
 --global-safety-checks-setting=Off
 --meta-data-generation=False
@@ -104,9 +104,9 @@ Library: C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst
 --linker-options=PdbAltPath="TowerWars_Data/Plugins/x86_64/lib_burst_generated.pdb"
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\bruco\TowerWars\Temp\Burst
---key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.62f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
+--key-folder=C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport
 --decode-folder=C:\Users\bruco\TowerWars\Library\Burst
---output=C:\Users\bruco\TowerWars\Temp\BurstOutput\Data\Plugins\x86_64\lib_burst_generated
+--output=C:\Users\bruco\TowerWars\Temp\StagingArea\Data\Plugins\x86_64\lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
 
 --method=Unity.Burst.BurstCompiler+BurstCompilerHelper, Unity.Burst, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::IsBurstEnabled()--8c2be93e18276203cbd918daa2748a10

@@ -16,28 +16,32 @@ public class RelayManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI joinCodeText;
     [SerializeField] private TMP_InputField joinCodeInputField;
 
-
-    private async void Start()
-    {
-        await UnityServices.InitializeAsync();
-
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    }
+ 
 
     public async void StartRelay()
     {
         string joinCode = await StartHostWithRelay();
         joinCodeText.text = joinCode;
     }
+
     public async void JoinRelay()
     {
         await StartClientWithRelay(joinCodeInputField.text);
     }
 
-    private async Task<string> StartHostWithRelay(int maxConnections = 2)
+    public async Task<string> StartHostWithRelay(int maxConnections = 3)
     {
+        Allocation allocation;
 
-        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+        try
+        {
+            allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+        }
+        catch
+        {
+            Debug.LogError("Creating allocation failed");
+            throw;
+        }
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
 
@@ -46,13 +50,12 @@ public class RelayManager : MonoBehaviour
         return NetworkManager.Singleton.StartHost() ? joinCode : null;
     }
 
-
-
-
-    private async Task<bool> StartClientWithRelay(string joinCode)
+    public async Task<bool> StartClientWithRelay(string joinCode)
     {
         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+
         return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
     }
 }
