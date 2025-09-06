@@ -21,6 +21,12 @@ public class MatchMakerManager : NetworkBehaviour
     private NetworkManager networkManager;
     private string currentTicket;
 
+
+    [SerializeField] private TextMeshProUGUI onlinePlayerCountText;
+    [SerializeField] private GameObject myPanel;
+
+
+
     private async void Start()
     {
         networkManager = NetworkManager.Singleton;
@@ -68,10 +74,16 @@ public class MatchMakerManager : NetworkBehaviour
             {
                 BackfillTicket backfillTicket = await MatchmakerService.Instance.ApproveBackfillTicketAsync(backfillTicketId);
                 backfillTicketId = backfillTicket.Id;
+                
+            }
+            if (NetworkManager.Singleton.ConnectedClientsList.Count == 2)
+            {
+                CloseMyPanel();
             }
 
             await Task.Delay(1000);
         }
+
     }
 
     private void OnPlayerConnected()
@@ -87,6 +99,11 @@ public class MatchMakerManager : NetworkBehaviour
         {
             UpdateBackfillTicket();
         }
+    }
+
+    public void CloseMyPanel()
+    {
+        myPanel.SetActive(false);
     }
 
     private async void UpdateBackfillTicket()
@@ -154,6 +171,7 @@ public class MatchMakerManager : NetworkBehaviour
                     NetworkManager.Singleton.StartClient();
 
                     Debug.Log("Match found");
+
                     return;
                 }
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Timeout)
@@ -169,6 +187,7 @@ public class MatchMakerManager : NetworkBehaviour
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.InProgress)
                 {
                     Debug.Log("Match is in progress");
+                    onlinePlayerCountText.text = "Rakip Aranýyor...";
                 }
 
             }
