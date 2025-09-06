@@ -79,6 +79,7 @@ public class MatchMakerManager : NetworkBehaviour
             if (NetworkManager.Singleton.ConnectedClientsList.Count == 2)
             {
                 CloseMyPanel();
+                onlinePlayerCountText.text = "Rakip Aranýyor...";
             }
 
             await Task.Delay(1000);

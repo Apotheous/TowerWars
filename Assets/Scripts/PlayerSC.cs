@@ -9,7 +9,7 @@ public class PlayerSC : NetworkBehaviour
 {
     [SerializeField] float movementSpeedBase = 5;
 
-    private Animator animator;
+
     private Rigidbody2D rb;
     private float movementSpeedMultiplier;
     private Vector2 currentMoveDirection;
@@ -26,7 +26,7 @@ public class PlayerSC : NetworkBehaviour
 
     void Start()
     {
-        animator = GetComponent<Animator>();
+
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -54,7 +54,7 @@ public class PlayerSC : NetworkBehaviour
         if (Input.GetMouseButton(0))
         {
             movementSpeedMultiplier = 0.5f;
-            animator.SetFloat("Attack", 1);
+
 
             if (canAttack)
             {
@@ -74,7 +74,7 @@ public class PlayerSC : NetworkBehaviour
         }
         else
         {
-            animator.SetFloat("Attack", 0);
+
             movementSpeedMultiplier = 1f;
         }
     }
