@@ -12,7 +12,7 @@ using Unity.Services.Core;
 using Unity.Services.Multiplay;
 public class MatchMakerManager : NetworkBehaviour
 {
-    [SerializeField] private TMP_Dropdown gameModeDropdown;
+    //[SerializeField] private TMP_Dropdown gameModeDropdown;
 
     private PayloadAllocation payloadAllocation;
     private IMatchmakerService matchmakerService;
@@ -78,7 +78,7 @@ public class MatchMakerManager : NetworkBehaviour
             }
             if (NetworkManager.Singleton.ConnectedClientsList.Count == 2)
             {
-                CloseMyPanel();
+   
                 onlinePlayerCountText.text = "Rakip Aranýyor...";
             }
 
@@ -105,6 +105,11 @@ public class MatchMakerManager : NetworkBehaviour
     public void CloseMyPanel()
     {
         myPanel.SetActive(false);
+    }
+    public void OpenMyPanel()
+    {
+        myPanel.SetActive(true);
+      
     }
 
     private async void UpdateBackfillTicket()
@@ -149,7 +154,7 @@ public class MatchMakerManager : NetworkBehaviour
     public async void ClientJoin()
     {
         CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
-            new Dictionary<string, object> { { "GameMode", gameModeDropdown.options[gameModeDropdown.value].text } });
+            new Dictionary<string, object> { { "GameMode", "EasyMode" } });//gameModeDropdown.options[gameModeDropdown.value].text
 
         List<Player> players = new List<Player> { new Player(AuthenticationService.Instance.PlayerId) };
 
