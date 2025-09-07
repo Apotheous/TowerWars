@@ -76,11 +76,7 @@ public class MatchMakerManager : NetworkBehaviour
                 backfillTicketId = backfillTicket.Id;
                 
             }
-            if (NetworkManager.Singleton.ConnectedClientsList.Count == 2)
-            {
-   
-                onlinePlayerCountText.text = "Rakip Aranýyor...";
-            }
+
 
             await Task.Delay(1000);
         }
@@ -193,7 +189,7 @@ public class MatchMakerManager : NetworkBehaviour
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.InProgress)
                 {
                     Debug.Log("Match is in progress");
-                    onlinePlayerCountText.text = "Rakip Aranýyor...";
+
                 }
 
             }
