@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Matchmaker;
 using Unity.Services.Matchmaker.Models;
-using UnityEngine;
-using TMPro;
-using System.Threading.Tasks;
-using Unity.Netcode.Transports.UTP;
-using Unity.Netcode;
-using Unity.Services.Core;
 using Unity.Services.Multiplay;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 public class MatchMakerManager : NetworkBehaviour
 {
     //[SerializeField] private TMP_Dropdown gameModeDropdown;
@@ -26,7 +27,7 @@ public class MatchMakerManager : NetworkBehaviour
     [SerializeField] private GameObject myPanel;
 
 
-
+    [SerializeField] string sceneName;
     private async void Start()
     {
         networkManager = NetworkManager.Singleton;
@@ -48,6 +49,76 @@ public class MatchMakerManager : NetworkBehaviour
             payloadAllocation = await MultiplayService.Instance.GetPayloadAllocationFromJsonAs<PayloadAllocation>();
             backfillTicketId = payloadAllocation.BackfillTicketId;
         }
+
+        networkManager.OnClientConnectedCallback += HandleClientConnected;
+
+    }
+    private void OnEnable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
+        }
+    }
+
+    private void HandleClientConnected(ulong clientId)
+    {
+        Debug.Log($"Player connected! ClientId: {clientId}");
+        DebugManager.Instance.Log3(networkManager.ConnectedClientsIds.Count.ToString());
+        CheckConnectedTwoPlayers();
+
+    }
+
+    private void HandleClientDisconnected(ulong clientId)
+    {
+        Debug.Log($"Player disconnected! ClientId: {clientId}");
+    }
+
+    private void CheckConnectedTwoPlayers()
+    {
+        if (networkManager.ConnectedClientsIds.Count==2)
+        {
+            LoadGameScene(sceneName);
+        }
+    }
+
+    public void LoadGameScene(string sceneName)
+    {
+        // Sadece server/host sahne deðiþikliði yapabilir
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            Debug.LogWarning("Only server/host can change scenes!");
+            return;
+        }
+
+        // Sahne geçiþi öncesi hazýrlýk
+        PrepareSceneTransition();
+
+        Debug.Log($"Loading scene: {sceneName}");
+
+        // NetworkManager'ýn SceneManager'ýný kullan
+        var status = NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+        if (status != SceneEventProgressStatus.Started)
+        {
+            Debug.LogError($"Failed to start loading scene {sceneName}");
+        }
+    }
+
+    private void PrepareSceneTransition()
+    {
+        // Sahne geçiþi öncesi temizlik iþlemleri
+        // Örneðin: UI panellerini kapat, geçici objeleri temizle
     }
 
     bool isDeallocating = false;
@@ -80,6 +151,7 @@ public class MatchMakerManager : NetworkBehaviour
 
             await Task.Delay(1000);
         }
+
 
     }
 
