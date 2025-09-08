@@ -11,6 +11,7 @@ public class DebugManager : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI text1;
     [SerializeField] private TextMeshProUGUI Text2Ýnt;
     [SerializeField] private TextMeshProUGUI text3;
+    [SerializeField] private TextMeshProUGUI forUpdateText;
 
     [SerializeField] private NetworkSpawnManager spawnManager;
 
@@ -87,7 +88,7 @@ public class DebugManager : NetworkBehaviour
         Debug.Log(message); // Unity Console’a da yaz
         if (text1 != null)
         {
-            text1.text += $"\n{message}";
+            Text2Ýnt.text += $"\n{message}";
         }
     }
     public void Log3(string message)
@@ -95,7 +96,15 @@ public class DebugManager : NetworkBehaviour
         Debug.Log(message); // Unity Console’a da yaz
         if (text1 != null)
         {
-            text1.text += $"\n{message}";
+            text3.text += $"\n{message}";
+        }
+    }
+    public void ForUpdate(string message)
+    {
+        Debug.Log(message); // Unity Console’a da yaz
+        if (text1 != null)
+        {
+            forUpdateText.text += $"\n{message}";
         }
     }
 
