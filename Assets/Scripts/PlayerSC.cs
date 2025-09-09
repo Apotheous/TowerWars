@@ -38,13 +38,13 @@ public class PlayerSC : NetworkBehaviour
 
     private void Move()
     {
-        //if (!IsOwner) return;
+        if (!IsOwner) return;
 
-        //float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sað ok
-        //float v = Input.GetAxis("Vertical");   // W, S veya Yukarý/Aþaðý ok
+        float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sað ok
+        float v = Input.GetAxis("Vertical");   // W, S veya Yukarý/Aþaðý ok
 
-        //Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
-        //transform.Translate(move, Space.World);
+        Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
+        transform.Translate(move, Space.World);
     }
 
 
