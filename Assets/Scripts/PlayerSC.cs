@@ -10,7 +10,7 @@ public class PlayerSC : NetworkBehaviour
     [SerializeField] float movementSpeedBase = 5;
 
 
-    private Rigidbody2D rb;
+    //private Rigidbody2D rb;
     private float movementSpeedMultiplier;
     private Vector2 currentMoveDirection;
     public int playerScore;
@@ -27,7 +27,7 @@ public class PlayerSC : NetworkBehaviour
     void Start()
     {
 
-        rb = GetComponent<Rigidbody2D>();
+        //rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -40,43 +40,43 @@ public class PlayerSC : NetworkBehaviour
     {
         //if (!IsOwner) return;
 
-        float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sað ok
-        float v = Input.GetAxis("Vertical");   // W, S veya Yukarý/Aþaðý ok
+        //float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sað ok
+        //float v = Input.GetAxis("Vertical");   // W, S veya Yukarý/Aþaðý ok
 
-        Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
-        transform.Translate(move, Space.World);
+        //Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
+        //transform.Translate(move, Space.World);
     }
 
 
     private bool canAttack = true;
     private void Attack()
     {
-        if (Input.GetMouseButton(0))
-        {
-            movementSpeedMultiplier = 0.5f;
+        //if (Input.GetMouseButton(0))
+        //{
+        //    movementSpeedMultiplier = 0.5f;
 
 
-            if (canAttack)
-            {
-                RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 1f, currentMoveDirection, 0, 1 << 6);
+        //    if (canAttack)
+        //    {
+        //        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 1f, currentMoveDirection, 0, 1 << 6);
 
-                if (hits.Length > 0)
-                {
-                    hits[0].transform.GetComponent<HealthSystem>().OnDamageDealt(50);
-                    if (hits[0].transform.GetComponent<HealthSystem>().health < 0)
-                    {
-                        playerScore++;
-                    }
-                }
+        //        if (hits.Length > 0)
+        //        {
+        //            hits[0].transform.GetComponent<HealthSystem>().OnDamageDealt(50);
+        //            if (hits[0].transform.GetComponent<HealthSystem>().health < 0)
+        //            {
+        //                playerScore++;
+        //            }
+        //        }
 
-                StartCoroutine(AttackCooldown());
-            }
-        }
-        else
-        {
+        //        StartCoroutine(AttackCooldown());
+        //    }
+        //}
+        //else
+        //{
 
-            movementSpeedMultiplier = 1f;
-        }
+        //    movementSpeedMultiplier = 1f;
+        //}
     }
 
     private IEnumerator AttackCooldown()

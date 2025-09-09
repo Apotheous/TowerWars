@@ -4,9 +4,10 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayersPlacement : MonoBehaviour
+public class PlayersPlacement : NetworkBehaviour
 {
     [SerializeField] private Transform Player1Transform, Player2Transform;
+
     void Start()
     {
         StartCoroutine(PlacePlayersDelayed());
@@ -20,23 +21,26 @@ public class PlayersPlacement : MonoBehaviour
 
     public void PlaceLocalPlayer()
     {
-     
+        var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
 
-        var player1 = NetworkManager.Singleton.ConnectedClients[0].PlayerObject;
-        if (player1 != null)
+        if (localPlayer != null)
         {
-            player1.transform.SetPositionAndRotation(Player1Transform.position, Player1Transform.rotation);
-            Debug.Log("Player1 yerleþtirildi.");
-        }
+            // Client ID'ye göre pozisyon belirle
+            ulong clientId = NetworkManager.Singleton.LocalClientId;
 
-        var player2 = NetworkManager.Singleton.ConnectedClients[1].PlayerObject;
-        if (player2 != null)
-        {
-            player2.transform.SetPositionAndRotation(Player2Transform.position, Player2Transform.rotation);
-            Debug.Log("Player2 yerleþtirildi.");
+            if (clientId == 1) // Ýlk oyuncu
+            {
+                localPlayer.transform.SetPositionAndRotation(Player1Transform.position, Player1Transform.rotation);
+                Debug.Log("Local Player (Player1) yerleþtirildi.");
+            }
+            else if (clientId == 2) // Ýkinci oyuncu
+            {
+                localPlayer.transform.SetPositionAndRotation(Player2Transform.position, Player2Transform.rotation);
+                Debug.Log("Local Player (Player2) yerleþtirildi.");
+            }
         }
-        
     }
-
-
 }
+
+
+
