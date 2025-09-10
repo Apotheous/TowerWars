@@ -251,6 +251,7 @@ public class MatchMakerManager : NetworkBehaviour
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Timeout)
                 {
                     Debug.Log("Match timeout");
+                    ClientJoin();
                     return;
                 }
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Failed)

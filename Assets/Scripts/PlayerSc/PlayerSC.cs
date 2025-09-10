@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -9,6 +10,11 @@ public class PlayerSC : NetworkBehaviour
 {
     [SerializeField] float movementSpeedBase = 5;
 
+    // PlayerData'dan gelen health verileri
+
+    public NetworkVariable<float> myInitialHealth = new NetworkVariable<float>(100);
+    public NetworkVariable<float> myCurrentHealth = new NetworkVariable<float>(100);
+    
 
     //private Rigidbody2D rb;
     private float movementSpeedMultiplier;
@@ -22,8 +28,15 @@ public class PlayerSC : NetworkBehaviour
             enabled = false;
             return;
         }
-    }
+        //myCurrentHealthText.text = myCurrentHealth.Value.ToString();
+        //GeneralUISingleton.Instance.PlayerCurrentHealth(myCurrentHealth.Value);
 
+    }
+    private void UpdateMyCurrentHealth(float damage)
+    {
+        myCurrentHealth.Value += damage;
+        GeneralUISingleton.Instance.PlayerCurrentHealth(myCurrentHealth.Value);
+    }
     void Start()
     {
 
