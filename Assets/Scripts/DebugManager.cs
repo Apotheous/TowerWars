@@ -94,7 +94,7 @@ public class DebugManager : NetworkBehaviour
     public void Log3(string message)
     {
         Debug.Log(message); // Unity Console’a da yaz
-        if (text1 != null)
+        if (text3 != null)
         {
             text3.text += $"\n{message}";
         }

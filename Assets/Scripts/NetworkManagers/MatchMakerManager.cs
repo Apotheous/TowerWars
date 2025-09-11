@@ -223,42 +223,63 @@ public class MatchMakerManager : NetworkBehaviour
     {
         await CreateAndStoreTicketAsync();
         await PollTicketStatusAsync(currentTicket);
+        DebugManager.Instance?.Log(currentTicket.ToString());
+        DebugManager.Instance?.Log2(currentTicket.ToString());
+        DebugManager.Instance?.ForUpdate(currentTicket.ToString());
     }
 
     private async Task CreateAndStoreTicketAsync()
     {
+        // Matchmaker queue için ticket oluþturma seçeneklerini ayarla
+        // "MyQueue" adlý queue'ya katýlmak için gerekli parametreleri belirle
         CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
             new Dictionary<string, object> { { "GameMode", "EasyMode" } });
 
+        // Bu ticket için oyuncu listesini oluþtur
+        // Þu anda sadece bu client'ýn oyuncusu (AuthenticationService'den alýnan PlayerId) eklenir
         List<Player> players = new List<Player>
         {
             new Player(AuthenticationService.Instance.PlayerId)
         };
-
+        // Matchmaker servisine ticket oluþturma isteði gönder
+        // Bu asenkron iþlem tamamlandýðýnda CreateTicketResponse döner
         CreateTicketResponse createTicketResponse =
             await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
 
+        // Dönen response'dan ticket ID'yi al ve currentTicket deðiþkeninde sakla
+        // Bu ID daha sonra ticket durumunu kontrol etmek için kullanýlacak
         currentTicket = createTicketResponse.Id;
 
         Debug.Log($"Ticket created: {currentTicket}");
+        DebugManager.Instance?.Log3(currentTicket.ToString());
     }
 
     private async Task PollTicketStatusAsync(string ticketId)
     {
+        // Sonsuz döngü - ticket durumu sürekli kontrol edilir
         while (true)
         {
+            // Matchmaker servisinden verilen ticket ID'nin durumunu asenkron olarak sorgula
+            // Bu iþlem ticket'ýn hangi aþamada olduðunu (beklemede, atanmýþ, vs.) döner
             TicketStatusResponse ticketStatusResponse =
                 await MatchmakerService.Instance.GetTicketAsync(ticketId);
-
+            // Eðer ticket durumu MultiplayAssignment tipindeyse (sunucu atanmýþ demektir)
             if (ticketStatusResponse.Type == typeof(MultiplayAssignment))
             {
+                // Response'u MultiplayAssignment tipine cast et
+                // Bu assignment sunucu IP, port ve diðer baðlantý bilgilerini içerir
                 var assignment = (MultiplayAssignment)ticketStatusResponse.Value;
+
+                // Assignment'ý iþle (sunucuya baðlanma iþlemi)
+                // HandleAssignmentAsync metodu true/false döner (baþarýlý/baþarýsýz)
                 bool handled = await HandleAssignmentAsync(assignment);
 
+                // Eðer assignment baþarýyla iþlendiyse (baþarýlý veya baþarýsýz olsun)
                 if (handled)
-                    return; // baþarýlý ya da baþarýsýz ? döngüden çýk
+                    return; // Polling döngüsünden çýk - iþlem tamamlandý
             }
-
+            // 1 saniye bekle ve tekrar ticket durumunu kontrol et
+            // Bu sürekli spam yapmayý önler ve sunucuya aþýrý yük bindirmez
             await Task.Delay(1000);
         }
     }
