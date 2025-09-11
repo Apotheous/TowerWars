@@ -221,55 +221,77 @@ public class MatchMakerManager : NetworkBehaviour
 
     public async void ClientJoin()
     {
+        await CreateAndStoreTicketAsync();
+        await PollTicketStatusAsync(currentTicket);
+    }
+
+    private async Task CreateAndStoreTicketAsync()
+    {
         CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
-            new Dictionary<string, object> { { "GameMode", "EasyMode" } });//gameModeDropdown.options[gameModeDropdown.value].text
+            new Dictionary<string, object> { { "GameMode", "EasyMode" } });
 
-        List<Player> players = new List<Player> { new Player(AuthenticationService.Instance.PlayerId) };
+        List<Player> players = new List<Player>
+        {
+            new Player(AuthenticationService.Instance.PlayerId)
+        };
 
-        CreateTicketResponse createTicketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
+        CreateTicketResponse createTicketResponse =
+            await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
+
         currentTicket = createTicketResponse.Id;
-        Debug.Log("Ticket created");
 
+        Debug.Log($"Ticket created: {currentTicket}");
+    }
+
+    private async Task PollTicketStatusAsync(string ticketId)
+    {
         while (true)
         {
-            TicketStatusResponse ticketStatusResponse = await MatchmakerService.Instance.GetTicketAsync(createTicketResponse.Id);
+            TicketStatusResponse ticketStatusResponse =
+                await MatchmakerService.Instance.GetTicketAsync(ticketId);
 
             if (ticketStatusResponse.Type == typeof(MultiplayAssignment))
             {
-                MultiplayAssignment multiplayAssignment = (MultiplayAssignment)ticketStatusResponse.Value;
+                var assignment = (MultiplayAssignment)ticketStatusResponse.Value;
+                bool handled = await HandleAssignmentAsync(assignment);
 
-                if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Found)
-                {
-                    UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-                    transport.SetConnectionData(multiplayAssignment.Ip, ushort.Parse(multiplayAssignment.Port.ToString()));
-                    NetworkManager.Singleton.StartClient();
-
-                    Debug.Log("Match found");
-
-                    return;
-                }
-                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Timeout)
-                {
-                    Debug.Log("Match timeout");
-                    ClientJoin();
-                    return;
-                }
-                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Failed)
-                {
-                    Debug.Log("Match failed" + multiplayAssignment.Status + "  " + multiplayAssignment.Message);
-                    return;
-                }
-                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.InProgress)
-                {
-                    Debug.Log("Match is in progress");
-
-                }
-
+                if (handled)
+                    return; // baþarýlý ya da baþarýsýz ? döngüden çýk
             }
 
             await Task.Delay(1000);
         }
+    }
 
+    private async Task<bool> HandleAssignmentAsync(MultiplayAssignment assignment)
+    {
+        switch (assignment.Status)
+        {
+            case MultiplayAssignment.StatusOptions.Found:
+                UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+                transport.SetConnectionData(assignment.Ip, ushort.Parse(assignment.Port.ToString()));
+                NetworkManager.Singleton.StartClient();
+
+                Debug.Log("? Match found, connecting to server...");
+                return true;
+
+            case MultiplayAssignment.StatusOptions.Timeout:
+                Debug.Log("?? Match timeout, retrying...");
+                await CreateAndStoreTicketAsync();
+                return false; // yeniden ticket oluþturulup polling devam edecek
+
+            case MultiplayAssignment.StatusOptions.Failed:
+                Debug.LogError($"? Match failed: {assignment.Message}");
+                return true;
+
+            case MultiplayAssignment.StatusOptions.InProgress:
+                Debug.Log("? Match is still in progress...");
+                return false;
+
+            default:
+                Debug.LogWarning("Unknown assignment status");
+                return false;
+        }
     }
 
 
