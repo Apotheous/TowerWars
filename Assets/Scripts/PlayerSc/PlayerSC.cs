@@ -12,9 +12,8 @@ public class PlayerSC : NetworkBehaviour
 
     // PlayerData'dan gelen health verileri
 
-    public NetworkVariable<float> myInitialHealth = new NetworkVariable<float>(100);
-    public NetworkVariable<float> myCurrentHealth = new NetworkVariable<float>(100);
-    
+    [SerializeField] private PlayerGameData playerGameData;
+
 
     //private Rigidbody2D rb;
     private float movementSpeedMultiplier;
@@ -28,25 +27,20 @@ public class PlayerSC : NetworkBehaviour
             enabled = false;
             return;
         }
-        //myCurrentHealthText.text = myCurrentHealth.Value.ToString();
-        //GeneralUISingleton.Instance.PlayerCurrentHealth(myCurrentHealth.Value);
+        playerGameData.Initialize(); // NetworkVariable'ý baþlat
+        //GeneralUISingleton.Instance.PlayerCurrentHealth(playerGameData.currentHealth.Value);
 
     }
     private void UpdateMyCurrentHealth(float damage)
     {
-        myCurrentHealth.Value += damage;
-        GeneralUISingleton.Instance.PlayerCurrentHealth(myCurrentHealth.Value);
+        playerGameData.currentHealth.Value += damage;
+        GeneralUISingleton.Instance.PlayerCurrentHealth(playerGameData.currentHealth.Value);
     }
-    void Start()
-    {
 
-        //rb = GetComponent<Rigidbody2D>();
-    }
 
     void Update()
     {
         Move();
-        Attack();
     }
 
     private void Move()
@@ -61,41 +55,16 @@ public class PlayerSC : NetworkBehaviour
     }
 
 
-    private bool canAttack = true;
-    private void Attack()
+
+}
+[System.Serializable]
+public class PlayerGameData
+{
+    public float initialHealth = 100f;  // editörde gözükecek
+    [HideInInspector] public NetworkVariable<float> currentHealth; // network-only
+
+    public void Initialize()
     {
-        //if (Input.GetMouseButton(0))
-        //{
-        //    movementSpeedMultiplier = 0.5f;
-
-
-        //    if (canAttack)
-        //    {
-        //        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 1f, currentMoveDirection, 0, 1 << 6);
-
-        //        if (hits.Length > 0)
-        //        {
-        //            hits[0].transform.GetComponent<HealthSystem>().OnDamageDealt(50);
-        //            if (hits[0].transform.GetComponent<HealthSystem>().health < 0)
-        //            {
-        //                playerScore++;
-        //            }
-        //        }
-
-        //        StartCoroutine(AttackCooldown());
-        //    }
-        //}
-        //else
-        //{
-
-        //    movementSpeedMultiplier = 1f;
-        //}
-    }
-
-    private IEnumerator AttackCooldown()
-    {
-        canAttack = false;
-        yield return new WaitForSeconds(1);
-        canAttack = true;
+        currentHealth = new NetworkVariable<float>(initialHealth);
     }
 }

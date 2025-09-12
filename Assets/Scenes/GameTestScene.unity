@@ -667,6 +667,7 @@ GameObject:
   - component: {fileID: 960009275}
   - component: {fileID: 960009273}
   - component: {fileID: 960009276}
+  - component: {fileID: 960009277}
   m_Layer: 0
   m_Name: ++++
   m_TagString: Untagged
@@ -736,26 +737,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7a7943e1c7feda44bd9eb79ccc63e3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1024959375 stripped
+--- !u!114 &960009277
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
-  m_PrefabInstance: {fileID: 1486827954422694856}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 960009272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1435527193 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
-  m_PrefabInstance: {fileID: 1486827954422694856}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 549f20b44ad3fef46a08d00fcaae35f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1702030765
@@ -974,10 +965,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitSelectionPanel: {fileID: 512063149}
   superPowerBtn: {fileID: 1486827954422694857}
+  soldierButton: {fileID: 0}
+  turretButton: {fileID: 0}
   slideDistance: 116
   animationDuration: 0.5
-  soldierBtn: {fileID: 1024959375}
-  turretBtn: {fileID: 1435527193}
 --- !u!1001 &1486827954422694856
 PrefabInstance:
   m_ObjectHideFlags: 0
