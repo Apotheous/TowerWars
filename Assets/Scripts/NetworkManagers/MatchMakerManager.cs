@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 public class MatchMakerManager : NetworkBehaviour
 {
     //[SerializeField] private TMP_Dropdown gameModeDropdown;
-
+    public static MatchMakerManager Instance;
     private PayloadAllocation payloadAllocation;
     private IMatchmakerService matchmakerService;
     private string backfillTicketId;
@@ -28,6 +28,19 @@ public class MatchMakerManager : NetworkBehaviour
 
 
     [SerializeField] string sceneName;
+
+    private void Awake()
+    {
+        // Eðer zaten bir Instance varsa ve bu o deðilse yok et
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject); // Sahne deðiþince kaybolmasýn
+    }
     private async void Start()
     {
         networkManager = NetworkManager.Singleton;
@@ -170,15 +183,6 @@ public class MatchMakerManager : NetworkBehaviour
         }
     }
 
-    public void CloseMyPanel()
-    {
-        myPanel.SetActive(false);
-    }
-    public void OpenMyPanel()
-    {
-        myPanel.SetActive(true);
-      
-    }
 
     private async void UpdateBackfillTicket()
     {
@@ -206,17 +210,7 @@ public class MatchMakerManager : NetworkBehaviour
         }
     }
 
-    private void OnApplicationQuit()
-    {
-        if (Application.platform != RuntimePlatform.LinuxServer)
-        {
-            if (networkManager.IsConnectedClient)
-            {
-                networkManager.Shutdown(true);
-                networkManager.DisconnectClient(OwnerClientId);
-            }
-        }
-    }
+
 
 
     public async void ClientJoin()
@@ -284,6 +278,65 @@ public class MatchMakerManager : NetworkBehaviour
         }
     }
 
+
+    // Sýradan çýk 
+    public async Task LeaveQueueAsync()
+    {
+        if (string.IsNullOrEmpty(currentTicket))
+        {
+            Debug.Log("Aktif ticket yok, sýradan çýkýlamaz.");
+            return;
+        }
+
+        try
+        {
+            // Önce ticket'ý iptal et
+            await MatchmakerService.Instance.DeleteTicketAsync(currentTicket);
+            Debug.Log($"Ticket iptal edildi: {currentTicket}");
+            currentTicket = null;
+
+            // Network baðlantýsýný temiz þekilde kapat
+            DisconnectFromNetwork();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"LeaveQueue hatasý: {ex.Message}");
+            // Hata olsa bile network'ü kapat
+            DisconnectFromNetwork();
+        }
+    }
+
+    private void DisconnectFromNetwork()
+    {
+        if (Application.platform != RuntimePlatform.LinuxServer)
+        {
+            if (networkManager != null && networkManager.IsConnectedClient)
+            {
+                Debug.Log("Network baðlantýsý kapatýlýyor...");
+                // Client olarak baðlantýyý kapat
+                networkManager.Shutdown();
+            }
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        // Eðer Linux sunucusu deðilse (client/host ise bu kýsým çalýþýr)
+        if (Application.platform != RuntimePlatform.LinuxServer)
+        {
+            // Eðer bu client bir networke baðlýysa
+            if (networkManager.IsConnectedClient)
+            {
+                // NetworkManager'ý kapat (true = zorla kapat)
+                // Bu tüm network baðlantýlarýný temizler
+                networkManager.Shutdown(true);
+                
+                // Bu client'ý network'ten kopar
+                // OwnerClientId = bu script'in sahibi olan client'ýn ID'si
+                networkManager.DisconnectClient(OwnerClientId);
+            }
+        }
+    }
     private async Task<bool> HandleAssignmentAsync(MultiplayAssignment assignment)
     {
         switch (assignment.Status)

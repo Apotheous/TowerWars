@@ -41,6 +41,14 @@ public class Counter : MonoBehaviour
         }
     }
 
+    // Sayaç sýfýrla
+    public void ResetCount()
+    {
+        StopCount(); // Önce sayacý durdur
+        seconds = 0f; // Zamaný sýfýrla
+        TimerTextWrite(); // Text'i güncelle (0:00 göstermek için)
+    }
+
     // Text’i güncelle
     private void TimerTextWrite()
     {
