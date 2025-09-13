@@ -666,7 +666,6 @@ GameObject:
   - component: {fileID: 960009274}
   - component: {fileID: 960009275}
   - component: {fileID: 960009273}
-  - component: {fileID: 960009276}
   - component: {fileID: 960009277}
   m_Layer: 0
   m_Name: ++++
@@ -689,6 +688,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player1Transform: {fileID: 321682433}
   Player2Transform: {fileID: 543206274}
+  spawnPoints:
+  - {fileID: 321682433}
+  - {fileID: 543206274}
 --- !u!4 &960009274
 Transform:
   m_ObjectHideFlags: 0
@@ -725,18 +727,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &960009276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 960009272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7a7943e1c7feda44bd9eb79ccc63e3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &960009277
 MonoBehaviour:
   m_ObjectHideFlags: 0

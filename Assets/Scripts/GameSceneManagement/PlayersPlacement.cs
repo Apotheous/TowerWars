@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class PlayersPlacement : NetworkBehaviour
 {
-    [SerializeField] private Transform Player1Transform, Player2Transform;
 
+    [SerializeField] private List<Transform> spawnPoints;
     void Start()
     {
         StartCoroutine(PlacePlayersDelayed());
@@ -15,31 +15,18 @@ public class PlayersPlacement : NetworkBehaviour
 
     IEnumerator PlacePlayersDelayed()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         PlaceLocalPlayer();
     }
 
     public void PlaceLocalPlayer()
     {
         var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
+        int index = (int)NetworkManager.Singleton.LocalClientId % spawnPoints.Count;
 
-        if (localPlayer != null)
-        {
-            // Client ID'ye göre pozisyon belirle
-            ulong clientId = NetworkManager.Singleton.LocalClientId;
-
-            if (clientId == 1) // Ýlk oyuncu
-            {
-                localPlayer.transform.SetPositionAndRotation(Player1Transform.position, Player1Transform.rotation);
-                Debug.Log("Local Player (Player1) yerleþtirildi.");
-            }
-            else if (clientId == 2) // Ýkinci oyuncu
-            {
-                localPlayer.transform.SetPositionAndRotation(Player2Transform.position, Player2Transform.rotation);
-                Debug.Log("Local Player (Player2) yerleþtirildi.");
-            }
-        }
+        localPlayer.transform.SetPositionAndRotation(spawnPoints[index].position, spawnPoints[index].rotation);
     }
+
 }
 
 
