@@ -28,8 +28,11 @@ public class PlayerSC : NetworkBehaviour
     public event Action OnLevelUp;
 
     private const float LEVEL_UP_THRESHOLD = 100f;
+
     #endregion
 
+    [SerializeField] Transform myweapon;
+    [SerializeField] GameObject bulletPrefab;
     public override void OnNetworkSpawn()
     {
         // Sadece owner input ve gain işlemleri yapacak
@@ -38,6 +41,9 @@ public class PlayerSC : NetworkBehaviour
             enabled = false;
             return;
         }
+        currentHealth.OnValueChanged += HandleHealthChanged;
+
+      
 
         // NetworkVariable değişimlerini dinle
         TechPoint.OnValueChanged += HandleTechPointChanged;
@@ -55,6 +61,14 @@ public class PlayerSC : NetworkBehaviour
 
         // Owner kendi puanını artırabilir
         InvokeRepeating(nameof(GainTechPoints), 2f, 2f);
+    }
+
+    private void HandleHealthChanged(float oldValue, float newValue)
+    {
+        if (IsOwner)
+        {
+            GeneralUISingleton.Instance.PlayerCurrentHealth(newValue);
+        }
     }
 
     #region TechPoint Logic
@@ -115,15 +129,29 @@ public class PlayerSC : NetworkBehaviour
     }
     #endregion
 
+    [ServerRpc]
+    private void FireBulletServerRpc()
+    {
+        // Server authoritative spawn
+        GameObject bullet = Instantiate(bulletPrefab, myweapon.position, myweapon.rotation);
+        bullet.GetComponent<NetworkObject>().Spawn();
+    }
+
     #region Movement
     private void Update()
     {
+        if (!IsOwner) return;
         Move();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            FireBulletServerRpc();
+        }
     }
 
     private void Move()
     {
-        if (!IsOwner) return;
+
 
         float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sağ ok
         float v = Input.GetAxis("Vertical");   // W, S veya Yukarı/Aşağı ok

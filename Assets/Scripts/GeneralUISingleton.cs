@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 
@@ -22,16 +23,9 @@ public class GeneralUISingleton : MonoBehaviour
         Instance = this;
         //DontDestroyOnLoad(gameObject); // Sahne deðiþince kaybolmasýn
     }
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+
 
     public void PlayerCurrentHealth(float health)
     {

@@ -87,7 +87,6 @@ public class MatchMakerManager : NetworkBehaviour
     private void HandleClientConnected(ulong clientId)
     {
         Debug.Log($"Player connected! ClientId: {clientId}");
-        DebugManager.Instance.Log3(networkManager.ConnectedClientsIds.Count.ToString());
         CheckConnectedTwoPlayers();
 
     }
@@ -215,11 +214,56 @@ public class MatchMakerManager : NetworkBehaviour
 
     public async void ClientJoin()
     {
-        await CreateAndStoreTicketAsync();
-        await PollTicketStatusAsync(currentTicket);
-        DebugManager.Instance?.Log(currentTicket.ToString());
-        DebugManager.Instance?.Log2(currentTicket.ToString());
-        DebugManager.Instance?.ForUpdate(currentTicket.ToString());
+        //await CreateAndStoreTicketAsync();
+        //await PollTicketStatusAsync(currentTicket);
+        CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
+           new Dictionary<string, object> { { "GameMode", "EasyMode" } });//gameModeDropdown.options[gameModeDropdown.value].text
+
+        List<Player> players = new List<Player> { new Player(AuthenticationService.Instance.PlayerId) };
+
+        CreateTicketResponse createTicketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
+        currentTicket = createTicketResponse.Id;
+        Debug.Log("Ticket created");
+
+        while (true)
+        {
+            TicketStatusResponse ticketStatusResponse = await MatchmakerService.Instance.GetTicketAsync(createTicketResponse.Id);
+
+            if (ticketStatusResponse.Type == typeof(MultiplayAssignment))
+            {
+                MultiplayAssignment multiplayAssignment = (MultiplayAssignment)ticketStatusResponse.Value;
+
+                if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Found)
+                {
+                    UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+                    transport.SetConnectionData(multiplayAssignment.Ip, ushort.Parse(multiplayAssignment.Port.ToString()));
+                    NetworkManager.Singleton.StartClient();
+
+                    Debug.Log("Match found");
+
+                    return;
+                }
+                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Timeout)
+                {
+                    Debug.Log("Match timeout");
+                    ClientJoin();
+                    return;
+                }
+                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Failed)
+                {
+                    Debug.Log("Match failed" + multiplayAssignment.Status + "  " + multiplayAssignment.Message);
+                    return;
+                }
+                else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.InProgress)
+                {
+                    Debug.Log("Match is in progress");
+
+                }
+
+            }
+
+            await Task.Delay(1000);
+        }
     }
 
     private async Task CreateAndStoreTicketAsync()

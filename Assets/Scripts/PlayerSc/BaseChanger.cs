@@ -39,7 +39,7 @@ public class BaseChanger : NetworkBehaviour
             }
             else if (clientId == 2) // İkinci oyuncu
             {
-                DebugManager.Instance.Log3("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!++++++");
+                DebugManager.Instance.Log("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!++++++");
 
             }
         }
