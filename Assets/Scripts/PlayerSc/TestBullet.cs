@@ -27,6 +27,9 @@ public class TestBullet : NetworkBehaviour
         if (player != null)
         {
             player.UpdateMyCurrentHealth(-damage); // Hasar uygula
+            player.UpdateMyScrap(damage);
+            player.UpdateExpPointIncrease(damage);
+
             Destroy(gameObject); // çarpýnca yok et
         }
     }

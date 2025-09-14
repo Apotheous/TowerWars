@@ -15,6 +15,7 @@ public class MatchMakerManager : NetworkBehaviour
 {
     //[SerializeField] private TMP_Dropdown gameModeDropdown;
     public static MatchMakerManager Instance;
+
     private PayloadAllocation payloadAllocation;
     private IMatchmakerService matchmakerService;
     private string backfillTicketId;
@@ -22,10 +23,7 @@ public class MatchMakerManager : NetworkBehaviour
     private NetworkManager networkManager;
     private string currentTicket;
 
-
-    [SerializeField] private TextMeshProUGUI onlinePlayerCountText;
-    [SerializeField] private GameObject myPanel;
-
+    [SerializeField] private MatchMakerUI matchMakerUI;
 
     [SerializeField] string sceneName;
 
@@ -98,8 +96,9 @@ public class MatchMakerManager : NetworkBehaviour
 
     private void CheckConnectedTwoPlayers()
     {
-        if (networkManager.ConnectedClientsIds.Count==2)
+        if (networkManager.ConnectedClientsList.Count==2)
         {
+
             LoadGameScene(sceneName);
         }
     }
@@ -121,10 +120,13 @@ public class MatchMakerManager : NetworkBehaviour
         // NetworkManager'ýn SceneManager'ýný kullan
         var status = NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
 
+
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogError($"Failed to start loading scene {sceneName}");
         }
+
+
     }
 
     private void PrepareSceneTransition()

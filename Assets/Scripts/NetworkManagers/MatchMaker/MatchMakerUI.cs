@@ -12,6 +12,8 @@ public class MatchMakerUI : MonoBehaviour
 
     [SerializeField] private GameObject queuePanel;
 
+    [SerializeField] private GameObject MainMenuCanvas;
+
     [SerializeField] private Counter counter;   
     void Start()
     {
@@ -34,11 +36,15 @@ public class MatchMakerUI : MonoBehaviour
 
     private void OpenQueuePanel()
     {
-        queuePanel.SetActive(true);
+        queuePanel?.SetActive(true);
     }
     private void CloseQueuePanel()
     {
         queuePanel?.SetActive(false);
+    }
+    public void CloseCloseCanvas()
+    {
+        MainMenuCanvas?.SetActive(false);
     }
 
 }

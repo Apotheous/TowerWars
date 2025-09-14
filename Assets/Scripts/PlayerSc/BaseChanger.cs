@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class BaseChanger : NetworkBehaviour
 {
-    private PlayerSC player;
+    [SerializeField] private PlayerSC player;
     void Start()
     {
         // Sahnedeki PlayerSC’yi bul (ilk bulduğu)
-        player = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerSC>();
+        //player = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerSC>();
 
         if (player != null)
         {

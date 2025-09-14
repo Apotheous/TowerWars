@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2898137128
+  GlobalObjectIdHash: 1697659862
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -157,11 +157,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eae61f895a7f1da48a6a5b829edd06cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeedBase: 5
-  currentHealth:
+  initalHealth:
     m_InternalValue: 100
-  TechPoint:
+  mycurrentHealth:
+    m_InternalValue: 100
+  myExpPoint:
     m_InternalValue: 0
+  myCurrentScrap:
+    m_InternalValue: 0
+  movementSpeedBase: 5
   myweapon: {fileID: 1428121347879896040}
   bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
 --- !u!114 &-3205990569949793416
@@ -204,6 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 534afb19ca2c8ec41add0e4e04b520d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 8317383942155078386}
 --- !u!65 &1830836544445083796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2077,7 +2082,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8703940311844072726
 Transform:
   m_ObjectHideFlags: 0
@@ -2172,6 +2177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 534afb19ca2c8ec41add0e4e04b520d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
 --- !u!1 &8625222891394113530
 GameObject:
   m_ObjectHideFlags: 0

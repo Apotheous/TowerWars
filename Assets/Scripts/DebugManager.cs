@@ -83,6 +83,10 @@ public class DebugManager : NetworkBehaviour
             text1.text += $"\n{message}";
         }
     }
+    /// <summary>
+    /// Buraya Yazfalan
+    /// </summary>
+  
     public void Log2(string message)
     {
         Debug.Log(message); // Unity Console’a da yaz
@@ -91,6 +95,8 @@ public class DebugManager : NetworkBehaviour
             Text2Ýnt.text += $"\n{message}";
         }
     }
+
+    
     public void Log3(string message)
     {
         Debug.Log(message); // Unity Console’a da yaz

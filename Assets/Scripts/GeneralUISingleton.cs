@@ -10,6 +10,8 @@ public class GeneralUISingleton : MonoBehaviour
 
 
     [SerializeField] private TextMeshProUGUI playerCurrenthHealth;
+    [SerializeField] private TextMeshProUGUI myScrapTexter;
+    [SerializeField] private TextMeshProUGUI myExpTexter;
 
     private void Awake()
     {
@@ -27,8 +29,20 @@ public class GeneralUISingleton : MonoBehaviour
 
 
 
-    public void PlayerCurrentHealth(float health)
+    public void PlayerCurrentHealthWrite(float health)
     {
         playerCurrenthHealth.text = health.ToString();
     }
+
+    public void PlayerScrapWrite(float scrap)
+    {
+        myScrapTexter.text = scrap.ToString();
+    }
+    public void PlayerExpWrite(float exp)
+    {
+        myExpTexter.text = exp.ToString();
+    }
+
+
+
 }

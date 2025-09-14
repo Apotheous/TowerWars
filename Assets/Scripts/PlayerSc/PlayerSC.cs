@@ -3,25 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using static PlayerScene_and_Game_Mode_Changer;
-//using NFloat = Unity.Netcode.NetworkVariable<float>;
+using NFloat = Unity.Netcode.NetworkVariable<float>;
 
 public class PlayerSC : NetworkBehaviour
 {
 
-    [Header("Movement Settings")]
-    [SerializeField] float movementSpeedBase = 5f;
 
     #region Player Data
     [Header("Player Stats")]
+    // NetworkVariable olarak Player Data’yı direkt burada tanımlıyoruz
+    public NetworkVariable<float> initalHealth = new NetworkVariable<float>();
 
     // NetworkVariable olarak Player Data’yı direkt burada tanımlıyoruz
-    public NetworkVariable<float> currentHealth = new NetworkVariable<float>(100f);
-    //public NFloat currentHealth = new NFloat(100f);
-    public NetworkVariable<float> TechPoint = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> mycurrentHealth = new NetworkVariable<float>();
+
+
+    //public NFloat currentHealth2 = new NFloat(100f);
+    public NetworkVariable<float> myExpPoint = new NetworkVariable<float>(0f);
+
+
+
+    public NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>(0f);
+    // Custom eventler
+    public event Action<float, float> OnScrapChanged;
+
+
 
     // Custom eventler
     public event Action<float, float> OnTechPointChanged;
@@ -29,7 +40,15 @@ public class PlayerSC : NetworkBehaviour
 
     private const float LEVEL_UP_THRESHOLD = 100f;
 
+
+
+
+
     #endregion
+
+
+    [Header("Movement Settings")]
+    [SerializeField] float movementSpeedBase = 5f;
 
     [SerializeField] Transform myweapon;
     [SerializeField] GameObject bulletPrefab;
@@ -41,12 +60,19 @@ public class PlayerSC : NetworkBehaviour
             enabled = false;
             return;
         }
-        currentHealth.OnValueChanged += HandleHealthChanged;
 
-      
+
+        //Stat abonelikleri
+        //canı değişiklik olduğunda ötecek sisteme bağlamak
+        mycurrentHealth.OnValueChanged += OnHealthChanged;
+
+
+        myCurrentScrap.OnValueChanged += OnMyScrapChanged;
+
 
         // NetworkVariable değişimlerini dinle
-        TechPoint.OnValueChanged += HandleTechPointChanged;
+        myExpPoint.OnValueChanged += OnExpPointChanged;
+
 
         // Debug için event subscribe (isteğe bağlı)
         OnTechPointChanged += (oldValue, newValue) =>
@@ -59,85 +85,38 @@ public class PlayerSC : NetworkBehaviour
             Debug.Log("[PlayerSC] LEVEL UP TRIGGERED!");
         };
 
-        // Owner kendi puanını artırabilir
-        InvokeRepeating(nameof(GainTechPoints), 2f, 2f);
+
     }
 
-    private void HandleHealthChanged(float oldValue, float newValue)
+    #region Player Stats abonelikler
+    private void OnHealthChanged(float previous, float current)
     {
         if (IsOwner)
         {
-            GeneralUISingleton.Instance.PlayerCurrentHealth(newValue);
+            GeneralUISingleton.Instance.PlayerCurrentHealthWrite(current);
         }
     }
-
-    #region TechPoint Logic
-    private void HandleTechPointChanged(float oldValue, float newValue)
+    private void OnMyScrapChanged(float previous, float current)
     {
-        // Event forward
-        OnTechPointChanged?.Invoke(oldValue, newValue);
-
-        // Level-up kontrolü
-        if (newValue >= LEVEL_UP_THRESHOLD && oldValue < LEVEL_UP_THRESHOLD)
+        if (IsOwner)
         {
-            Debug.Log("Player leveled up!");
-            OnLevelUp?.Invoke();
+            GeneralUISingleton.Instance.PlayerScrapWrite(current);
         }
     }
-
-    private void GainTechPoints()
+    private void OnExpPointChanged(float previous, float current)
     {
-        if (IsServer)
+        if (IsOwner)
         {
-            // Server authoritative → direkt değiştir
-            TechPoint.Value += 25f;
-        }
-        else
-        {
-            // Client → ServerRpc üzerinden artır
-            RequestGainTechPointsServerRpc(25f);
+            GeneralUISingleton.Instance.PlayerExpWrite(current);
         }
     }
 
-    [ServerRpc]
-    private void RequestGainTechPointsServerRpc(float amount)
-    {
-        TechPoint.Value += amount;
-    }
+
+
+
     #endregion
 
-    #region Health Logic
-    public void UpdateMyCurrentHealth(float damage)
-    {
-        if (IsServer)
-        {
-            currentHealth.Value += damage;
-        }
-        else
-        {
-            RequestUpdateHealthServerRpc(damage);
-        }
 
-        // UI güncellemesi
-        GeneralUISingleton.Instance.PlayerCurrentHealth(currentHealth.Value);
-    }
-
-    [ServerRpc]
-    private void RequestUpdateHealthServerRpc(float damage)
-    {
-        currentHealth.Value += damage;
-    }
-    #endregion
-
-    [ServerRpc]
-    private void FireBulletServerRpc()
-    {
-        // Server authoritative spawn
-        GameObject bullet = Instantiate(bulletPrefab, myweapon.position, myweapon.rotation);
-        bullet.GetComponent<NetworkObject>().Spawn();
-    }
-
-    #region Movement
     private void Update()
     {
         if (!IsOwner) return;
@@ -147,6 +126,24 @@ public class PlayerSC : NetworkBehaviour
         {
             FireBulletServerRpc();
         }
+    }
+
+
+
+
+
+
+
+
+    #region Movement and fire Yalandan
+
+
+    [ServerRpc]
+    private void FireBulletServerRpc()
+    {
+        // Server authoritative spawn
+        GameObject bullet = Instantiate(bulletPrefab, myweapon.position, myweapon.rotation);
+        bullet.GetComponent<NetworkObject>().Spawn();
     }
 
     private void Move()
@@ -162,4 +159,94 @@ public class PlayerSC : NetworkBehaviour
     #endregion
 
 
+
+    #region Health Logic
+
+    /// <summary>
+    /// Playerın currentHealth değerini değiştirir
+    /// </summary>
+    /// <param name="damage"></param>
+    public void UpdateMyCurrentHealth(float damage)
+    {
+        if (IsServer)
+        {
+            mycurrentHealth.Value += damage;
+        }
+        else
+        {
+            RequestUpdateHealthServerRpc(damage);
+        }
+    }
+
+    [ServerRpc]
+    private void RequestUpdateHealthServerRpc(float damage)
+    {
+        mycurrentHealth.Value += damage;
+    }
+    #endregion
+
+
+    #region Scrap Logic
+
+    /// <summary>
+    /// Playerın scrap değerini değiştirir
+    /// </summary>
+    /// <param name="damage"></param>
+    public void UpdateMyScrap(float amount)
+    {
+        if (IsServer)
+        {
+            myCurrentScrap.Value += amount;
+        }
+        else
+        {
+            RequestUpdateScrapServerRpc(amount);
+        }
+    }
+
+    [ServerRpc]
+    private void RequestUpdateScrapServerRpc(float amount)
+    {
+        myCurrentScrap.Value += amount;
+    }
+    #endregion
+
+
+    #region TechPoint Logic
+    private void HandleTechPointChanged(float oldValue, float newValue)
+    {
+        // Event forward
+        OnTechPointChanged?.Invoke(oldValue, newValue);
+
+        // Level-up kontrolü
+        if (newValue >= LEVEL_UP_THRESHOLD && oldValue < LEVEL_UP_THRESHOLD)
+        {
+            Debug.Log("Player leveled up!");
+            OnLevelUp?.Invoke();
+        }
+    }
+
+    public void UpdateExpPointIncrease(float amount)
+    {
+        if (IsServer)
+        {
+            // Server authoritative → direkt değiştir
+            myExpPoint.Value += amount;
+        }
+        else
+        {
+            // Client → ServerRpc üzerinden artır
+            RequestExpPointsServerRpc(amount);
+        }
+    }
+
+
+    [ServerRpc]
+    private void RequestExpPointsServerRpc(float amount)
+    {
+        myExpPoint.Value += amount;
+    }
+
+
+    #endregion
 }
