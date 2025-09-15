@@ -21,10 +21,14 @@ public class PlayersPlacement : NetworkBehaviour
 
     public void PlaceLocalPlayer()
     {
-        var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
-        int index = (int)NetworkManager.Singleton.LocalClientId % spawnPoints.Count;
+        if (NetworkManager.Singleton!=null)
+        {
+            var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject;
+            int index = (int)NetworkManager.Singleton.LocalClientId % spawnPoints.Count;
 
-        localPlayer.transform.SetPositionAndRotation(spawnPoints[index].position, spawnPoints[index].rotation);
+            localPlayer.transform.SetPositionAndRotation(spawnPoints[index].position, spawnPoints[index].rotation);
+        }
+       
     }
 
 }

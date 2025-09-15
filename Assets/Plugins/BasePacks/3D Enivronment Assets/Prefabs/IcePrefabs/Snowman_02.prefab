@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7706677956890513230}
   - component: {fileID: 7157000554707362235}
   - component: {fileID: 4533026801054422007}
-  - component: {fileID: 8070849969500290163}
   m_Layer: 0
   m_Name: Snowman_02
   m_TagString: Untagged
@@ -84,19 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!208 &8070849969500290163
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2196600302573777373}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 8.786, y: 10.243, z: 6.86}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: -0.023000002, y: 10.243, z: -0.032}
-  m_TimeToStationary: 0.5

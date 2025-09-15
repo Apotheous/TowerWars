@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7327834123462202445}
   - component: {fileID: 908986095060005578}
   - component: {fileID: 9014458185047583527}
-  - component: {fileID: 3151646743493738607}
   m_Layer: 0
   m_Name: IcePlatform_02
   m_TagString: Untagged
@@ -84,19 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!208 &3151646743493738607
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9065609774188061675}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 16.665, y: 2.219, z: 15.097001}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 1.368, y: 2.219, z: -0.48000002}
-  m_TimeToStationary: 0.5

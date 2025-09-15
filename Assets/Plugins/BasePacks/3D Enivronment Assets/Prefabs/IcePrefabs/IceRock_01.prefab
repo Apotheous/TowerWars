@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5963355862546683357}
   - component: {fileID: 726584986703599343}
   - component: {fileID: 6727801646480453112}
-  - component: {fileID: 100606701582024634}
   m_Layer: 0
   m_Name: IceRock_01
   m_TagString: Untagged
@@ -84,19 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!208 &100606701582024634
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8819208786060711880}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 2.97, y: 1.8240001, z: 1.8930001}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: -0.321, y: 1.6700001, z: 0.13700001}
-  m_TimeToStationary: 0.5

@@ -701,6 +701,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Plane
       objectReference: {fileID: 0}
+    - target: {fileID: 6915028109253254596, guid: be401859f5cac584da1f4e5203dcaa5d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 518027236ab174241b30c61236433e84, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be401859f5cac584da1f4e5203dcaa5d, type: 3}
 --- !u!4 &298144160284961219 stripped

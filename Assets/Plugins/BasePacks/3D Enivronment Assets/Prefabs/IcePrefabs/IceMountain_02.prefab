@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7422955339616670871}
   - component: {fileID: 587235629246266439}
   - component: {fileID: 8268872893083637430}
-  - component: {fileID: -3541286705254471027}
   m_Layer: 0
   m_Name: IceMountain_02
   m_TagString: Untagged
@@ -84,19 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!208 &-3541286705254471027
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7799598339947194755}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 40.607002, y: 33.043003, z: 35.919003}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 4.3710003, y: 33.043003, z: -7.4730005}
-  m_TimeToStationary: 0.5

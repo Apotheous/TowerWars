@@ -49,7 +49,7 @@ public class EnemySpawner : NetworkBehaviour
             {
                 Vector2 spawnPos = new Vector2(Random.Range(minSpawnPos.x, maxSpawnPos.x), Random.Range(minSpawnPos.y, maxSpawnPos.y));
                 Transform enemyTransform = Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
-                enemyTransform.GetComponent<Enemy>().enemySpawner = this;
+                enemyTransform.GetComponent<EnemyTemp>().enemySpawner = this;
                 enemyTransform.GetComponent<NetworkObject>().Spawn(true);
                 enemies.Add(enemyTransform);
 

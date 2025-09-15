@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(HealthSystem))]
 
-public class Enemy : NetworkBehaviour
+public class EnemyTemp : NetworkBehaviour
 {
     [SerializeField] float attackRange = 2;
     [SerializeField] int damage = 3;

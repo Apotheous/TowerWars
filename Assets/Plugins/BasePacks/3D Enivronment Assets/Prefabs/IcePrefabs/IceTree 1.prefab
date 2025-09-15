@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7451920675793060555}
   - component: {fileID: 4208102750845481888}
   - component: {fileID: 4176658481615072173}
-  - component: {fileID: -2484359481564303237}
   m_Layer: 0
   m_Name: IceTree 1
   m_TagString: Untagged
@@ -84,19 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!208 &-2484359481564303237
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5990300224523370596}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 16.315, y: 19.25, z: 14.184001}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: -1.001, y: 19.25, z: -2.9810002}
-  m_TimeToStationary: 0.5
