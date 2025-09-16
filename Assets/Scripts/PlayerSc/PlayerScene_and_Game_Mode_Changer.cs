@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class PlayerScene_and_Game_Mode_Changer : NetworkBehaviour
 {
+    [SerializeField] private PlayerComponentController playerComponentController;
     public enum PlayerMode
     {
         MainMenu,
@@ -42,6 +43,8 @@ public class PlayerScene_and_Game_Mode_Changer : NetworkBehaviour
             OnModeChanged?.Invoke(newValue);
             HandleModeChange(newValue);
         };
+        //HandleModeChange(PlayerMode.MainMenu);
+        playerComponentController.SetComponentsActive(false);
     }
 
     private void HandleModeChange(PlayerMode newMode)
@@ -51,11 +54,13 @@ public class PlayerScene_and_Game_Mode_Changer : NetworkBehaviour
             case PlayerMode.MainMenu:
                 Debug.Log("Mode changed to MainMenu");
                 if (oneVSOneMode) oneVSOneMode.SetActive(false);
+                playerComponentController.SetComponentsActive(false);
                 break;
 
             case PlayerMode.OneVsOne:
                 Debug.Log("Mode changed to OneVsOne");
                 if (oneVSOneMode) oneVSOneMode.SetActive(true);
+                playerComponentController.SetComponentsActive(true);
                 break;
         }
     }
