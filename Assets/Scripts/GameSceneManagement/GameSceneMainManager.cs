@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using static PlayerScene_and_Game_Mode_Changer;
 
-public class GameSceneMainManager : MonoBehaviour
+public class GameSceneMainManager : NetworkBehaviour
 {
     private void Start()
     {
@@ -13,7 +10,7 @@ public class GameSceneMainManager : MonoBehaviour
 
         if (player != null)
         {
-            var modeChanger = player.GetComponent<PlayerScene_and_Game_Mode_Changer>();
+            var modeChanger = player.GetComponent<Player_Game_Mode_Manager>();
             if (modeChanger != null)
             {
                 // Event örneði (mode deðiþtiðinde tetiklenecek)
@@ -22,13 +19,13 @@ public class GameSceneMainManager : MonoBehaviour
                 // Sadece sahibi serverRPC ile deðiþiklik yapabilir
                 if (modeChanger.IsOwner)
                 {
-                    modeChanger.SetModeServerRpc(PlayerScene_and_Game_Mode_Changer.PlayerMode.OneVsOne);
+                    modeChanger.RequestStartGameServerRpc();
                 }
             }
         }
     }
 
-    private void ModeChangedHandler(PlayerScene_and_Game_Mode_Changer.PlayerMode newMode)
+    private void ModeChangedHandler(Player_Game_Mode_Manager.PlayerMode newMode)
     {
         Debug.Log("GameSceneMainManager detected new mode: " + newMode);
         // Buraya ek oyun mantýklarý ekleyebilirsin

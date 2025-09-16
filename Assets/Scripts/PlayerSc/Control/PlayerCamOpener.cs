@@ -4,7 +4,7 @@ using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerCamPlacement : NetworkBehaviour
+public class PlayerCamOpener : NetworkBehaviour
 {
     [SerializeField] private Camera playerCamera;
 

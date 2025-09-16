@@ -192,13 +192,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 721576413610324778}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76546e1a976b15643ae0548161ab7f87, type: 3}
+  m_Script: {fileID: 11500000, guid: 531d0ead13566544cad0d00d8149d8f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerComponentController: {fileID: 560940281554677081}
-  oneVSOneMode: {fileID: 7966489065968556800}
-  _currentMode:
-    m_InternalValue: 0
+  playerCamera: {fileID: 6126111961810745838}
 --- !u!114 &7672791723624637143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,7 +480,7 @@ GameObject:
   - component: {fileID: 2815201450559361569}
   - component: {fileID: 2425442117047264991}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: MyBarrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

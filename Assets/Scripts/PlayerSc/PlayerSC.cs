@@ -7,7 +7,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-using static PlayerScene_and_Game_Mode_Changer;
+using static Player_Game_Mode_Manager;
 using NFloat = Unity.Netcode.NetworkVariable<float>;
 
 public class PlayerSC : NetworkBehaviour
