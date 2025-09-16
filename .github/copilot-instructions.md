@@ -2,7 +2,7 @@
 - Project name: TowerWars
 - Unity version: Unity 2021.3.45f1
 - Active game object:
-  - Name: Main Camera
-  - Tag: MainCamera
+  - Name: DebugManager
+  - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
