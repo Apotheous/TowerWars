@@ -4,9 +4,9 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 
-public class GeneralUISingleton : MonoBehaviour
+public class OneVsOneGameSceneUISingleton : MonoBehaviour
 {
-    public static GeneralUISingleton Instance { get; private set; }
+    public static OneVsOneGameSceneUISingleton Instance { get; private set; }
 
 
     [SerializeField] private TextMeshProUGUI playerCurrenthHealth;

@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 247085208
+  GlobalObjectIdHash: 3977425626
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -77,7 +77,7 @@ MonoBehaviour:
   healthBar: {fileID: 7547361602274862805}
   myCost: 50
   myPrize: 50
-  myBarrel: {fileID: 0}
+  myBarrel: {fileID: 1265268758880465537}
   myRange: 5
 --- !u!195 &557825423593218548
 NavMeshAgent:

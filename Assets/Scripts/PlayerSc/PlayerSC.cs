@@ -93,21 +93,21 @@ public class PlayerSC : NetworkBehaviour
     {
         if (IsOwner)
         {
-            GeneralUISingleton.Instance.PlayerCurrentHealthWrite(current);
+            OneVsOneGameSceneUISingleton.Instance.PlayerCurrentHealthWrite(current);
         }
     }
     private void OnMyScrapChanged(float previous, float current)
     {
         if (IsOwner)
         {
-            GeneralUISingleton.Instance.PlayerScrapWrite(current);
+            OneVsOneGameSceneUISingleton.Instance.PlayerScrapWrite(current);
         }
     }
     private void OnExpPointChanged(float previous, float current)
     {
         if (IsOwner)
         {
-            GeneralUISingleton.Instance.PlayerExpWrite(current);
+            OneVsOneGameSceneUISingleton.Instance.PlayerExpWrite(current);
         }
     }
 

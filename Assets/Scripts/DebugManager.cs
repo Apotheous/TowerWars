@@ -25,53 +25,9 @@ public class DebugManager : NetworkBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Sahne deðiþince kaybolmasýn
+        //DontDestroyOnLoad(gameObject); // Sahne deðiþince kaybolmasýn
     }
 
-    private void Start()
-    {
-
-  
-    }
-
-
-    private void Update()
-    {
-        if (NetworkManager.Singleton.IsConnectedClient)
-        {
-            text1.text = " Baðlandý ="+NetworkManager.Singleton.ConnectedClientsIds.Count;
-        }
-        else { text1.text = " Baðlanýlýyor"; }
-        //onlinePlayerCountText.text = NetworkManager.Singleton.ConnectedClientsIds.Count.ToString();
-        //text3.text = NetworkManager.Singleton.ServerTime.ToString() ;
-    }
-    public void DenemeBtn()
-    {
-        //NetworkManager.Singleton.Shutdown();
-        if (NetworkManager.Singleton == null)
-        {
-            Text2Ýnt.text = "NetworkManager yok";
-            return;
-        }
-
-        if (NetworkManager.Singleton.IsServer)
-        {
-            // Server'da gerçek sayý
-            int count = NetworkManager.Singleton.ConnectedClientsList.Count;
-            Text2Ýnt.text = $"Online: {count}";
-        }
-        else if (NetworkManager.Singleton.IsClient)
-        {
-            // Client'ta sadece baðlantý durumu
-            Text2Ýnt.text = "Client - Baðlý Count = " + NetworkManager.Singleton.ConnectedClientsList.Count.ToString();
-        }
-        else
-        {
-            // Baðlantý yok
-            Text2Ýnt.text = "Offline";
-        }
-
-    }
     /// <summary>
     /// Debug mesajý ekrana basar.
     /// </summary>
