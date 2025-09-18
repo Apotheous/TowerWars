@@ -77,14 +77,7 @@ public class Enemy : MonoBehaviour
 
     private string currentState;
 
-    #region State Machine Variables
-    public EnemyStateMachine StateMachine { get; set; }
-    public EnemyIdleState IdleState { get; set; }
-    public EnemyChaseState ChaseState { get; set;}
-    public EnemyAttackState AttackState { get; set; }
-    public EnemyDieState DieState { get; set; }
 
-    #endregion
 
     #region Idle Veriables
     public float RandomMovementrange = 5f;
@@ -100,15 +93,7 @@ public class Enemy : MonoBehaviour
     public bool IsAggroed { get; set; }
     public bool IsWithinStrikeingDistance { get; set; }
 
-    private void Awake()
-    {
-        StateMachine = new EnemyStateMachine();
 
-        IdleState = new EnemyIdleState(this, StateMachine);
-        ChaseState = new EnemyChaseState(this, StateMachine);
-        AttackState = new EnemyAttackState(this, StateMachine);
-        DieState = new EnemyDieState(this, StateMachine);
-    }
     private void Start()
     {
         EnemyStartMeth();
@@ -119,7 +104,7 @@ public class Enemy : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         CurrentHealth = MaxHealth;
-        StateMachine.Initialize(IdleState);
+
         //TryModelController.Instance.enemies.Add(gameObject);
 
         InvokeRepeating("UpdateTargetWithGizmos", 0f, 0.5f);
@@ -133,14 +118,13 @@ public class Enemy : MonoBehaviour
        
 
 
-        StateMachine.CurrentEnemyState.FrameUpdate();
+
         //// Mevcut duruma bağlı olarak her kare güncellenir
         // StateMachine.CurrentEnemyState.FrameUpdate();
         if (target == null)
         {
             // Eğer target yoksa saldırı veya kovalama durumuna geçme
-            Debug.LogWarning("Target is null, not switching to Chase or Attack State.");
-            StateMachine.ChangeState(IdleState);
+
             return;
         }
         else
@@ -148,14 +132,14 @@ public class Enemy : MonoBehaviour
             //// Eğer düşman hedefe yakınsa ve saldırı menzilindeyse, saldırı durumuna geç
             if (Vector3.Distance(transform.position, target.position) < myWeapon.attackRange)
             {
-                StateMachine.ChangeState(AttackState);
+
                 // ChangeAnimationState(animatoinClass.ENEMY_SHOOT_AUTO);
 
             }
             // Eğer düşman hedefi görüyorsa ve menzile girdiyse kovala
             else if (Vector3.Distance(transform.position, target.position) < myWeapon.GizmosRange)
             {
-                StateMachine.ChangeState(ChaseState);
+
 
             }
             else
@@ -166,11 +150,6 @@ public class Enemy : MonoBehaviour
 
 
         
-    }
-
-    private void FixedUpdate()
-    {
-        StateMachine.CurrentEnemyState.PhysicsUpdate();
     }
 
 
@@ -229,14 +208,10 @@ public class Enemy : MonoBehaviour
         healthBar.fillAmount = CurrentHealth / MaxHealth;
         if (CurrentHealth <= 0)
         {
-            Die();
+ 
         }
     }
 
-    public void Die()
-    {
-        StateMachine.ChangeState(DieState);
-    }
 
     public void CheckForForwardOrBackFacing(Vector3 velocity)
     {
@@ -254,7 +229,7 @@ public class Enemy : MonoBehaviour
 
     private void AnimationTriggerEvent(AnimationTriggerType triggerType)
     {
-        StateMachine.CurrentEnemyState.AnimationTriggerEvent(triggerType);
+  
     }
 
     public enum AnimationTriggerType

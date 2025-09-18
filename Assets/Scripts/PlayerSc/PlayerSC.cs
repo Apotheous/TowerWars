@@ -120,7 +120,7 @@ public class PlayerSC : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
-        Move();
+        //Move();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -146,16 +146,16 @@ public class PlayerSC : NetworkBehaviour
         bullet.GetComponent<NetworkObject>().Spawn();
     }
 
-    private void Move()
-    {
+    //private void Move()
+    //{
 
 
-        float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sağ ok
-        float v = Input.GetAxis("Vertical");   // W, S veya Yukarı/Aşağı ok
+    //    float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sağ ok
+    //    float v = Input.GetAxis("Vertical");   // W, S veya Yukarı/Aşağı ok
 
-        Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
-        transform.Translate(move, Space.World);
-    }
+    //    Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
+    //    transform.Translate(move, Space.World);
+    //}
     #endregion
 
 

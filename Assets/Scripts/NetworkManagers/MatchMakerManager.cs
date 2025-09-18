@@ -96,11 +96,11 @@ public class MatchMakerManager : NetworkBehaviour
 
     private void CheckConnectedTwoPlayers()
     {
-        if (networkManager.ConnectedClientsList.Count==2)
+        if (IsServer && networkManager.ConnectedClientsList.Count == 2)
         {
-
             LoadGameScene(sceneName);
         }
+
     }
 
     public void LoadGameScene(string sceneName)

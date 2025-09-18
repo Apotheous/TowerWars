@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class BaseChanger : NetworkBehaviour
+public class BaseChangerListener : NetworkBehaviour
 {
     [SerializeField] private PlayerSC player;
+
+
     void Start()
     {
         // Sahnedeki PlayerSC’yi bul (ilk bulduğu)
-        //player = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerSC>();
+        player = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerSC>();
 
         if (player != null)
         {

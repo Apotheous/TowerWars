@@ -64,6 +64,7 @@ GameObject:
   - component: {fileID: 8317383942155078386}
   - component: {fileID: 4371309540473112813}
   - component: {fileID: 7672791723624637143}
+  - component: {fileID: 8526755292245196328}
   - component: {fileID: 560940281554677081}
   - component: {fileID: 1830836544445083796}
   - component: {fileID: 3473521663130239458}
@@ -106,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1697659862
+  GlobalObjectIdHash: 2898137128
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -195,6 +196,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 8317383942155078386}
+--- !u!114 &8526755292245196328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721576413610324778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f99112b811aa7a45bc7e1ec103e5f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerComponentController: {fileID: 560940281554677081}
+  myCam: {fileID: 7843161767407068067}
+  oneVSOneMode: {fileID: 7966489065968556800}
 --- !u!114 &560940281554677081
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ using UnityEngine;
 public class Player_Game_Mode_Manager : NetworkBehaviour
 {
     [SerializeField] private PlayerComponentController playerComponentController;
+    [SerializeField] private GameObject myCam;
     public enum PlayerMode
     {
         MainMenu,
@@ -37,6 +38,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
 
     private void Start()
     {
+        CurrentMode.Equals(PlayerMode.MainMenu);
         _currentMode.OnValueChanged += (oldValue, newValue) =>
         {
             OnModeChanged?.Invoke(newValue);
@@ -86,49 +88,5 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         // Şimdilik sadece "en az 2 oyuncu var mı" diye bakalım
         return NetworkManager.Singleton.ConnectedClients.Count >= 2;
     }
-
-
-
-    //private void Start()
-    //{
-    //    // NetworkVariable değişikliklerini dinle
-    //    _currentMode.OnValueChanged += (oldValue, newValue) =>
-    //    {
-    //        OnModeChanged?.Invoke(newValue);
-    //        HandleModeChange(newValue);
-    //    };
-    //    //HandleModeChange(PlayerMode.MainMenu);
-    //    playerComponentController.SetComponentsActive(false);
-    //}
-
-    //private void HandleModeChange(PlayerMode newMode)
-    //{
-    //    switch (newMode)
-    //    {
-    //        case PlayerMode.MainMenu:
-    //            Debug.Log("Mode changed to MainMenu");
-    //            if (oneVSOneMode) oneVSOneMode.SetActive(false);
-    //            playerComponentController.SetComponentsActive(false);
-    //            break;
-
-    //        case PlayerMode.OneVsOne:
-    //            Debug.Log("Mode changed to OneVsOne");
-    //            if (oneVSOneMode) oneVSOneMode.SetActive(true);
-    //            playerComponentController.SetComponentsActive(true);
-    //            break;
-    //    }
-    //}
-
-    //// Client bir değişiklik yapmak istediğinde server üzerinden değiştir
-    //[ServerRpc]
-    //public void SetModeServerRpc(PlayerMode newMode)
-    //{
-    //    currentMode = newMode;
-    //}
-
-
-
-
-
 
 }

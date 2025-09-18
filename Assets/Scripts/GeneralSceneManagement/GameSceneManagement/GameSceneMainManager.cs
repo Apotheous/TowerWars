@@ -1,8 +1,14 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
 public class GameSceneMainManager : NetworkBehaviour
 {
+   
+    public static event Action ActOnGameSceneStarted;
+    public static event Action ActOnGameSceneClosed;
+
+
     private void Start()
     {
         // Local player objesini al
@@ -24,6 +30,24 @@ public class GameSceneMainManager : NetworkBehaviour
             }
         }
     }
+
+    public void OnGameSceneOpening()
+    {
+        Debug.Log("MainSceneManager Start: Main scene initialized");
+
+        ActOnGameSceneStarted?.Invoke();
+    }
+    public void OnGameSceneClosed()
+    {
+        Debug.Log("MainSceneManager Start: Main scene initialized");
+
+        ActOnGameSceneClosed?.Invoke();
+    }
+
+
+
+
+
 
     private void ModeChangedHandler(Player_Game_Mode_Manager.PlayerMode newMode)
     {
