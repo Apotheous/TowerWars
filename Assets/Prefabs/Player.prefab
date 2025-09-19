@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1697659862
+  GlobalObjectIdHash: 2898137128
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1953,7 +1953,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7843161767407068067}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 68.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1994,7 +1994,7 @@ MonoBehaviour:
   zoomSpeed: 14
   limitZoom: 1
   zoomMin: 1
-  zoomMax: 40
+  zoomMax: 100
   panSpeedBoost: 1
   slowSpeed: 2.5
   fastSpeed: 40
@@ -2009,14 +2009,14 @@ MonoBehaviour:
   fastRotateSpeed: 100
   enableStartPosition: 1
   startX: 0
-  startY: 22.5
+  startY: 150
   startZ: -31
   enableStartXrotation: 1
   startRotX: 300
   enableStartYrotation: 1
   startRotY: 0
   enableStartZoom: 1
-  startZoom: 20
+  startZoom: 0
   rotRig: {fileID: 7235088432202574097}
   cameraTransform: {fileID: 7015347402704607611}
 --- !u!1 &7966489065968556800

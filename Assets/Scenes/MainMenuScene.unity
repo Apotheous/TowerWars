@@ -3836,7 +3836,7 @@ GameObject:
   - component: {fileID: 923445627}
   - component: {fileID: 923445626}
   m_Layer: 0
-  m_Name: +++NetworkManager+++
+  m_Name: +++NetworkManager++++++
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4432,7 +4432,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1156447459}
   m_Layer: 0
-  m_Name: ++++NetworkManagers++++++++++
+  m_Name: ++++++NetworkManagers++++++++++
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
