@@ -508,6 +508,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4799424189914545967, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
   m_PrefabInstance: {fileID: 1486827954422694856}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &512063150 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6523043247201192115, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
+  m_PrefabInstance: {fileID: 1486827954422694856}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &543206270
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,6 +1096,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 984312758}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1111321396 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
+  m_PrefabInstance: {fileID: 1486827954422694856}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1157151182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1417,9 +1433,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc2ce5bb82ec3cf428d9c4dd6ea34992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soldierMenuBtn: {fileID: 1882879032}
+  turretMenuBtn: {fileID: 1111321396}
+  unitMenuPanel: {fileID: 512063149}
+  unitMenuContent: {fileID: 512063150}
+  unitSlotPrefab: {fileID: 2646333515049357572, guid: 55c2d071b85901546981c2df1979f3eb, type: 3}
   playerCurrenthHealth: {fileID: 607449562}
   myScrapTexter: {fileID: 1486827954422694858}
   myExpTexter: {fileID: 1486827954422694859}
+  allSoldiers: []
 --- !u!4 &1702030767
 Transform:
   m_ObjectHideFlags: 0
@@ -1533,6 +1555,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1737823558}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1882879032 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
+  m_PrefabInstance: {fileID: 1486827954422694856}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1886852710
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,8 +1737,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitSelectionPanel: {fileID: 512063149}
   superPowerBtn: {fileID: 1486827954422694857}
-  soldierButton: {fileID: 0}
-  turretButton: {fileID: 0}
+  soldierButton: {fileID: 1882879032}
+  turretButton: {fileID: 1111321396}
   slideDistance: 116
   animationDuration: 0.5
 --- !u!1001 &1486827954422694856
@@ -1866,18 +1899,18 @@ PrefabInstance:
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 2018691360}
+      objectReference: {fileID: 1702030766}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SoldierBtn
+      value: TogglePanel
       objectReference: {fileID: 0}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: TogglePanel
+      value: OnSoldierMenuBtnClicked
       objectReference: {fileID: 0}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -1885,7 +1918,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: SelectionPanelAnimation, Assembly-CSharp
+      value: OneVsOneGameSceneUISingleton, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3764553087332515070, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1909,7 +1942,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
@@ -1929,7 +1962,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: TurretBtn
+      value: TogglePanel
       objectReference: {fileID: 0}
     - target: {fileID: 5083131620616023698, guid: 3918280c54763814cb01ac2ee7eef03d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName

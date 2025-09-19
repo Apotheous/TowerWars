@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class Soldier : NetworkBehaviour, IDamageable
 {
-
+    public Player_Game_Mode_Manager.PlayerAge age;
     [SerializeField] private float MaxHealth = 100f;
 
     // Health deðerini aðda senkronize tutuyoruz

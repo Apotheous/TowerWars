@@ -15,7 +15,13 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     }
 
     [SerializeField] private GameObject oneVSOneMode;
-
+    public enum PlayerAge
+    {
+        IceAge,
+        MediavalAge,
+        ModernAge
+    }
+    [SerializeField] public PlayerAge age;
     // Senkronize değişken
     private NetworkVariable<PlayerMode> _currentMode = new NetworkVariable<PlayerMode>(PlayerMode.MainMenu);
 
