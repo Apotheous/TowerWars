@@ -10,7 +10,7 @@ public class UnitData : ScriptableObject
     public string id;
     public Player_Game_Mode_Manager.PlayerAge age; // Hangi çað için geçerli
     public float trainingTime;
-    public int cost;
+    public float cost;
     public GameObject prefab;
 
     [Header("UI")]

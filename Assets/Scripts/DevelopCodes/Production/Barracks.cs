@@ -6,52 +6,65 @@ using UnityEngine;
 public class Barracks : NetworkBehaviour
 {
     [SerializeField] private UnitDatabase unitDatabase;
+    [SerializeField] private PlayerSC playerSC;
+
 
     private Queue<string> productionQueue = new Queue<string>();
+   
     private bool isProducing = false;
+
+    [SerializeField] Transform mySpawnPoint;
+
 
     [ServerRpc(RequireOwnership = false)]
     public void QueueUnitServerRpc(string unitId)
     {
-        productionQueue.Enqueue(unitId);
+        UnitData data = unitDatabase.GetById(unitId); // ID ile unit verisini al
 
-        if (!isProducing)
+        if (data == null)
+        {
+            Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
+            return;
+        }
 
-            StartCoroutine(ProduceNextUnit());
+        // Oyuncunun kaynaðý yeterli mi?
+        if (playerSC.myCurrentScrap.Value >= data.cost)
+        {
+            playerSC.myCurrentScrap.Value -= data.cost;
+            productionQueue.Enqueue(unitId);
 
-
-        //// Oyuncunun kaynaðý yetiyor mu?
-        //if (playerResources.Gold >= data.cost)
-        //{
-        //    playerResources.Gold -= data.cost;
-        //    productionQueue.Enqueue(unitId);
-
-        //    if (!isProducing)
-        //        StartCoroutine(ProduceNextUnit());
-        //}
-        //else
-        //{
-        //    // oyuncuya "yetersiz kaynak" mesajý gönder
-        //}
+            if (!isProducing)
+                StartCoroutine(ProduceNextUnit());
+        }
+        else
+        {
+            Debug.Log("Yetersiz kaynak! Birim üretilemiyor.");
+        }
     }
 
     private IEnumerator ProduceNextUnit()
     {
         isProducing = true;
+
         while (productionQueue.Count > 0)
         {
             string unitId = productionQueue.Dequeue();
             UnitData data = unitDatabase.GetById(unitId);
 
+            if (data == null)
+            {
+                Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
+                continue;
+            }
+
+            // Eðitim süresini bekle
             yield return new WaitForSeconds(data.trainingTime);
 
-            GameObject obj = Instantiate(
-                data.prefab,
-                transform.position + Vector3.forward * 2,
-                Quaternion.identity
-            );
+            // Birimi instantiate et ve networkte spawn et
+            GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
             obj.GetComponent<NetworkObject>().Spawn(true);
         }
+
         isProducing = false;
     }
 }

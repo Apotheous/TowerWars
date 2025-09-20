@@ -24,11 +24,11 @@ public class PlayerSC : NetworkBehaviour
 
 
     //public NFloat currentHealth2 = new NFloat(100f);
-    public NetworkVariable<float> myExpPoint = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> myExpPoint = new NetworkVariable<float>();
 
 
 
-    public NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>();
     // Custom eventler
     public event Action<float, float> OnScrapChanged;
 
