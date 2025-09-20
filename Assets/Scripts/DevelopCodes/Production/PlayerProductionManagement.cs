@@ -40,8 +40,35 @@ public class PlayerProductionManagement : NetworkBehaviour
             playerSC.myCurrentScrap.Value -= data.cost;
             productionQueue.Enqueue(unitId);
 
+
             if (!isProducing)
                 StartCoroutine(ProduceNextUnit());
+        }
+        else
+        {
+            Debug.Log("Yetersiz kaynak! Birim üretilemiyor.");
+        }
+    }
+    [ServerRpc(RequireOwnership = false)]
+    public void QueueTurretServerRpc(string unitId)
+    {
+        TurretData data = turretDatabase.GetById(unitId); // ID ile unit verisini al
+
+        if (data == null)
+        {
+            Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
+            return;
+        }
+
+        // Oyuncunun kaynaðý yeterli mi?
+        if (playerSC.myCurrentScrap.Value >= data.cost)
+        {
+            playerSC.myCurrentScrap.Value -= data.cost;
+            productionQueue.Enqueue(unitId);
+
+
+            if (!isProducing)
+                StartCoroutine(ProduceNextTurret());
         }
         else
         {
@@ -57,6 +84,31 @@ public class PlayerProductionManagement : NetworkBehaviour
         {
             string unitId = productionQueue.Dequeue();
             UnitData data = unitDatabase.GetById(unitId);
+
+            if (data == null)
+            {
+                Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
+                continue;
+            }
+
+            // Eðitim süresini bekle
+            yield return new WaitForSeconds(data.trainingTime);
+
+            // Birimi instantiate et ve networkte spawn et
+            GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
+            obj.GetComponent<NetworkObject>().Spawn(true);
+        }
+
+        isProducing = false;
+    }
+    private IEnumerator ProduceNextTurret()
+    {
+        isProducing = true;
+
+        while (productionQueue.Count > 0)
+        {
+            string unitId = productionQueue.Dequeue();
+            TurretData data = turretDatabase.GetById(unitId);
 
             if (data == null)
             {

@@ -143,7 +143,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
                 Button unitBtnPrfBtn = unitBtnPrfGo.GetComponent<Button>();
 
                 string id = unit.id; // closure
-                unitBtnPrfBtn.onClick.AddListener(() => SoldiersProductionBtnCliecked(id));
+                unitBtnPrfBtn.onClick.AddListener(() => TurretsProductionBtnCliecked(id));
 
                 Image iconImage = unitBtnPrfGo.GetComponentInChildren<Image>();
                 if (iconImage != null)
@@ -163,6 +163,11 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     {
         Debug.Log("Asker Üretim Btn " + unitId);
         myBarracks.QueueUnitServerRpc(unitId);
+    }
+    private void TurretsProductionBtnCliecked(string unitId)
+    {
+        Debug.Log("Asker Üretim Btn " + unitId);
+        myBarracks.QueueTurretServerRpc(unitId);
     }
 
 
