@@ -10,14 +10,14 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 {
     public static OneVsOneGameSceneUISingleton Instance { get; private set; }
 
-    [SerializeField] private Barracks myBarracks;
+
     [SerializeField] private Button soldierMenuBtn;
     [SerializeField] private Button turretMenuBtn;
 
     [SerializeField] private GameObject unitMenuPanel;
 
     [SerializeField] private Transform unitMenuContent; // Panel altýndaki container
-    [SerializeField] private GameObject unitSlotPrefab; // Slot prefab
+    [SerializeField] private GameObject unitBtnPrefab; // Slot prefab
 
     [SerializeField] private TextMeshProUGUI playerCurrenthHealth;
     [SerializeField] private TextMeshProUGUI myScrapTexter;
@@ -25,10 +25,16 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
     //variables for unit selection
     [SerializeField] private UnitData[] allSoldiers;
-    [SerializeField] private GameObject myPlayerLocalObject;
+    [SerializeField] private TurretData[] allTurrets;
 
-    [SerializeField] private Player_Game_Mode_Manager myPlayerAge;
-    
+
+    //Player Comps
+    private GameObject myPlayerLocalObject;
+
+    private Player_Game_Mode_Manager myPlayerAge;
+
+    private Barracks myBarracks;
+
 
     private void Awake()
     {
@@ -50,6 +56,8 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         StartCoroutine(InitializeWhenReady());
         allSoldiers = Resources.LoadAll<UnitData>("UnitData");
         Debug.Log($"Found {allSoldiers.Length} units");
+        allTurrets = Resources.LoadAll<TurretData>("TurretData");
+        Debug.Log($"Found {allTurrets.Length} Turrets");
     }
 
     private IEnumerator InitializeWhenReady()
@@ -67,8 +75,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         // Age referansý
         myPlayerAge = myPlayerLocalObject.GetComponent<Player_Game_Mode_Manager>();
 
-        // Artýk UI menüsünü açabilirsin
-        CalculateUniteMenu();
+
     }
 
 
@@ -77,6 +84,13 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         
 
         CalculateUniteMenu();
+    }
+
+    public void OnTurretMenuBtnClicked()
+    {
+        
+
+        CalculateTurretMenu();
     }
 
     private void CalculateUniteMenu()
@@ -93,7 +107,37 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         {
             if (unit.age == age)
             {
-                GameObject unitBtnPrfGo = Instantiate(unitSlotPrefab, unitMenuContent);
+                GameObject unitBtnPrfGo = Instantiate(unitBtnPrefab, unitMenuContent);
+                unitBtnPrfGo.name = unit.id;
+
+                Button unitBtnPrfBtn = unitBtnPrfGo.GetComponent<Button>();
+
+                string id = unit.id; // closure
+                unitBtnPrfBtn.onClick.AddListener(() => SoldiersProductionBtnCliecked(id));
+
+                Image iconImage = unitBtnPrfGo.GetComponentInChildren<Image>();
+                if (iconImage != null)
+                {
+                    iconImage.sprite = unit.icon;
+                }
+            }
+        }
+    }
+    private void CalculateTurretMenu()
+    {
+        // Önce paneli temizle
+        foreach (Transform child in unitMenuContent)
+            Destroy(child.gameObject);
+
+        // Çað bilgisi
+        var age = myPlayerAge.age;
+
+   
+        foreach (var unit in allTurrets)
+        {
+            if (unit.age == age)
+            {
+                GameObject unitBtnPrfGo = Instantiate(unitBtnPrefab, unitMenuContent);
                 unitBtnPrfGo.name = unit.id;
 
                 Button unitBtnPrfBtn = unitBtnPrfGo.GetComponent<Button>();

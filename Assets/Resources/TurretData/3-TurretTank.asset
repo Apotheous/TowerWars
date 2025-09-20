@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcadb6760e901104daa019de996f48d5, type: 3}
+  m_Name: 3-TurretTank
+  m_EditorClassIdentifier: 
+  id: 354834
+  age: 2
+  trainingTime: 5
+  cost: 15
+  prefab: {fileID: 2737073753183690271, guid: 2d04b51a34c417644becacb5a67b6d6c, type: 3}
+  icon: {fileID: 21300000, guid: 7169c42e59d12cb4c95a1786a4d86f6d, type: 3}
