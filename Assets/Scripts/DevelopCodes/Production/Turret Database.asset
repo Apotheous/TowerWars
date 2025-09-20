@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 153b95e07db2d31448b619e78c035c2a, type: 3}
-  m_Name: New Turret Database
+  m_Name: Turret Database
   m_EditorClassIdentifier: 
   turrets:
   - {fileID: 11400000, guid: ec5ec7a18f2971f4b93fe5bc968ebe78, type: 2}

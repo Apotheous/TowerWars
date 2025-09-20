@@ -33,7 +33,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
     private Player_Game_Mode_Manager myPlayerAge;
 
-    private Barracks myBarracks;
+    private PlayerProductionManagement myBarracks;
 
 
     private void Awake()
@@ -70,7 +70,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         myPlayerLocalObject = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
 
         // Barracks referansý
-        myBarracks = myPlayerLocalObject.GetComponentInChildren<Barracks>();
+        myBarracks = myPlayerLocalObject.GetComponentInChildren<PlayerProductionManagement>();
 
         // Age referansý
         myPlayerAge = myPlayerLocalObject.GetComponent<Player_Game_Mode_Manager>();

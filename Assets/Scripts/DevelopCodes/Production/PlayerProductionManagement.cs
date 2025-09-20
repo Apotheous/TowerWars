@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Barracks : NetworkBehaviour
+public class PlayerProductionManagement : NetworkBehaviour
 {
     [SerializeField] private UnitDatabase unitDatabase;
+    [SerializeField] private TurretDatabase turretDatabase;
     [SerializeField] private PlayerSC playerSC;
 
 
@@ -14,6 +15,12 @@ public class Barracks : NetworkBehaviour
     private bool isProducing = false;
 
     [SerializeField] Transform mySpawnPoint;
+
+    
+
+    [SerializeField] Transform turretPos1;
+    [SerializeField] Transform turretPos2;
+    [SerializeField] Transform turretPos3;
 
 
     [ServerRpc(RequireOwnership = false)]

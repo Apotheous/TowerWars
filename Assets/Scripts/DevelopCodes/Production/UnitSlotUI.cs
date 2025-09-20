@@ -40,7 +40,7 @@ public class UnitSlotUI : MonoBehaviour
         if (localPlayer == null) return;
 
         // Player_Game_Mode_Manager component’i
-        var playerBarracks = localPlayer.GetComponent<Barracks>();
+        var playerBarracks = localPlayer.GetComponent<PlayerProductionManagement>();
         if (playerBarracks == null) return;
 
         // Server RPC ile queue ekleme

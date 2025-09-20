@@ -2,7 +2,7 @@
 - Project name: TowerWars
 - Unity version: Unity 2021.3.45f1
 - Active game object:
-  - Name: SoldierSelectBtn
-  - Tag: Untagged
-  - Layer: UI
+  - Name: Player
+  - Tag: Player
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
