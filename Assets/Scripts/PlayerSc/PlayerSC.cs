@@ -10,7 +10,7 @@ using UnityEngine;
 using static Player_Game_Mode_Manager;
 using NFloat = Unity.Netcode.NetworkVariable<float>;
 
-public class PlayerSC : NetworkBehaviour
+public class PlayerSC : NetworkBehaviour ,IDamageable
 {
 
 
@@ -41,9 +41,6 @@ public class PlayerSC : NetworkBehaviour
     private const float LEVEL_UP_THRESHOLD = 100f;
 
 
-
-
-
     #endregion
 
 
@@ -54,14 +51,6 @@ public class PlayerSC : NetworkBehaviour
     [SerializeField] GameObject bulletPrefab;
     public override void OnNetworkSpawn()
     {
-        // Sadece owner input ve gain işlemleri yapacak
-        if (!IsOwner)
-        {
-            enabled = false;
-            return;
-        }
-
-
         //Stat abonelikleri
         //canı değişiklik olduğunda ötecek sisteme bağlamak
         mycurrentHealth.OnValueChanged += OnHealthChanged;
@@ -84,8 +73,6 @@ public class PlayerSC : NetworkBehaviour
         {
             Debug.Log("[PlayerSC] LEVEL UP TRIGGERED!");
         };
-
-
     }
 
     #region Player Stats abonelikler
@@ -183,6 +170,17 @@ public class PlayerSC : NetworkBehaviour
     {
         mycurrentHealth.Value += damage;
     }
+
+
+    public void TakeDamage(float damageAmount)
+    {
+        UpdateMyCurrentHealth(damageAmount);
+    }
+
+    public void Die()
+    {
+        Debug.Log("Player died!");
+    }
     #endregion
 
 
@@ -246,6 +244,8 @@ public class PlayerSC : NetworkBehaviour
     {
         myExpPoint.Value += amount;
     }
+
+  
 
 
     #endregion

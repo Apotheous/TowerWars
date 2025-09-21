@@ -23,6 +23,7 @@ public class PlayerProductionManagement : NetworkBehaviour
     [SerializeField] Transform turretPos3;
 
 
+    #region Soldier Production
     [ServerRpc(RequireOwnership = false)]
     public void QueueUnitServerRpc(string unitId)
     {
@@ -43,32 +44,6 @@ public class PlayerProductionManagement : NetworkBehaviour
 
             if (!isProducing)
                 StartCoroutine(ProduceNextUnit());
-        }
-        else
-        {
-            Debug.Log("Yetersiz kaynak! Birim üretilemiyor.");
-        }
-    }
-    [ServerRpc(RequireOwnership = false)]
-    public void QueueTurretServerRpc(string unitId)
-    {
-        TurretData data = turretDatabase.GetById(unitId); // ID ile unit verisini al
-
-        if (data == null)
-        {
-            Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
-            return;
-        }
-
-        // Oyuncunun kaynaðý yeterli mi?
-        if (playerSC.myCurrentScrap.Value >= data.cost)
-        {
-            playerSC.myCurrentScrap.Value -= data.cost;
-            productionQueue.Enqueue(unitId);
-
-
-            if (!isProducing)
-                StartCoroutine(ProduceNextTurret());
         }
         else
         {
@@ -101,6 +76,39 @@ public class PlayerProductionManagement : NetworkBehaviour
 
         isProducing = false;
     }
+
+    #endregion
+
+    #region Turret Production
+
+    [ServerRpc(RequireOwnership = false)]
+    public void QueueTurretServerRpc(string unitId)
+    {
+        TurretData data = turretDatabase.GetById(unitId); // ID ile unit verisini al
+
+        if (data == null)
+        {
+            Debug.LogWarning($"Unit with ID {unitId} not found in UnitDatabase!");
+            return;
+        }
+
+        // Oyuncunun kaynaðý yeterli mi?
+        if (playerSC.myCurrentScrap.Value >= data.cost)
+        {
+            playerSC.myCurrentScrap.Value -= data.cost;
+            productionQueue.Enqueue(unitId);
+
+
+            if (!isProducing)
+                StartCoroutine(ProduceNextTurret());
+        }
+        else
+        {
+            Debug.Log("Yetersiz kaynak! Birim üretilemiyor.");
+        }
+    }
+
+
     private IEnumerator ProduceNextTurret()
     {
         isProducing = true;
@@ -126,4 +134,8 @@ public class PlayerProductionManagement : NetworkBehaviour
 
         isProducing = false;
     }
+
+    #endregion
+
+
 }

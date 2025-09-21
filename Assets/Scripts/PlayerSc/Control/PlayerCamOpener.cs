@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerCamOpener : NetworkBehaviour
 {
-    [SerializeField] private Camera playerCamera;
+    [SerializeField] private GameObject playerCamera;
 
     void Start()
     {
@@ -15,8 +12,7 @@ public class PlayerCamOpener : NetworkBehaviour
         {
             if (playerCamera != null)
             {
-                playerCamera.enabled = false; // Kamerayý deaktif et
-                Debug.Log("Uzak oyuncunun kamerasý deaktif edildi");
+                playerCamera.SetActive(false);
             }
         }
         else
@@ -24,8 +20,7 @@ public class PlayerCamOpener : NetworkBehaviour
             // Local player'ýn kamerasý aktif olsun
             if (playerCamera != null)
             {
-                playerCamera.enabled = true; // Kamerayý aktif et
-                Debug.Log("Local oyuncunun kamerasý aktif edildi");
+                playerCamera.SetActive(true);
             }
         }
     }

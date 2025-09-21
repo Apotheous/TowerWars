@@ -45,7 +45,7 @@ public class TestBullet : NetworkBehaviour
         var dmg = c.GetComponent<IDamageable>();
         if (dmg != null)
         {
-            dmg.TakeDamage(25f);
+            dmg.TakeDamage(-25f);
         }
         else
         {
