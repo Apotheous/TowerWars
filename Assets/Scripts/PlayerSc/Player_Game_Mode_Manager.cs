@@ -65,6 +65,14 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
             case PlayerMode.OneVsOne:
                 if (oneVSOneMode) oneVSOneMode.SetActive(true);
                 playerComponentController.SetComponentsActive(true);
+                if (IsOwner)
+                {
+                    myCam.SetActive(true);
+                }else
+                {
+                    myCam.SetActive(false);
+                }
+
                 break;
         }
     }

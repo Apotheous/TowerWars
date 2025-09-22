@@ -167,7 +167,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private void TurretsProductionBtnCliecked(string unitId)
     {
         Debug.Log("Asker Üretim Btn " + unitId);
-        myBarracks.QueueTurretServerRpc(unitId);
+        myBarracks.QueueTurretServerRpc(unitId,2);
     }
 
 

@@ -158,6 +158,10 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         if (IsServer)
         {
             mycurrentHealth.Value += damage;
+            if (mycurrentHealth.Value <= 0)
+            {
+                Die();
+            }
         }
         else
         {
@@ -179,6 +183,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     public void Die()
     {
+        // Ölüm işlemleri burada yapılır
         Debug.Log("Player died!");
     }
     #endregion

@@ -20,7 +20,7 @@ public class PlayerCamOpener : NetworkBehaviour
             // Local player'ýn kamerasý aktif olsun
             if (playerCamera != null)
             {
-                playerCamera.SetActive(true);
+                playerCamera.SetActive(false);
             }
         }
     }
