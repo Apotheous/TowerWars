@@ -302,7 +302,7 @@ GameObject:
   - component: {fileID: 321682430}
   m_Layer: 0
   m_Name: PlayerOneSpawnPoint
-  m_TagString: Untagged
+  m_TagString: Player1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -315,7 +315,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 321682429}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -527,7 +527,7 @@ GameObject:
   - component: {fileID: 543206271}
   m_Layer: 0
   m_Name: PlayerTwoSpawnPoint
-  m_TagString: Untagged
+  m_TagString: Player2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -540,7 +540,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543206270}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -1596,6 +1596,9 @@ MonoBehaviour:
   myExpTexter: {fileID: 1486827954422694859}
   allSoldiers: []
   allTurrets: []
+  selecetedTurretPos: -1
+  selectingTurretPos: 0
+  myTag: 
 --- !u!4 &1702030767
 Transform:
   m_ObjectHideFlags: 0

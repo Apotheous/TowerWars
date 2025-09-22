@@ -40,6 +40,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     [SerializeField] private int selecetedTurretPos = -1;
     [SerializeField] private bool selectingTurretPos = false;
     private string pendingTurretUnitId; // geçici olarak tutulacak unit id
+    [SerializeField] private string myTag; // geçici olarak tutulacak unit id
     private void Awake()
     {
         // Eðer zaten bir Instance varsa ve bu o deðilse yok et
@@ -62,8 +63,25 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         Debug.Log($"Found {allSoldiers.Length} units");
         allTurrets = Resources.LoadAll<TurretData>("TurretData");
         Debug.Log($"Found {allTurrets.Length} Turrets");
+        // Kullanýmý:
+        StartCoroutine(GetMyTagWithDelay(2f));
     }
+    private IEnumerator GetMyTagWithDelay(float delay = 2f)
+    {
+        yield return new WaitForSeconds(delay);
 
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.LocalClient != null &&
+            NetworkManager.Singleton.LocalClient.PlayerObject != null)
+        {
+            myTag = NetworkManager.Singleton.LocalClient.PlayerObject.tag;
+            Debug.Log("Local player tag: " + myTag);
+        }
+        else
+        {
+            Debug.LogWarning("Local player henüz hazýr deðil!");
+        }
+    }
     private void Update()
     {
         if (selectingTurretPos)
@@ -75,12 +93,16 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.collider.gameObject.name == "TurretPos1")
-                        selecetedTurretPos = 1;
-                    else if (hit.collider.gameObject.name == "TurretPos2")
-                        selecetedTurretPos = 2;
-                    else if (hit.collider.gameObject.name == "TurretPos3")
-                        selecetedTurretPos = 3;
+                    if (hit.collider.tag == myTag)
+                    {
+                        if (hit.collider.gameObject.name == "TurretPos1")
+                            selecetedTurretPos = 1;
+                        else if (hit.collider.gameObject.name == "TurretPos2")
+                            selecetedTurretPos = 2;
+                        else if (hit.collider.gameObject.name == "TurretPos3")
+                            selecetedTurretPos = 3;
+                    }
+                 
 
                     if (selecetedTurretPos != -1)
                     {
@@ -121,7 +143,6 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
         // Age referansý
         myPlayerAge = myPlayerLocalObject.GetComponent<Player_Game_Mode_Manager>();
-
 
     }
 

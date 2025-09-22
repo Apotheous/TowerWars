@@ -1,17 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Player_Game_Mode_Manager;
 
 public class PlayersPlacement : NetworkBehaviour
 {
 
     [SerializeField] private List<Transform> spawnPoints;
+
     void Start()
     {
+
         StartCoroutine(PlacePlayersDelayed());
+
     }
+
 
     IEnumerator PlacePlayersDelayed()
     {
@@ -27,6 +33,7 @@ public class PlayersPlacement : NetworkBehaviour
             int index = (int)NetworkManager.Singleton.LocalClientId % spawnPoints.Count;
 
             localPlayer.transform.SetPositionAndRotation(spawnPoints[index].position, spawnPoints[index].rotation);
+
         }
        
     }
