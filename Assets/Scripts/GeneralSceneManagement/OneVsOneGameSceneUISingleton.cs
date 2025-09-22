@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -36,6 +37,9 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private PlayerProductionManagement myBarracks;
 
 
+    [SerializeField] private int selecetedTurretPos = -1;
+    [SerializeField] private bool selectingTurretPos = false;
+    private string pendingTurretUnitId; // geçici olarak tutulacak unit id
     private void Awake()
     {
         // Eðer zaten bir Instance varsa ve bu o deðilse yok et
@@ -60,6 +64,49 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         Debug.Log($"Found {allTurrets.Length} Turrets");
     }
 
+    private void Update()
+    {
+        if (selectingTurretPos)
+        {
+            if (Input.GetMouseButtonDown(0)) // sadece sol týk ile seç
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.collider.gameObject.name == "TurretPos1")
+                        selecetedTurretPos = 1;
+                    else if (hit.collider.gameObject.name == "TurretPos2")
+                        selecetedTurretPos = 2;
+                    else if (hit.collider.gameObject.name == "TurretPos3")
+                        selecetedTurretPos = 3;
+
+                    if (selecetedTurretPos != -1)
+                    {
+                        Debug.Log($"Seçilen Pos: {selecetedTurretPos}, Unit: {pendingTurretUnitId}");
+
+                        // üretimi baþlat
+                        myBarracks.QueueTurretServerRpc(pendingTurretUnitId, selecetedTurretPos);
+
+                        // resetle
+                        selectingTurretPos = false;
+                        pendingTurretUnitId = null;
+                        selecetedTurretPos = -1;
+                    }
+                }
+            }
+            if (Input.GetMouseButtonDown(1)) // sað týk = iptal
+            {
+                Debug.Log("Turret pozisyon seçme iþlemi iptal edildi.");
+
+                selectingTurretPos = false;
+                pendingTurretUnitId = null;
+                selecetedTurretPos = -1;
+            }
+        }
+
+    }
     private IEnumerator InitializeWhenReady()
     {
         yield return new WaitUntil(() =>
@@ -166,8 +213,22 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     }
     private void TurretsProductionBtnCliecked(string unitId)
     {
-        Debug.Log("Asker Üretim Btn " + unitId);
-        myBarracks.QueueTurretServerRpc(unitId,2);
+        Debug.Log("Turret üretim butonuna bastýn: " + unitId);
+        selectingTurretPos = true;
+        pendingTurretUnitId = unitId; // geçici kaydet
+
+
+
+    }
+    private void TurretsProductionBtnCliecked2(string unitId)
+    {
+
+
+            Debug.Log("Asker Üretim Btn " + unitId + " | Pos: " + selecetedTurretPos);
+        if (selecetedTurretPos != -1) // yani geçerli bir pozisyon seçildi
+            myBarracks.QueueTurretServerRpc(unitId, selecetedTurretPos);
+
+
     }
 
 
