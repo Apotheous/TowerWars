@@ -1,7 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Net;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -24,9 +21,11 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     [SerializeField] private TextMeshProUGUI myScrapTexter;
     [SerializeField] private TextMeshProUGUI myExpTexter;
 
+    [SerializeField] private GameObject WinPanel;
+    [SerializeField] private GameObject LosePanel;
     //variables for unit selection
-    [SerializeField] private UnitData[] allSoldiers;
-    [SerializeField] private TurretData[] allTurrets;
+    private UnitData[] allSoldiers;
+    private TurretData[] allTurrets;
 
 
     //Player Comps
@@ -37,10 +36,10 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private PlayerProductionManagement myBarracks;
 
 
-    [SerializeField] private int selecetedTurretPos = -1;
-    [SerializeField] private bool selectingTurretPos = false;
+    private int selecetedTurretPos = -1;
+    private bool selectingTurretPos = false;
     private string pendingTurretUnitId; // geçici olarak tutulacak unit id
-    [SerializeField] private string myTag; // geçici olarak tutulacak unit id
+    private string myTag; // geçici olarak tutulacak unit id
     private void Awake()
     {
         // Eðer zaten bir Instance varsa ve bu o deðilse yok et
@@ -241,16 +240,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
 
     }
-    private void TurretsProductionBtnCliecked2(string unitId)
-    {
-
-
-            Debug.Log("Asker Üretim Btn " + unitId + " | Pos: " + selecetedTurretPos);
-        if (selecetedTurretPos != -1) // yani geçerli bir pozisyon seçildi
-            myBarracks.QueueTurretServerRpc(unitId, selecetedTurretPos);
-
-
-    }
+    
 
 
 
@@ -269,6 +259,25 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         myExpTexter.text = exp.ToString();
     }
 
+    public void ShowGameOver(string message, bool iWon)
+    {
+        // Menüleri kapat
+        unitMenuPanel.SetActive(false);
 
+        // Her ihtimale karþý ikisini de kapat
+        WinPanel.SetActive(false);
+        LosePanel.SetActive(false);
+
+        if (iWon)
+        {
+            WinPanel.SetActive(true);
+            Debug.Log("GAME OVER - KAZANDIN: " + message);
+        }
+        else
+        {
+            LosePanel.SetActive(true);
+            Debug.Log("GAME OVER - KAYBETTÝN: " + message);
+        }
+    }
 
 }

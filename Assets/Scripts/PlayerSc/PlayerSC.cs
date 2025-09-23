@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using TMPro;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
-using static Player_Game_Mode_Manager;
-using NFloat = Unity.Netcode.NetworkVariable<float>;
 
 public class PlayerSC : NetworkBehaviour ,IDamageable
 {
@@ -49,6 +41,9 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     [SerializeField] Transform myweapon;
     [SerializeField] GameObject bulletPrefab;
+
+    public NetworkVariable<ulong> WinnerClientId = new NetworkVariable<ulong>(0);
+
     public override void OnNetworkSpawn()
     {
         //Stat abonelikleri
@@ -62,6 +57,8 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         // NetworkVariable değişimlerini dinle
         myExpPoint.OnValueChanged += OnExpPointChanged;
 
+        // WinnerClientId değişimini özel olarak ele al
+        WinnerClientId.OnValueChanged += OnWinnerDeclared;
 
         // Debug için event subscribe (isteğe bağlı)
         OnTechPointChanged += (oldValue, newValue) =>
@@ -73,6 +70,18 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         {
             Debug.Log("[PlayerSC] LEVEL UP TRIGGERED!");
         };
+    }
+
+    private void OnWinnerDeclared(ulong previousValue, ulong newValue)
+    {
+        if (newValue != 0) // 0 = kimse kazanmadı varsayalım
+        {
+            if (IsOwner) // sadece kendi ekranımda göster
+            {
+                bool benKazandim = (newValue == NetworkManager.Singleton.LocalClientId);
+                OneVsOneGameSceneUISingleton.Instance.ShowGameOver("Oyun bitti!", benKazandim);
+            }
+        }
     }
 
     #region Player Stats abonelikler
@@ -183,8 +192,23 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     public void Die()
     {
-        // Ölüm işlemleri burada yapılır
-        Debug.Log("Player died!");
+        if (IsServer)
+        {
+            Debug.Log($"Player {OwnerClientId} died (server).");
+            OneVsOneGameManager.Instance.HandlePlayerDeath(OwnerClientId);
+            // opsiyonel: oyuncu objesini devre dışı bırak
+            RpcDisablePlayerVisualsClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void RpcDisablePlayerVisualsClientRpc()
+    {
+        // görselleri/sesleri kapat; kontrol scriptlerini disable et
+        var inputComp = GetComponent<PlayerSC>(); // senin input component'ine göre değiştir
+        if (inputComp != null && IsOwner) inputComp.enabled = false;
+        // animasyon, collider vb. kapat
+        // gameObject.SetActive(false); -> dikkat, NetObject de unmanaged olabilir
     }
     #endregion
 
