@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,12 +8,15 @@ public class Soldier : NetworkBehaviour, IDamageable
     public Player_Game_Mode_Manager.PlayerAge age;
     [SerializeField] private float MaxHealth = 100f;
 
+
+
     // Health deðerini aðda senkronize tutuyoruz
     private NetworkVariable<float> myHealth = new NetworkVariable<float>(
         100f,  // varsayýlan deðer
         NetworkVariableReadPermission.Everyone,  // herkes okuyabilir
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
+
 
     [Header("Unity Stuff")]
     public Image healthBar;
@@ -26,12 +26,16 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private Transform myBarrel;
     [SerializeField] private float myRange;
 
-    private void OnEnable()
+
+
+
+    public override void OnNetworkSpawn()
     {
         // Saðlýk server’da initialize edilir
         if (IsServer)
         {
             myHealth.Value = MaxHealth;
+            
         }
 
         // Health deðiþtiðinde UI güncellensin
@@ -39,14 +43,20 @@ public class Soldier : NetworkBehaviour, IDamageable
 
         // Ýlk UI güncellemesi
         OnHealthChanged(0, myHealth.Value);
+     
+
 
     }
+
+
 
     private void OnHealthChanged(float oldValue, float newValue)
     {
         if (healthBar != null)
             healthBar.fillAmount = newValue / MaxHealth;
     }
+
+
 
     // === IDamageable implementasyonu ===
     [ServerRpc]

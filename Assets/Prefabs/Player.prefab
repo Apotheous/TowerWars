@@ -159,6 +159,7 @@ GameObject:
   - component: {fileID: 118557269323403440}
   - component: {fileID: 3927157785363492197}
   - component: {fileID: 3473521663130239458}
+  - component: {fileID: 345824425829569237}
   - component: {fileID: 1830836544445083796}
   - component: {fileID: 560940281554677081}
   - component: {fileID: 8317383942155078386}
@@ -166,7 +167,6 @@ GameObject:
   - component: {fileID: 7672791723624637143}
   - component: {fileID: 8526755292245196328}
   - component: {fileID: 2706243705016327071}
-  - component: {fileID: 345824425829569237}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -193,6 +193,7 @@ Transform:
   - {fileID: 9041860557517756405}
   - {fileID: 6843307233996261082}
   - {fileID: 6239498623851085336}
+  - {fileID: 6560944538289043924}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -264,6 +265,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &345824425829569237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721576413610324778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d98397f61eb44468a87f64cab8e00b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!65 &1830836544445083796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -314,6 +327,8 @@ MonoBehaviour:
   movementSpeedBase: 5
   myweapon: {fileID: 1428121347879896040}
   bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  WinnerClientId:
+    m_InternalValue: 0
 --- !u!114 &4371309540473112813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,21 +390,7 @@ MonoBehaviour:
   turretPos1: {fileID: 9041860557517756405}
   turretPos2: {fileID: 6843307233996261082}
   turretPos3: {fileID: 6239498623851085336}
---- !u!114 &345824425829569237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 721576413610324778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12d98397f61eb44468a87f64cab8e00b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turretPos1: {fileID: 1711427071904255224}
-  turretPos2: {fileID: 7714187668629659311}
-  turretPos3: {fileID: 316337153587035055}
+  myTag: 
 --- !u!1 &810558122463653983
 GameObject:
   m_ObjectHideFlags: 0
@@ -963,8 +964,10 @@ GameObject:
   - component: {fileID: 6560944538289043924}
   - component: {fileID: 4848729060253430503}
   - component: {fileID: 3637164451992079630}
+  - component: {fileID: 736062400297200390}
+  - component: {fileID: 2204337003965811073}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: SoldierSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -977,13 +980,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3402458064456811048}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.05, z: 6.49}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1934222777490954923}
-  m_RootOrder: 1
+  m_Father: {fileID: 4171640056608729479}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4848729060253430503
 MeshFilter:
@@ -1035,6 +1038,31 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &736062400297200390
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3402458064456811048}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 38.972343, y: 25.76948, z: 33.456314}
+  m_Center: {x: 0.17418623, y: -3.006984, z: -0.28638482}
+--- !u!114 &2204337003965811073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3402458064456811048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b485a13889b857e46ab9d1a5e3f56e75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3431479770032975116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,7 +2006,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6708098020655270457}
-  - {fileID: 6560944538289043924}
   m_Father: {fileID: 8703940311844072726}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2255,6 +2282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2906350527549765592}
   - component: {fileID: 3377410537731941333}
+  - component: {fileID: 8363539264570129392}
   m_Layer: 0
   m_Name: RTSCamRig
   m_TagString: Untagged
@@ -2336,6 +2364,19 @@ MonoBehaviour:
   startZoom: 0
   rotRig: {fileID: 7235088432202574097}
   cameraTransform: {fileID: 7015347402704607611}
+--- !u!65 &8363539264570129392
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7843161767407068067}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 9.635729, y: 11.688515, z: 8.699272}
+  m_Center: {x: 0.053164482, y: 5.3442574, z: 0.34987426}
 --- !u!1 &7966489065968556800
 GameObject:
   m_ObjectHideFlags: 0

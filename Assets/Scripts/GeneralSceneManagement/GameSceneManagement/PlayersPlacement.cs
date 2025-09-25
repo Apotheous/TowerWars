@@ -10,9 +10,7 @@ public class PlayersPlacement : NetworkBehaviour
 
     void Start()
     {
-
         StartCoroutine(PlacePlayersDelayed());
-
     }
 
 
@@ -30,7 +28,7 @@ public class PlayersPlacement : NetworkBehaviour
             int index = (int)NetworkManager.Singleton.LocalClientId % spawnPoints.Count;
 
             localPlayer.transform.SetPositionAndRotation(spawnPoints[index].position, spawnPoints[index].rotation);
-
+            localPlayer.gameObject.name = "Player_" + NetworkManager.Singleton.LocalClientId;
         }
        
     }

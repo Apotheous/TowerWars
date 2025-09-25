@@ -63,24 +63,9 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         allTurrets = Resources.LoadAll<TurretData>("TurretData");
         Debug.Log($"Found {allTurrets.Length} Turrets");
         // Kullanýmý:
-        StartCoroutine(GetMyTagWithDelay(2f));
+    
     }
-    private IEnumerator GetMyTagWithDelay(float delay = 2f)
-    {
-        yield return new WaitForSeconds(delay);
 
-        if (NetworkManager.Singleton != null &&
-            NetworkManager.Singleton.LocalClient != null &&
-            NetworkManager.Singleton.LocalClient.PlayerObject != null)
-        {
-            myTag = NetworkManager.Singleton.LocalClient.PlayerObject.tag;
-            Debug.Log("Local player tag: " + myTag);
-        }
-        else
-        {
-            Debug.LogWarning("Local player henüz hazýr deðil!");
-        }
-    }
     private void Update()
     {
         if (selectingTurretPos)

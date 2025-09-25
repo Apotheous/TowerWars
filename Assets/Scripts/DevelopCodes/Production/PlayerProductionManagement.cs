@@ -21,7 +21,16 @@ public class PlayerProductionManagement : NetworkBehaviour
     [SerializeField] private Transform turretPos1;
     [SerializeField] private Transform turretPos2;
     [SerializeField] private Transform turretPos3;
+    [SerializeField] private string myTag;
 
+
+
+    private void OnTriggerEnter(Collider c)
+    {
+        if (myTag != null) return;
+       
+        myTag = c.tag.ToString();
+    }
     #region Soldier Production
     [ServerRpc(RequireOwnership = false)]
     public void QueueUnitServerRpc(string unitId)
@@ -67,8 +76,10 @@ public class PlayerProductionManagement : NetworkBehaviour
             yield return new WaitForSeconds(data.trainingTime);
 
             GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
-            obj.GetComponent<NetworkObject>().Spawn(true);
 
+            obj.GetComponent<NetworkObject>().Spawn(true);
+            // Spawn eden player’ýn ClientId’sini set et
+            
 
         }
 
