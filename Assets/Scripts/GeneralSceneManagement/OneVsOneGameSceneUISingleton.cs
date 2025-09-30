@@ -40,6 +40,9 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private bool selectingTurretPos = false;
     private string pendingTurretUnitId; // geçici olarak tutulacak unit id
     private string myTag; // geçici olarak tutulacak unit id
+
+    // YENÝ EKLENEN DEÐÝÞKEN: Oyuncunun kendi controller'ýna referans
+    private PlayerController myPlayerController;
     private void Awake()
     {
         // Eðer zaten bir Instance varsa ve bu o deðilse yok et
@@ -92,9 +95,11 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
                     {
                         Debug.Log($"Seçilen Pos: {selecetedTurretPos}, Unit: {pendingTurretUnitId}");
 
-                        // üretimi baþlat
-                        myBarracks.QueueTurretServerRpc(pendingTurretUnitId, selecetedTurretPos);
-
+                    
+                        if (myPlayerController != null)
+                        {
+                            myPlayerController.RequestTurretProduction(pendingTurretUnitId, selecetedTurretPos);
+                        }
                         // resetle
                         selectingTurretPos = false;
                         pendingTurretUnitId = null;
@@ -119,14 +124,18 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
             NetworkManager.Singleton != null &&
             NetworkManager.Singleton.LocalClient?.PlayerObject != null);
 
-        // Local player objesini kaydet
         myPlayerLocalObject = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
-
-        // Barracks referansý
         myBarracks = myPlayerLocalObject.GetComponentInChildren<PlayerProductionManagement>();
-
-        // Age referansý
         myPlayerAge = myPlayerLocalObject.GetComponent<Player_Game_Mode_Manager>();
+
+        // YENÝ EKLENEN SATIR: PlayerController referansýný alýyoruz.
+        myPlayerController = myPlayerLocalObject.GetComponent<PlayerController>();
+
+        // Hata kontrolü
+        if (myPlayerController == null)
+        {
+            Debug.LogError("Oyuncu objesinde PlayerController script'i bulunamadý!");
+        }
 
     }
 
@@ -214,7 +223,11 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private void SoldiersProductionBtnCliecked(string unitId)
     {
         Debug.Log("Asker Üretim Btn " + unitId);
-        myBarracks.QueueUnitServerRpc(unitId);
+        // YENÝ HALÝ: Komutu kendi PlayerController'ýmýza gönderiyoruz.
+        if (myPlayerController != null)
+        {
+            myPlayerController.RequestUnitProduction(unitId);
+        }
     }
     private void TurretsProductionBtnCliecked(string unitId)
     {

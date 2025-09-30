@@ -94,6 +94,8 @@ GameObject:
   - component: {fileID: 5457178074426233218}
   - component: {fileID: 404782850}
   - component: {fileID: 404782851}
+  - component: {fileID: 912789676411401860}
+  - component: {fileID: 5367142547015899127}
   m_Layer: 0
   m_Name: 3-Turret-Tank
   m_TagString: Untagged
@@ -130,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 831416602
+  GlobalObjectIdHash: 3119361152
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -158,6 +160,51 @@ MonoBehaviour:
   myPrize: 50
   myBarrel: {fileID: 5457178075897747193}
   myRange: 50
+--- !u!114 &912789676411401860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5457178074426233219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a4c74ba65948a2488861e769ee1ef53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamId:
+    m_InternalValue: 0
+--- !u!114 &5367142547015899127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5457178074426233219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &5457178074990050499
 GameObject:
   m_ObjectHideFlags: 0

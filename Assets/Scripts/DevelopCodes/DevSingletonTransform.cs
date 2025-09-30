@@ -52,7 +52,7 @@ public class DevSingletonTransform : MonoBehaviour
                 localPlayer.transform.SetPositionAndRotation(player1Transform.position, player1Transform.rotation);
                 localPlayer.gameObject.name = "Player_" + NetworkManager.Singleton.LocalClientId;
             }
-            else if (NetworkManager.Singleton.LocalClientId == 2)
+            if (NetworkManager.Singleton.LocalClientId == 2)
             {
                 localPlayer.transform.SetPositionAndRotation(player2Transform.position, player2Transform.rotation);
                 localPlayer.gameObject.name = "Player_" + NetworkManager.Singleton.LocalClientId;
