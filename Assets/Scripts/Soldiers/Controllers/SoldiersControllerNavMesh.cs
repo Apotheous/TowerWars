@@ -10,16 +10,8 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
     [SerializeField] private Transform target;
 
 
-    public override void OnNetworkSpawn()
-    {
-        if (!IsServer) return;
 
-        // Coroutine'i baþlatýyoruz.
-        StartCoroutine(FindTargetAndSetDestination());
-    }
-
-
-    private IEnumerator FindTargetAndSetDestination()
+    public IEnumerator FindTargetAndSetDestination()
     {
         var myIdentity = GetComponent<UnitIdentity>();
         if (myIdentity == null)

@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,15 @@ public class Soldier : NetworkBehaviour, IDamageable
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
 
+    ////PlayerProductionManagement ProduceNextUnit() dunda dolduruluyor.
+
+    //// Bu deðiþken tüm client'lara senkronize edilecek.
+    //// ReadPermission.Everyone -> Herkes okuyabilir
+    //// WritePermission.Server -> Sadece server deðiþtirebilir
+    //public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
+    //    NetworkVariableReadPermission.Everyone,
+    //    NetworkVariableWritePermission.Server);
+
 
     [Header("Unity Stuff")]
     public Image healthBar;
@@ -26,28 +36,54 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private Transform myBarrel;
     [SerializeField] private float myRange;
 
+    // Takým ID'sini bu deðiþkende saklayacaðýz.
+    private int myTeamId = -1;
 
-
-
+    [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
     public override void OnNetworkSpawn()
     {
-        // Saðlýk server’da initialize edilir
+        // NetworkVariable'larýn senkronizasyonu tamamlandýðýnda bu metot çalýþýr.
+
+        // 1. TeamId'yi GÜVENLÝ bir þekilde al ve sakla
+        var unitIdentity = GetComponent<UnitIdentity>();
+        if (unitIdentity != null)
+        {
+            myTeamId = unitIdentity.TeamId.Value;
+        }
+        else
+        {
+            Debug.LogError("Bu objenin üzerinde UnitIdentity component'i bulunamadý!", gameObject);
+        }
+
+
+        // 2. Sadece Server üzerinde çalýþacak mantýk
         if (IsServer)
         {
             myHealth.Value = MaxHealth;
-            
+            Debug.Log($"[SERVER] Asker spawn oldu. Takýmý: {myTeamId}", gameObject);
+
+            // Örneðin, burada takýmýna göre bir hedef bulma mantýðý çalýþtýrýlabilir.
+            // FindInitialTarget(); 
+
+
+            // 1. TeamId'yi GÜVENLÝ bir þekilde al ve sakla
+            var soldiersControllerNavMesh = GetComponent<SoldiersControllerNavMesh>();
+            if (soldiersControllerNavMesh != null)
+            {
+                // Coroutine'i bu þekilde baþlatmalýsýn:
+                StartCoroutine(soldiersControllerNavMesh.FindTargetAndSetDestination());
+            }
+            else
+            {
+                Debug.LogError("Bu objenin üzerinde SoldiersControllerNavMesh component'i bulunamadý!", gameObject);
+            }
         }
-
-        // Health deðiþtiðinde UI güncellensin
+        // 3. Tüm client'larda çalýþacak mantýk (Görsel güncellemeler vb.)
         myHealth.OnValueChanged += OnHealthChanged;
-
-        // Ýlk UI güncellemesi
-        OnHealthChanged(0, myHealth.Value);
-     
+        OnHealthChanged(0, myHealth.Value); // UI'ý ilk deðerle güncelle
 
 
     }
-
 
 
     private void OnHealthChanged(float oldValue, float newValue)

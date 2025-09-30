@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class UnitIdentity : MonoBehaviour
 {
+    //PlayerProductionManagement ProduceNextUnit() dunda dolduruluyor.
+
     // Bu deðiþken tüm client'lara senkronize edilecek.
     // ReadPermission.Everyone -> Herkes okuyabilir
     // WritePermission.Server -> Sadece server deðiþtirebilir
