@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 
-public class NavMeshDers : NetworkBehaviour
+public class SoldiersControllerNavMesh : NetworkBehaviour
 {
     [SerializeField] private NavMeshAgent navMesh;
     [SerializeField] private Transform target;
