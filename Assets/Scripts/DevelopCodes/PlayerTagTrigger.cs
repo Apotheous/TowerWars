@@ -4,9 +4,16 @@ using UnityEngine;
 public class PlayerTagTrigger : NetworkBehaviour
 {
 
+    public enum PlayerTag
+    {
+        None,
+        Player1,
+        Player2
+    }
+
 
     // --- Network senkronize edilen tag ---
-    
+
 
     private NetworkVariable<PlayerTag> ownerTag = new NetworkVariable<PlayerTag>(
         PlayerTag.None,
@@ -56,4 +63,8 @@ public class PlayerTagTrigger : NetworkBehaviour
 
         Debug.Log($"[{(IsServer ? "Server" : "Client")}] {gameObject.name} {unityTag} tagine geçti.");
     }
+
+
+
+
 }
