@@ -39,7 +39,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     private int selecetedTurretPos = -1;
     private bool selectingTurretPos = false;
     private string pendingTurretUnitId; // geçici olarak tutulacak unit id
-    private string myTag; // geçici olarak tutulacak unit id
+    //private string myTag; // geçici olarak tutulacak unit id
 
     // YENÝ EKLENEN DEÐÝÞKEN: Oyuncunun kendi controller'ýna referans
     private PlayerController myPlayerController;
@@ -80,7 +80,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.collider.tag == myTag)
+                    if (hit.collider.tag == myPlayerController.gameObject.tag)
                     {
                         if (hit.collider.gameObject.name == "TurretPos1")
                             selecetedTurretPos = 1;

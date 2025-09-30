@@ -8,238 +8,110 @@ public class PlayerProductionManagement : NetworkBehaviour
     [SerializeField] private UnitDatabase unitDatabase;
     [SerializeField] private TurretDatabase turretDatabase;
     [SerializeField] private PlayerSC playerSC;
+    [SerializeField] private Transform mySpawnPoint;
+    [SerializeField] private Transform turretPos1, turretPos2, turretPos3;
 
-    //private Queue<string> productionQueue = new Queue<string>(); // Soldier queue
-    private Queue<string> productionTurretQueue = new Queue<string>(); // Turret IDs
-    private Queue<Transform> productionTurretQueueTransform = new Queue<Transform>(); // Turret spawn points
-
-    // YENÝ HALÝ: (string, ulong) çiftlerini tutan bir kuyruk
-    private Queue<(string unitId, ulong clientId)> productionQueue = new Queue<(string, ulong)>();
+    // Asker ve Taret için üretim sýralarý
+    private Queue<(string unitId, ulong clientId)> productionUnitQueue = new Queue<(string, ulong)>();
+    private Queue<(string unitId, int positionIndex, ulong clientId)> productionTurretQueue = new Queue<(string, int, ulong)>();
 
     private bool isProducingUnit = false;
     private bool isProducingTurret = false;
 
-    [SerializeField] private Transform mySpawnPoint;
+    
 
-    [SerializeField] private Transform turretPos1;
-    [SerializeField] private Transform turretPos2;
-    [SerializeField] private Transform turretPos3;
-    [SerializeField] private string myTag;
+    #region Üretim Baþlatma Metodlarý (PlayerController'dan çaðrýlýr)
 
-    [SerializeField] NetworkObjectPool objectPool;
-
-    private void Awake()
-    {
-        // PlayerController'ýn bize kolayca ulaþabilmesi için statik referansý dolduruyoruz.
-        // Sahnede sadece bir tane ProductionManager olduðunu varsayýyoruz.
-        
-    }
-    private void OnTriggerEnter(Collider c)
-    {
-
-        if (c.GetComponent<NetworkObjectPool>()!=null)
-        {
-            objectPool = c.GetComponent<NetworkObjectPool>();
-        }
-      
-    }
-    #region Soldier Production
-
-    // Bu RPC'yi çaðýrma þekli ayný kalýyor. Buton kodunu deðiþtirmene gerek yok.
-    [ServerRpc(RequireOwnership = false)]
-    public void QueueUnitServerRpc(string unitId, ServerRpcParams serverRpcParams = default)
-    {
-        var clientId = serverRpcParams.Receive.SenderClientId;
-
-        UnitData data = unitDatabase.GetById(unitId);
-        if (data == null)
-        {
-            Debug.LogWarning($"[Unit] ID {unitId} bulunamadý!");
-            return;
-        }
-
-        if (playerSC.myCurrentScrap.Value >= data.cost)
-        {
-            playerSC.myCurrentScrap.Value -= data.cost;
-            productionQueue.Enqueue((unitId, clientId));
-
-            if (!isProducingUnit)
-                StartCoroutine(ProduceNextUnit());
-        }
-    }
-    // ARTIK RPC DEÐÝL! PlayerController çaðýracak.
     public void StartProducingUnit(string unitId, ulong clientId)
     {
-        // ... (QueueUnitServerRpc içindeki kodun aynýsý)
-
-        // 1. DOÐRU VERÝTABANINI KULLAN
         UnitData data = unitDatabase.GetById(unitId);
-        if (data == null)
-        {
-            Debug.LogError($"[Unit] ID '{unitId}' unitDatabase içinde bulunamadý!");
-            return;
-        }
+        if (data == null) { Debug.LogError($"[Unit] ID '{unitId}' bulunamadý!"); return; }
 
-        // 2. KAYNAK KONTROLÜNÜ YAP
         if (playerSC.myCurrentScrap.Value >= data.cost)
         {
-            // 3. YETERLÝ KAYNAK VARSA:
-            // Önce kaynaðý düþür
             playerSC.myCurrentScrap.Value -= data.cost;
-
-            // Sonra birimi üretim sýrasýna ekle
-            productionQueue.Enqueue((unitId, clientId));
-
-            // Üretim zaten baþlamadýysa, baþlat
-            if (!isProducingUnit)
-            {
-                StartCoroutine(ProduceNextUnit());
-            }
+            productionUnitQueue.Enqueue((unitId, clientId));
+            if (!isProducingUnit) StartCoroutine(ProduceNextUnit());
         }
         else
         {
-            // 4. YETERLÝ KAYNAK YOKSA:
-            // Ýsteðe baðlý: Oyuncuya "Yetersiz Kaynak" mesajý göster.
-            Debug.Log($"[Unit] Yetersiz kaynak! {data.cost} scrap gerekli ama {playerSC.myCurrentScrap.Value} scrap var.");
+            Debug.Log($"[Unit] Yetersiz kaynak!");
         }
-
-
     }
 
-    // ARTIK RPC DEÐÝL! PlayerController çaðýracak.
     public void StartProducingTurret(string unitId, int positionIndex, ulong clientId)
     {
         TurretData data = turretDatabase.GetById(unitId);
-        if (data == null)
-        {
-            Debug.LogError($"[Turret] ID '{unitId}' turretDatabase içinde bulunamadý!");
-            return;
-        }
+        if (data == null) { Debug.LogError($"[Turret] ID '{unitId}' bulunamadý!"); return; }
 
         if (playerSC.myCurrentScrap.Value >= data.cost)
         {
             playerSC.myCurrentScrap.Value -= data.cost;
-            productionTurretQueue.Enqueue(unitId);
-            Transform spawnPoint = GetTurretSpawn(positionIndex);
-            if (spawnPoint != null)
-                productionTurretQueueTransform.Enqueue(spawnPoint);
-
-            if (!isProducingTurret)
-                StartCoroutine(ProduceNextTurret());
+            // Sýraya artýk pozisyon ve sahip bilgisini de ekliyoruz
+            productionTurretQueue.Enqueue((unitId, positionIndex, clientId));
+            if (!isProducingTurret) StartCoroutine(ProduceNextTurret());
         }
         else
         {
-            Debug.Log($"[Turret] Yetersiz kaynak! {data.cost} scrap gerekli ama {playerSC.myCurrentScrap.Value} scrap var.");
+            Debug.Log($"[Turret] Yetersiz kaynak!");
         }
     }
-    private IEnumerator ProduceNextUnit()
-    {
-        isProducingUnit = true;
-
-        while (productionQueue.Count > 0)
-        {
-            var productionOrder = productionQueue.Dequeue();
-            string unitId = productionOrder.unitId;
-            ulong ownerId = productionOrder.clientId;
-
-            UnitData data = unitDatabase.GetById(unitId);
-            if (data == null)
-            {
-                Debug.LogWarning($"[Unit] ID {unitId} bulunamadý!");
-                continue;
-            }
-
-            yield return new WaitForSeconds(data.trainingTime);
-
-            // --- DEÐÝÞÝKLÝK BURADA BAÞLIYOR ---
-
-            // ADIM 1: Havuzdan almak yerine doðrudan Instantiate ediyoruz.
-            GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
-
-            if (obj != null)
-            {
-                var unitIdentity = obj.GetComponent<UnitIdentity>();
-                if (unitIdentity != null)
-                {
-                    // ADIM 2: Takým kimliðini (TeamId) atýyoruz.
-                    unitIdentity.TeamId.Value = (int)ownerId;
-                    Debug.Log($"Birim Instantiate edildi. Sahibi: Client {ownerId}, TeamId atandý: {unitIdentity.TeamId.Value}");
-                }
-                else
-                {
-                    Debug.LogError($"'{data.prefab.name}' prefab'ýnda UnitIdentity script'i bulunmuyor!");
-                }
-
-                // ADIM 3: Objeyi network'e spawn ediyoruz.
-                // Bu sayede client'lar objeyi, TeamId'si atanmýþ güncel haliyle alýrlar.
-                obj.GetComponent<NetworkObject>().Spawn(true);
-            }
-        }
-
-        isProducingUnit = false;
-    }
-
 
     #endregion
 
-    #region Turret Production
-    [ServerRpc(RequireOwnership = false)]
-    public void QueueTurretServerRpc(string unitId, int spawnIndex)
+    #region Üretim Coroutine'leri (Sadece Server'da çalýþýr)
+
+    private IEnumerator ProduceNextUnit()
     {
-        TurretData data = turretDatabase.GetById(unitId);
-
-        if (data == null)
+        isProducingUnit = true;
+        while (productionUnitQueue.Count > 0)
         {
-            Debug.LogWarning($"[Turret] ID {unitId} bulunamadý!");
-            return;
-        }
+            var order = productionUnitQueue.Dequeue();
+            UnitData data = unitDatabase.GetById(order.unitId);
+            if (data == null) continue;
 
-        if (playerSC.myCurrentScrap.Value >= data.cost)
-        {
-            playerSC.myCurrentScrap.Value -= data.cost;
-            productionTurretQueue.Enqueue(unitId);
+            yield return new WaitForSeconds(data.trainingTime);
 
-            // SpawnPoint seç
-            Transform spawnPoint = GetTurretSpawn(spawnIndex);
-            if (spawnPoint != null)
-                productionTurretQueueTransform.Enqueue(spawnPoint);
-
-            if (!isProducingTurret)
-                StartCoroutine(ProduceNextTurret());
+            GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
+            var unitIdentity = obj.GetComponent<UnitIdentity>();
+            if (unitIdentity != null)
+            {
+                unitIdentity.TeamId.Value = (int)order.clientId;
+            }
+            obj.GetComponent<NetworkObject>().Spawn(true);
         }
-        else
-        {
-            Debug.Log("[Turret] Yetersiz kaynak!");
-        }
+        isProducingUnit = false;
     }
 
     private IEnumerator ProduceNextTurret()
     {
         isProducingTurret = true;
-
-        while (productionTurretQueue.Count > 0 && productionTurretQueueTransform.Count > 0)
+        while (productionTurretQueue.Count > 0)
         {
-            string unitId = productionTurretQueue.Dequeue();
-            Transform spawnPoint = productionTurretQueueTransform.Dequeue();
+            var order = productionTurretQueue.Dequeue();
+            TurretData data = turretDatabase.GetById(order.unitId);
+            if (data == null) continue;
 
-            TurretData data = turretDatabase.GetById(unitId);
-
-            if (data == null)
-            {
-                Debug.LogWarning($"[Turret] ID {unitId} bulunamadý!");
-                continue;
-            }
+            Transform spawnPoint = GetTurretSpawn(order.positionIndex);
+            if (spawnPoint == null) continue;
 
             yield return new WaitForSeconds(data.trainingTime);
 
-            GameObject obj = objectPool.GetFromPool(data.prefab, spawnPoint.position, spawnPoint.rotation);
+            // Taretler için de artýk doðrudan Instantiate kullanýyoruz
+            GameObject obj = Instantiate(data.prefab, spawnPoint.position, spawnPoint.rotation);
+
+            // Taretlerin de kime ait olduðunu belirtiyoruz
+            var unitIdentity = obj.GetComponent<UnitIdentity>();
+            if (unitIdentity != null)
+            {
+                unitIdentity.TeamId.Value = (int)order.clientId;
+            }
             obj.GetComponent<NetworkObject>().Spawn(true);
-
-          
         }
-
         isProducingTurret = false;
     }
+
+    #endregion
 
     private Transform GetTurretSpawn(int index)
     {
@@ -251,6 +123,5 @@ public class PlayerProductionManagement : NetworkBehaviour
             default: return mySpawnPoint;
         }
     }
-    #endregion
 
 }

@@ -62,6 +62,7 @@ GameObject:
   - component: {fileID: 3530960546005792036}
   - component: {fileID: 5428851723497610989}
   - component: {fileID: 2849176104359325266}
+  - component: {fileID: 6712433040168718799}
   m_Layer: 0
   m_Name: TurretPos3
   m_TagString: Untagged
@@ -147,6 +148,19 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &6712433040168718799
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316337153587035055}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2.0835333
+  m_Center: {x: -0.15172529, y: 0, z: 0}
 --- !u!1 &721576413610324778
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,8 +407,6 @@ MonoBehaviour:
   turretPos1: {fileID: 9041860557517756405}
   turretPos2: {fileID: 6843307233996261082}
   turretPos3: {fileID: 6239498623851085336}
-  myTag: 
-  objectPool: {fileID: 0}
 --- !u!114 &-5593812341764850184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,8 +660,8 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 2.0835333
+  m_Center: {x: -0.15172529, y: 0, z: 0}
 --- !u!1 &1837595266436033118
 GameObject:
   m_ObjectHideFlags: 0
@@ -2235,6 +2247,7 @@ GameObject:
   - component: {fileID: 1928915718481165489}
   - component: {fileID: 6135344177934729453}
   - component: {fileID: 4747827818444278151}
+  - component: {fileID: 6050417946931659752}
   m_Layer: 0
   m_Name: TurretPos2
   m_TagString: Untagged
@@ -2320,6 +2333,19 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &6050417946931659752
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7714187668629659311}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2.0835333
+  m_Center: {x: -0.15172529, y: 0, z: 0}
 --- !u!1 &7764158552113948693
 GameObject:
   m_ObjectHideFlags: 0
