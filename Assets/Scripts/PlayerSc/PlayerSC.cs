@@ -166,7 +166,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     {
         if (IsServer)
         {
-            mycurrentHealth.Value += damage;
+            mycurrentHealth.Value -= damage;
             if (mycurrentHealth.Value <= 0)
             {
                 Die();
@@ -181,7 +181,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     [ServerRpc]
     private void RequestUpdateHealthServerRpc(float damage)
     {
-        mycurrentHealth.Value += damage;
+        mycurrentHealth.Value -= damage;
     }
 
 

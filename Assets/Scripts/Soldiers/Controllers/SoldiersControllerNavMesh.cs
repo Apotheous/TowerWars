@@ -90,6 +90,11 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
         }
     }
 
+    // SoldiersControllerNavMesh.cs içinde
+    public Transform GetCurrentTarget()
+    {
+        return target;
+    }
     private void Update()
     {
         if (!IsServer) return;

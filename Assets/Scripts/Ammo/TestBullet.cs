@@ -6,61 +6,79 @@ using UnityEngine;
 
 public class TestBullet : NetworkBehaviour
 {
-    public float speed = 10f;
-    public float myDamage = 10f;
-    public float lifetime = 3f;
+    [SerializeField] private float speed = 20f;
+    [SerializeField] private float lifetime = 3f;
 
-    private void Start()
+    private float damageAmount;
+    private int ownerTeamId;
+
+    // Mermiyi kimin, hangi takýmdan ve ne kadar hasarla ateþlediðini belirten baþlangýç metodu.
+    // Bu metot, mermi spawn olmadan hemen önce SADECE server'da çaðrýlacak.
+    public void Initialize(int teamId, float damage)
     {
+        this.ownerTeamId = teamId;
+        this.damageAmount = damage;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        // Mermi spawn olduðunda, eðer server ise ömrünü baþlat.
         if (IsServer)
         {
-            StartCoroutine(DelayedDespawn());
+            Invoke(nameof(DestroyBullet), lifetime);
         }
     }
 
-    private IEnumerator DelayedDespawn()
+    // Mermiyi yok eden metot
+    private void DestroyBullet()
     {
-        yield return new WaitForSeconds(lifetime);
-        DespawnBulletServerRpc(NetworkObjectId);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void DespawnBulletServerRpc(ulong bulletId)
-    {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(bulletId, out var bulletObj))
+        // Eðer hala network'te ise despawn et.
+        if (NetworkObject != null && NetworkObject.IsSpawned)
         {
-            bulletObj.Despawn(); // Pooling varsa bunu kullan, yoksa Destroy(bulletObj.gameObject)
+            NetworkObject.Despawn();
         }
     }
-
 
     private void Update()
     {
+        // Merminin hareketi tüm client'larda ayný þekilde görünsün diye Update'te.
+        // Daha geliþmiþ bir sistem için NetworkTransform de kullanýlabilir.
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
     }
 
-    private void OnTriggerEnter(Collider c)
+    private void OnTriggerEnter(Collider other)
     {
-        //if (!IsServer) return; // Sadece server tarafýnda hasar uygula
-        var dmg = c.GetComponent<IDamageable>();
-        if (dmg != null)
-        {
-            dmg.TakeDamage(-25f);
-        }
-        else
-        {
-            myDamage = 0;
-        }
-        
+        // Çarpýþma ve hasar mantýðý SADECE server'da çalýþmalý.
+        if (!IsServer) return;
 
-        //if (c != null)
-        //{
-        //    player.UpdateMyCurrentHealth(-myDamage); // Hasar uygula
-        //    player.UpdateMyScrap(myDamage);
-        //    player.UpdateExpPointIncrease(myDamage);
+        // Hasarýmýz zaten sýfýrlandýysa veya bir þekil2de mermi geçersizse bir þey yapma.
+        if (damageAmount <= 0) return;
 
-        //    Destroy(gameObject); // çarpýnca yok et
-        //}
+        // Çarptýðýmýz objenin kimlik bilgisi var mý?
+        var targetIdentity = other.GetComponent<UnitIdentity>();
+        if (targetIdentity != null)
+        {
+            // Eðer çarptýðýmýz þey kendi takýmýmýzdansa, hasar verme ve yok ol.
+            if (targetIdentity.TeamId.Value == ownerTeamId)
+            {
+                // Kendi takým arkadaþýna çarptýn. Hasar verme.
+                DestroyBullet();
+                return; // Metodun devamýný çalýþtýrma.
+            }
+        }
+
+        // Çarptýðýmýz þeyin caný var mý? (IDamageable)
+        var damageableTarget = other.GetComponent<IDamageable>();
+        if (damageableTarget != null)
+        {
+            // Düþmana çarptýk! Hasar ver.
+            damageableTarget.TakeDamage(damageAmount);
+        }
+
+        // Mermi bir þeye çarptýðý için (düþman, dost, duvar fark etmez) görevini tamamladý.
+        // Hasarýný sýfýrla ve kendini yok et.
+        damageAmount = 0;
+        DestroyBullet();
     }
 
 

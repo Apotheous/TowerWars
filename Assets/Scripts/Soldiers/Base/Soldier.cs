@@ -18,15 +18,7 @@ public class Soldier : NetworkBehaviour, IDamageable
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
 
-    ////PlayerProductionManagement ProduceNextUnit() dunda dolduruluyor.
-
-    //// Bu deðiþken tüm client'lara senkronize edilecek.
-    //// ReadPermission.Everyone -> Herkes okuyabilir
-    //// WritePermission.Server -> Sadece server deðiþtirebilir
-    //public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
-    //    NetworkVariableReadPermission.Everyone,
-    //    NetworkVariableWritePermission.Server);
-
+ 
 
     [Header("Unity Stuff")]
     public Image healthBar;
@@ -118,5 +110,12 @@ public class Soldier : NetworkBehaviour, IDamageable
     {
         gameObject.SetActive(false);
         // GetComponent<NetworkObject>().Despawn(); // alternatifi
+    }
+
+
+    // Soldier.cs içine bu metodu ekle
+    public int GetTeamId()
+    {
+        return myTeamId;
     }
 }

@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 7591193204476448610}
   - component: {fileID: 6955123455520474635}
   - component: {fileID: 5527731865689721147}
+  - component: {fileID: 6546390961960704592}
   m_Layer: 0
   m_Name: ArcherTwo
   m_TagString: Untagged
@@ -187,6 +188,7 @@ MonoBehaviour:
   myPrize: 50
   myBarrel: {fileID: 3592182118042573096}
   myRange: 10
+  soldiersControllerNavMesh: {fileID: 0}
 --- !u!114 &2196776996376851835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,6 +277,23 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &6546390961960704592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 10
+  fireRate: 1
+  damage: 10
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 0}
 --- !u!1 &6612645288833671493
 GameObject:
   m_ObjectHideFlags: 0

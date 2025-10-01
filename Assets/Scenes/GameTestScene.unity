@@ -355,7 +355,7 @@ GameObject:
   m_TagString: Player2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!23 &203092045
 MeshRenderer:
@@ -2225,7 +2225,7 @@ GameObject:
   m_TagString: Player1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!23 &1293948308
 MeshRenderer:

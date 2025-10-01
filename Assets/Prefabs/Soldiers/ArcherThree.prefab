@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 7054680944188205767}
   - component: {fileID: 7591193204476448610}
   - component: {fileID: -5013645668071552999}
+  - component: {fileID: -7349933436319925749}
   m_Layer: 0
   m_Name: ArcherThree
   m_TagString: Untagged
@@ -220,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3914512091
+  GlobalObjectIdHash: 956289974
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -359,6 +360,23 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-7349933436319925749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 10
+  fireRate: 1
+  damage: 10
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 3592182118042573096}
 --- !u!1 &6612645288833671493
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,7 +474,7 @@ GameObject:
   - component: {fileID: 1739904717408146827}
   - component: {fileID: 4499270004333836676}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

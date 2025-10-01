@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: -6083335654545479499}
   - component: {fileID: -6044702516541412413}
   - component: {fileID: 6971600654628098195}
+  - component: {fileID: 7842768490817650384}
   m_Layer: 0
   m_Name: TankTwo
   m_TagString: Untagged
@@ -82,6 +83,7 @@ MonoBehaviour:
   myPrize: 50
   myBarrel: {fileID: 1265268758880465537}
   myRange: 5
+  soldiersControllerNavMesh: {fileID: 0}
 --- !u!195 &557825423593218548
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -192,6 +194,23 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &7842768490817650384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339119858819233629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 10
+  fireRate: 1
+  damage: 10
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 0}
 --- !u!1 &1339119859717018566
 GameObject:
   m_ObjectHideFlags: 0

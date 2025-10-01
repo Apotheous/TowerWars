@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 475776045348914089}
   - component: {fileID: 3362101744363608993}
   m_Layer: 0
-  m_Name: MyBarrel
+  m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: -3404581058339859377}
   - component: {fileID: -5576227550347339717}
   - component: {fileID: -656442107663558530}
+  - component: {fileID: -1139996475724866815}
   m_Layer: 0
   m_Name: SwordOne
   m_TagString: Untagged
@@ -248,6 +249,7 @@ MonoBehaviour:
   myPrize: 50
   myBarrel: {fileID: 1485270440577693048}
   myRange: 5
+  soldiersControllerNavMesh: {fileID: 0}
 --- !u!195 &3587595115300533167
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -262,7 +264,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -358,6 +360,23 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-1139996475724866815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3587595115300533166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 10
+  fireRate: 1
+  damage: 10
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 1485270440577693048}
 --- !u!1001 &2613522506534363727
 PrefabInstance:
   m_ObjectHideFlags: 0

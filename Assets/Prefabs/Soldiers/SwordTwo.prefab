@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: -3404581058339859377}
   - component: {fileID: -3473509391874600603}
   - component: {fileID: 2361121322339101047}
+  - component: {fileID: 1813637445825791619}
   m_Layer: 0
   m_Name: SwordTwo
   m_TagString: Untagged
@@ -249,6 +250,7 @@ MonoBehaviour:
   myPrize: 50
   myBarrel: {fileID: 1485270440577693048}
   myRange: 5
+  soldiersControllerNavMesh: {fileID: 0}
 --- !u!195 &3587595115300533167
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -359,6 +361,23 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &1813637445825791619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3587595115300533166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 10
+  fireRate: 1
+  damage: 10
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 0}
 --- !u!1 &6986650920411232717
 GameObject:
   m_ObjectHideFlags: 0
