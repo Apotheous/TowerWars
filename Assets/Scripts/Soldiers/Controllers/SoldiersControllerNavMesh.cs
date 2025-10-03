@@ -16,11 +16,10 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
         var myIdentity = GetComponent<UnitIdentity>();
         if (myIdentity == null)
         {
-            Debug.LogError("[SERVER] UnitIdentity script'i bulunamadý!", gameObject);
+            
             yield break;
         }
 
-        Debug.Log($"[SERVER] Birim spawn oldu. Gelen TeamID: {myIdentity.TeamId.Value}. Hedef aranýyor...");
 
         int attempts = 0;
         while (target == null && attempts < 10)
@@ -28,12 +27,12 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
             attempts++;
             if (myIdentity.TeamId.Value == 1)
             {
-                Debug.Log($"[SERVER] TeamID "+myIdentity.TeamId.Value+", Player1 hedefi aranýyor... ");
+
                 target = DevSingletonTransform.instance.player2Transform;
             }
             else if (myIdentity.TeamId.Value == 2)
             {
-                Debug.Log($"[SERVER] TeamID " + myIdentity.TeamId.Value + ", Player1 hedefi aranýyor... ");
+
                 target = DevSingletonTransform.instance.player1Transform;
             }
 
@@ -46,18 +45,18 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
         // Hedef atamasý yapýldýktan sonra...
         if (target != null)
         {
-            Debug.Log($"[SERVER] HEDEF ATAMASI BAÞARILI: {target.name}. Þimdi NavMesh kontrolleri yapýlýyor...");
+
 
             // --- NAVMESH KONTROL ADIMLARI ---
 
             // 1. Kontrol: Bu birimin kendisi NavMesh üzerinde mi?
             bool isAgentOnNavMesh = navMesh.isOnNavMesh;
-            Debug.Log($"[SERVER CHECK] Bu birim NavMesh üzerinde mi? -> {isAgentOnNavMesh}");
+
 
             // 2. Kontrol: Hedefin pozisyonu NavMesh üzerinde mi? (1 metrelik bir toleransla)
             NavMeshHit hit;
             bool isTargetOnNavMesh = NavMesh.SamplePosition(target.position, out hit, 1.0f, NavMesh.AllAreas);
-            Debug.Log($"[SERVER CHECK] Hedef NavMesh üzerinde mi? -> {isTargetOnNavMesh}");
+
 
             // 3. Kontrol (En Önemlisi): Bu birimden hedefe geçerli bir yol var mý?
             NavMeshPath path = new NavMeshPath();
@@ -94,6 +93,15 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
     public Transform GetCurrentTarget()
     {
         return target;
+    }
+    public void GiveMeNewTarget(Transform newTarget)
+    {
+        target = newTarget;
+        if (IsServer && target != null)
+        {
+            navMesh.SetDestination(target.position);
+            Debug.Log($"[NavMesh] Düþman birim alýndý ({target.name}) hedefine yoneldi.");
+        }
     }
     private void Update()
     {

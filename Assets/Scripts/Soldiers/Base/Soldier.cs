@@ -32,6 +32,8 @@ public class Soldier : NetworkBehaviour, IDamageable
     private int myTeamId = -1;
 
     [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
+    [SerializeField] private TargetDetector targetDetector;
+
     public override void OnNetworkSpawn()
     {
         // NetworkVariable'larýn senkronizasyonu tamamlandýðýnda bu metot çalýþýr.
@@ -41,6 +43,7 @@ public class Soldier : NetworkBehaviour, IDamageable
         if (unitIdentity != null)
         {
             myTeamId = unitIdentity.TeamId.Value;
+            
         }
         else
         {
@@ -53,6 +56,7 @@ public class Soldier : NetworkBehaviour, IDamageable
         {
             myHealth.Value = MaxHealth;
             Debug.Log($"[SERVER] Asker spawn oldu. Takýmý: {myTeamId}", gameObject);
+            gameObject.name = myTeamId.ToString();
 
             // Örneðin, burada takýmýna göre bir hedef bulma mantýðý çalýþtýrýlabilir.
             // FindInitialTarget(); 
@@ -73,7 +77,14 @@ public class Soldier : NetworkBehaviour, IDamageable
         // 3. Tüm client'larda çalýþacak mantýk (Görsel güncellemeler vb.)
         myHealth.OnValueChanged += OnHealthChanged;
         OnHealthChanged(0, myHealth.Value); // UI'ý ilk deðerle güncelle
-
+        if (targetDetector != null)
+        {
+            targetDetector.WhenNetworkSpawn();
+        }
+        else
+        {
+            Debug.LogError("Bu objenin üzerinde TargetDetector component'i bulunamadý!", gameObject);
+        }
 
     }
 

@@ -2552,7 +2552,6 @@ GameObject:
   - component: {fileID: 8703940311844072726}
   - component: {fileID: 4180181427731492423}
   - component: {fileID: 4910232694440321169}
-  - component: {fileID: 8507703845456764107}
   m_Layer: 0
   m_Name: OneVSOneMode
   m_TagString: Untagged
@@ -2629,19 +2628,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8507703845456764107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7966489065968556800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 534afb19ca2c8ec41add0e4e04b520d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
 --- !u!1 &8135768053771056812
 GameObject:
   m_ObjectHideFlags: 0
