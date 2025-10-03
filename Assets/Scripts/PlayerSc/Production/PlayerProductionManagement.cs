@@ -73,12 +73,13 @@ public class PlayerProductionManagement : NetworkBehaviour
             yield return new WaitForSeconds(data.trainingTime);
 
             GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
+            obj.GetComponent<NetworkObject>().Spawn(true);
             var unitIdentity = obj.GetComponent<Soldier>();
             if (unitIdentity != null)
             {
                 unitIdentity.TeamId.Value = (int)order.clientId;
             }
-            obj.GetComponent<NetworkObject>().Spawn(true);
+            
         }
         isProducingUnit = false;
     }
@@ -101,12 +102,13 @@ public class PlayerProductionManagement : NetworkBehaviour
             GameObject obj = Instantiate(data.prefab, spawnPoint.position, spawnPoint.rotation);
 
             // Taretlerin de kime ait olduðunu belirtiyoruz
+
+            obj.GetComponent<NetworkObject>().Spawn(true);
             var unitIdentity = obj.GetComponent<Turret>();
             if (unitIdentity != null)
             {
                 unitIdentity.TeamId.Value = (int)order.clientId;
             }
-            obj.GetComponent<NetworkObject>().Spawn(true);
         }
         isProducingTurret = false;
     }
