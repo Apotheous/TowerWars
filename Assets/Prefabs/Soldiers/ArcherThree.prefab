@@ -177,7 +177,6 @@ GameObject:
   - component: {fileID: 6612645287355585467}
   - component: {fileID: 8454957887197285233}
   - component: {fileID: -249691399742853654}
-  - component: {fileID: -4833586957299858405}
   - component: {fileID: 6612645287355585464}
   - component: {fileID: 2196776996376851835}
   - component: {fileID: 7054680944188205767}
@@ -253,20 +252,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &-4833586957299858405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a4c74ba65948a2488861e769ee1ef53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TeamId:
-    m_InternalValue: 0
 --- !u!114 &6612645287355585464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,6 +266,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   age: 2
   MaxHealth: 100
+  TeamId:
+    m_InternalValue: 0
   healthBar: {fileID: 1702172565097953223}
   myCost: 50
   myPrize: 50

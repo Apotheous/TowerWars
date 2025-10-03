@@ -55,7 +55,7 @@ public class TestBullet : NetworkBehaviour
         if (damageAmount <= 0) return;
 
         // Çarptýðýmýz objenin kimlik bilgisi var mý?
-        var targetIdentity = other.GetComponent<UnitIdentity>();
+        var targetIdentity = other.GetComponent<Soldier>();
         if (targetIdentity != null)
         {
             // Eðer çarptýðýmýz þey kendi takýmýmýzdansa, hasar verme ve yok ol.

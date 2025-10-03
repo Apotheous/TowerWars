@@ -13,7 +13,7 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
 
     public IEnumerator FindTargetAndSetDestination()
     {
-        var myIdentity = GetComponent<UnitIdentity>();
+        var myIdentity = GetComponent<Soldier>();
         if (myIdentity == null)
         {
             

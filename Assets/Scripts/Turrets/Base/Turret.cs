@@ -15,7 +15,12 @@ public class Turret : NetworkBehaviour,IDamageable
         NetworkVariableReadPermission.Everyone,  // herkes okuyabilir
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
-
+    // Bu deðiþken tüm client'lara senkronize edilecek.
+    // ReadPermission.Everyone -> Herkes okuyabilir
+    // WritePermission.Server -> Sadece server deðiþtirebilir
+    public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
     [Header("Unity Stuff")]
     public Image healthBar;
 

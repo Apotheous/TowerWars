@@ -18,7 +18,14 @@ public class Soldier : NetworkBehaviour, IDamageable
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
 
- 
+    //PlayerProductionManagement ProduceNextUnit() dunda dolduruluyor.
+
+    // Bu deðiþken tüm client'lara senkronize edilecek.
+    // ReadPermission.Everyone -> Herkes okuyabilir
+    // WritePermission.Server -> Sadece server deðiþtirebilir
+    public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
     [Header("Unity Stuff")]
     public Image healthBar;
@@ -37,19 +44,6 @@ public class Soldier : NetworkBehaviour, IDamageable
     public override void OnNetworkSpawn()
     {
         // NetworkVariable'larýn senkronizasyonu tamamlandýðýnda bu metot çalýþýr.
-
-        // 1. TeamId'yi GÜVENLÝ bir þekilde al ve sakla
-        var unitIdentity = GetComponent<UnitIdentity>();
-        if (unitIdentity != null)
-        {
-            myTeamId = unitIdentity.TeamId.Value;
-            
-        }
-        else
-        {
-            Debug.LogError("Bu objenin üzerinde UnitIdentity component'i bulunamadý!", gameObject);
-        }
-
 
         // 2. Sadece Server üzerinde çalýþacak mantýk
         if (IsServer)

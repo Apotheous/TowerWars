@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class TargetDetector : NetworkBehaviour
 {
-    [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
-    private UnitIdentity myIdentity; // Kendi takým bilgimizi tutan referans
+    private SoldiersControllerNavMesh soldiersControllerNavMesh;
+    private Soldier myIdentity; // Kendi takým bilgimizi tutan referans
 
     public void WhenNetworkSpawn()
     {
@@ -20,7 +20,7 @@ public class TargetDetector : NetworkBehaviour
         }
 
         // Kendi UnitIdentity'mizi bul (takým bilgisi için kritik).
-        myIdentity = GetComponentInParent<UnitIdentity>();
+        myIdentity = GetComponentInParent<Soldier>();
         Debug.Log($"[SERVER DETECTOR] UnitIdentity çekildi MyTeamID ===" + myIdentity.TeamId.Value +"++++");
         if (myIdentity == null)
         {
@@ -40,7 +40,7 @@ public class TargetDetector : NetworkBehaviour
         Debug.Log($"[SERVER DETECTOR] trigger tetiklendi ({other.name}) -------");
 
         // 2. Birim Kimliði Kontrolü: Çarptýðýmýz objenin bir UnitIdentity'si var mý?
-        if (other.TryGetComponent<UnitIdentity>(out var unitIdentity))
+        if (other.TryGetComponent<Soldier>(out var unitIdentity))
         {
             // Kendi kimlik bilgimiz ayarlý deðilse devam etme (Hata korumasý)
             if (myIdentity == null)

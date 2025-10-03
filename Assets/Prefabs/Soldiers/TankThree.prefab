@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 4688456907441993285}
   - component: {fileID: 6302664422833124621}
   - component: {fileID: -6083335654545479499}
-  - component: {fileID: 6837371234859467661}
   - component: {fileID: 8149685480909384070}
   - component: {fileID: -3228509473518541863}
   m_Layer: 0
@@ -79,6 +78,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   age: 2
   MaxHealth: 100
+  TeamId:
+    m_InternalValue: 0
   healthBar: {fileID: 7547361602274862805}
   myCost: 50
   myPrize: 50
@@ -151,20 +152,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6837371234859467661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339119858819233629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a4c74ba65948a2488861e769ee1ef53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TeamId:
-    m_InternalValue: 0
 --- !u!114 &8149685480909384070
 MonoBehaviour:
   m_ObjectHideFlags: 0
