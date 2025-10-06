@@ -74,10 +74,12 @@ public class PlayerProductionManagement : NetworkBehaviour
 
             GameObject obj = Instantiate(data.prefab, mySpawnPoint.position, Quaternion.identity);
             obj.GetComponent<NetworkObject>().Spawn(true);
+            
             var unitIdentity = obj.GetComponent<Soldier>();
             if (unitIdentity != null)
             {
                 unitIdentity.TeamId.Value = (int)order.clientId;
+                obj.name = $"Soldier_Team_{order.clientId}";
             }
             
         }

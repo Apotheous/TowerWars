@@ -58,7 +58,7 @@ public class PlayerTagTrigger : NetworkBehaviour
 
         foreach (Transform child in transform)
         {
-            child.gameObject.tag = unityTag;
+            //child.gameObject.tag = unityTag;
         }
 
         Debug.Log($"[{(IsServer ? "Server" : "Client")}] {gameObject.name} {unityTag} tagine geçti.");

@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,119 +6,146 @@ using UnityEngine.AI;
 
 public class SoldiersControllerNavMesh : NetworkBehaviour
 {
+    // Inspector'dan atanmasÄ± gereken NavMeshAgent bileÅŸeni
     [SerializeField] private NavMeshAgent navMesh;
-    [SerializeField] private Transform target;
 
+    // Askerin mevcut hedefini tutar
+    [SerializeField]private Transform currentTarget;
+    [SerializeField]private Transform baseTarget;
 
-
-    public IEnumerator FindTargetAndSetDestination()
+ 
+    public void GiveMeNewTarget(Transform newTarget)
     {
-        var myIdentity = GetComponent<Soldier>();
-        if (myIdentity == null)
+
+        if (newTarget == null)
         {
-            
-            yield break;
+            Debug.LogWarning("[SERVER/NavMesh] Yeni hedef null. Atama yapÄ±lmadÄ±.");
+            return;
         }
 
+        currentTarget = newTarget;
 
-        int attempts = 0;
-        while (target == null && attempts < 10)
+        if (navMesh != null && navMesh.isOnNavMesh)
         {
-            attempts++;
-            if (myIdentity.TeamId.Value == 1)
-            {
-
-                target = DevSingletonTransform.instance.player2Transform;
-            }
-            else if (myIdentity.TeamId.Value == 2)
-            {
-
-                target = DevSingletonTransform.instance.player1Transform;
-            }
-
-            if (target == null)
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
-        }
-
-        // Hedef ataması yapıldıktan sonra...
-        if (target != null)
-        {
-
-
-            // --- NAVMESH KONTROL ADIMLARI ---
-
-            // 1. Kontrol: Bu birimin kendisi NavMesh üzerinde mi?
-            bool isAgentOnNavMesh = navMesh.isOnNavMesh;
-
-
-            // 2. Kontrol: Hedefin pozisyonu NavMesh üzerinde mi? (1 metrelik bir toleransla)
-            NavMeshHit hit;
-            bool isTargetOnNavMesh = NavMesh.SamplePosition(target.position, out hit, 1.0f, NavMesh.AllAreas);
-
-
-            // 3. Kontrol (En Önemlisi): Bu birimden hedefe geçerli bir yol var mı?
-            NavMeshPath path = new NavMeshPath();
-            bool pathCalculated = NavMesh.CalculatePath(transform.position, target.position, NavMesh.AllAreas, path);
-            if (pathCalculated)
-            {
-                Debug.Log($"[SERVER CHECK] Hedefe giden bir yol var mı? -> DURUM: {path.status}");
-            }
-            else
-            {
-                Debug.LogError($"[SERVER CHECK] Hedefe giden bir yol HESAPLANAMADI! Başlangıç veya bitiş noktası çok uzakta olabilir.");
-            }
-
-            // --- KONTROLLER BİTTİ ---
-
-            // Tüm kontroller başarılıysa hareket komutunu ver
-            if (isAgentOnNavMesh && isTargetOnNavMesh && path.status == NavMeshPathStatus.PathComplete)
-            {
-                Debug.Log($"[SERVER] Tüm NavMesh kontrolleri başarılı. Harekete geçiliyor!");
-                navMesh.destination = target.position;
-            }
-            else
-            {
-                Debug.LogError($"[SERVER] NavMesh kontrolleri başarısız olduğu için hareket ETTİRİLMEDİ. Lütfen yukarıdaki [SERVER CHECK] loglarını inceleyin.");
-            }
+            navMesh.ResetPath(); // eski path'i temizle
+            navMesh.SetDestination(currentTarget.position); // yeni hedefe yÃ¶nlendir
+            Debug.Log($"[SERVER/NavMesh] Yeni hedef alÄ±ndÄ±: ({currentTarget.name}). YÃ¶nlendirme baÅŸlatÄ±ldÄ±.");
         }
         else
         {
-            Debug.LogError("[SERVER] 10 denemeye rağmen hedef ATANAMADI!");
+            Debug.LogError($"[SERVER/NavMesh] {gameObject.name} NavMesh Ã¼zerinde deÄŸil veya Agent bileÅŸeni yok. Hareket ettirilemiyor.");
         }
     }
 
-    // SoldiersControllerNavMesh.cs içinde
+    // Harici birimlerin mevcut hedefi almasÄ±nÄ± saÄŸlar (Opsiyonel)
     public Transform GetCurrentTarget()
     {
-        return target;
-    }
-    public void GiveMeNewTarget(Transform newTarget)
-    {
-        target = newTarget;
-        if (IsServer && target != null)
+        if (currentTarget!=null)
         {
-            navMesh.SetDestination(target.position);
-            Debug.Log($"[NavMesh] Düşman birim alındı ({target.name}) hedefine yoneldi.");
+            baseTarget = currentTarget;
         }
+        return currentTarget;
     }
-    private void Update()
-    {
-        if (!IsServer) return;
 
-        if (target != null)
+   
+    //private void Update()
+    //{
+
+
+    //    if (currentTarget != null)
+    //    {
+
+    //        navMesh.SetDestination(currentTarget.position);
+
+    //    }
+      
+    //}
+    public void StopUnit()
+    {
+        if (IsServer)
         {
-            if (navMesh.destination != target.position)
+            // NavMeshAgent'Ä±n var olup olmadÄ±ÄŸÄ±nÄ± kontrol etmek iyi bir pratik.
+            if (navMesh != null)
             {
-                navMesh.SetDestination(target.position);
+                // 1. **isStopped = true** yapmak, Agent'Ä±n mevcut hedefine gitmeyi hemen bÄ±rakmasÄ±nÄ± saÄŸlar.
+                // Bu, durdurma iÃ§in en temel ve Ã¶nerilen yÃ¶ntemdir.
+                navMesh.isStopped = true;
+
+                // 2. **speed = 0f** yapmak, yeni bir hedef atandÄ±ÄŸÄ±nda bile Agent'Ä±n hareket etmemesini garanti eder.
+                // Ancak, isStopped = true ise bu genellikle gereksizdir. Yine de emin olmak iÃ§in kullanÄ±labilir.
+                navMesh.speed = 0f;
+
+                // 3. **velocity = Vector3.zero** yapmak, anlÄ±k hÄ±zÄ± sÄ±fÄ±rlar. 
+                // navMesh.isStopped = true yapÄ±ldÄ±ÄŸÄ±nda motor bunu zaten halleder, 
+                // ancak ani duruÅŸ saÄŸlamak iÃ§in bazen eklenir. Genellikle sadece isStopped yeterlidir.
+                navMesh.velocity = Vector3.zero;
+
+                // âœ¨ NOT: Genellikle sadece 'navMesh.isStopped = true;' kullanmak yeterlidir.
+                Debug.Log($"[SERVER/NavMesh] {gameObject.name} birimi durduruldu. "+"NavmeshSpeed =="+navMesh.speed + "NavmeshSpeedtoString ==" + navMesh.speed.ToString());
             }
         }
-        // Eğer bir sebepten ötürü hedef yok olduysa ve biz hala hedefsizsek, tekrar aramayı dene.
-        else if (navMesh.hasPath == false)
+        // NavMeshAgent'Ä±n var olup olmadÄ±ÄŸÄ±nÄ± kontrol etmek iyi bir pratik.
+        else if (!IsServer)
         {
-            // Bu kısmı projenin mantığına göre daha sonra doldurabilirsin.
-            // Örneğin, en yakın düşmanı bul gibi.
+            // 1. **isStopped = true** yapmak, Agent'Ä±n mevcut hedefine gitmeyi hemen bÄ±rakmasÄ±nÄ± saÄŸlar.
+            // Bu, durdurma iÃ§in en temel ve Ã¶nerilen yÃ¶ntemdir.
+            navMesh.isStopped = true;
+
+            // 2. **speed = 0f** yapmak, yeni bir hedef atandÄ±ÄŸÄ±nda bile Agent'Ä±n hareket etmemesini garanti eder.
+            // Ancak, isStopped = true ise bu genellikle gereksizdir. Yine de emin olmak iÃ§in kullanÄ±labilir.
+            navMesh.speed = 0f;
+
+            // 3. **velocity = Vector3.zero** yapmak, anlÄ±k hÄ±zÄ± sÄ±fÄ±rlar. 
+            // navMesh.isStopped = true yapÄ±ldÄ±ÄŸÄ±nda motor bunu zaten halleder, 
+            // ancak ani duruÅŸ saÄŸlamak iÃ§in bazen eklenir. Genellikle sadece isStopped yeterlidir.
+            navMesh.velocity = Vector3.zero;
+
+            // âœ¨ NOT: Genellikle sadece 'navMesh.isStopped = true;' kullanmak yeterlidir.
+            Debug.Log($"[Local/NavMesh] {gameObject.name} birimi durduruldu. " + "NavmeshSpeed ==" + navMesh.speed + "NavmeshSpeedtoString ==" + navMesh.speed.ToString());
+        }
+        
+
+
+    }
+ 
+    public IEnumerator FindTargetAndSetDestination()
+    {
+
+        var myIdentity = GetComponent<Soldier>();
+
+        if (myIdentity == null)
+        {
+            yield break;
+        }
+
+        int attempts = 0;
+
+        while (baseTarget == null && attempts < 10)
+        {
+
+            attempts++;
+
+            if (myIdentity.TeamId.Value == 1)
+
+            {
+                baseTarget = DevSingletonTransform.instance.player2Transform;
+            }
+
+            else if (myIdentity.TeamId.Value == 2)
+            {
+                baseTarget = DevSingletonTransform.instance.player1Transform;
+            }
+            if (baseTarget == null)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+
+        }
+
+Â  Â  Â  Â  // Hedef atamasÄ± yapÄ±ldÄ±ktan sonra...
+Â  Â  Â  Â  if (baseTarget != null)
+        {
+            GiveMeNewTarget(baseTarget);
         }
     }
 }
