@@ -35,8 +35,6 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private Transform myBarrel;
     [SerializeField] private float myRange;
 
-    // Takým ID'sini bu deðiþkende saklayacaðýz.
-    private int myTeamId = -1;
 
     [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
     [SerializeField] private TargetDetector targetDetector;
@@ -49,8 +47,8 @@ public class Soldier : NetworkBehaviour, IDamageable
         if (IsServer)
         {
             myHealth.Value = MaxHealth;
-            Debug.Log($"[SERVER] Asker spawn oldu. Takýmý: {myTeamId}", gameObject);
-            gameObject.name = myTeamId.ToString();
+
+            gameObject.name = TeamId.Value.ToString();
 
             // Örneðin, burada takýmýna göre bir hedef bulma mantýðý çalýþtýrýlabilir.
             // FindInitialTarget(); 
@@ -118,9 +116,5 @@ public class Soldier : NetworkBehaviour, IDamageable
     }
 
 
-    // Soldier.cs içine bu metodu ekle
-    public int GetTeamId()
-    {
-        return myTeamId;
-    }
+
 }

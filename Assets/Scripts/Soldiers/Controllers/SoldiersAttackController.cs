@@ -69,7 +69,7 @@ public class SoldiersAttackController : NetworkBehaviour
 
         // 2. Merminin script'ini al ve GÖREVÝNÝ VER (takým kimliði ve hasar).
         TestBullet bulletScript = bulletInstance.GetComponent<TestBullet>();
-        bulletScript.Initialize(mySoldierInfo.GetTeamId(), damage);
+        bulletScript.Initialize(mySoldierInfo.TeamId.Value, damage);
 
         // 3. Mermiyi network'te spawn et ki client'lar da görsün.
         bulletInstance.GetComponent<NetworkObject>().Spawn(true);
