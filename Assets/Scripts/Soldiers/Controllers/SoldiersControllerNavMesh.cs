@@ -39,9 +39,7 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
 
     // Harici birimlerin mevcut hedefi almasını sağlar (Opsiyonel)
     public Transform GetCurrentTarget()
-    {
-        baseTarget = currentTarget;
-        
+    {        
         return currentTarget;
     }
 
