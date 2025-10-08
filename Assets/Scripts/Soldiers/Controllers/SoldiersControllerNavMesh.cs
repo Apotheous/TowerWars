@@ -13,7 +13,54 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
     [SerializeField]private Transform currentTarget;
     [SerializeField]private Transform baseTarget;
 
- 
+    public override void OnNetworkSpawn()
+    {
+        if (!IsServer)
+        {
+            this.enabled = false;
+            return;
+        }
+    }
+
+    private void Update()
+    {
+        if (!IsServer) return;
+        if (navMesh == null)
+        {
+            Debug.LogError($"[SERVER/NavMesh] {gameObject.name} için NavMeshAgent atanmadı!");
+            return;
+        }
+        if (currentTarget != null)
+        {
+            // Hedefe doğru yönlendir
+            if (navMesh.isOnNavMesh)
+            {
+                navMesh.SetDestination(currentTarget.position);
+            }
+            else
+            {
+                Debug.LogError($"[SERVER/NavMesh] {gameObject.name} NavMesh üzerinde değil. Hedefe yönlendirilemiyor.");
+            }
+        }
+        else if (baseTarget!=null)
+        {
+            // Hedef yoksa dur
+            // Hedefe doğru yönlendir
+            if (navMesh.isOnNavMesh)
+            {
+                navMesh.SetDestination(baseTarget.position);
+            }
+        }
+        else
+        {
+            // Hedef yoksa dur
+            if (navMesh.hasPath)
+            {
+                navMesh.ResetPath();
+                Debug.Log($"[SERVER/NavMesh] {gameObject.name} için hedef null, hareket durduruldu.");
+            }
+        }
+    }
     public void GiveMeNewTarget(Transform newTarget)
     {
 
@@ -43,19 +90,6 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
         return currentTarget;
     }
 
-
-    //private void Update()
-    //{
-
-
-    //    if (currentTarget != null)
-    //    {
-
-    //        navMesh.SetDestination(currentTarget.position);
-
-    //    }
-
-    //}
     public void StopUnit()
     {
         if (IsServer)
@@ -80,28 +114,6 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
                 Debug.Log($"[SERVER/NavMesh] {gameObject.name} birimi durduruldu. "+"NavmeshSpeed =="+navMesh.speed + "NavmeshSpeedtoString ==" + navMesh.speed.ToString());
             }
         }
-        // NavMeshAgent'ın var olup olmadığını kontrol etmek iyi bir pratik.
-        else if (!IsServer)
-        {
-            // 1. **isStopped = true** yapmak, Agent'ın mevcut hedefine gitmeyi hemen bırakmasını sağlar.
-            // Bu, durdurma için en temel ve önerilen yöntemdir.
-            navMesh.isStopped = true;
-
-            // 2. **speed = 0f** yapmak, yeni bir hedef atandığında bile Agent'ın hareket etmemesini garanti eder.
-            // Ancak, isStopped = true ise bu genellikle gereksizdir. Yine de emin olmak için kullanılabilir.
-            navMesh.speed = 0f;
-
-            // 3. **velocity = Vector3.zero** yapmak, anlık hızı sıfırlar. 
-            // navMesh.isStopped = true yapıldığında motor bunu zaten halleder, 
-            // ancak ani duruş sağlamak için bazen eklenir. Genellikle sadece isStopped yeterlidir.
-            navMesh.velocity = Vector3.zero;
-
-            // ✨ NOT: Genellikle sadece 'navMesh.isStopped = true;' kullanmak yeterlidir.
-            Debug.Log($"[Local/NavMesh] {gameObject.name} birimi durduruldu. " + "NavmeshSpeed ==" + navMesh.speed + "NavmeshSpeedtoString ==" + navMesh.speed.ToString());
-        }
-        
-
-
     }
  
     public IEnumerator FindTargetAndSetDestination()

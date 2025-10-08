@@ -5,7 +5,7 @@ public class TargetDetector : NetworkBehaviour
 {
     [SerializeField] private SoldiersControllerNavMesh controllerNavMesh;
     [SerializeField] private SoldiersAttackController controllerAttack;
-    [SerializeField] private Soldier myIdentity; // Kendi takým bilgimizi tutan referans
+    [SerializeField] private Soldier soldier; // Kendi takým bilgimizi tutan referans
     [SerializeField] Transform target; // Þu an kullanýlmýyor, ama gelecekte hedefi tutmak için kullanýlabilir.
 
     public void WhenNetworkSpawn()
@@ -30,9 +30,9 @@ public class TargetDetector : NetworkBehaviour
         }
 
         // Kendi UnitIdentity'mizi bul (takým bilgisi için kritik).
-        myIdentity = GetComponentInParent<Soldier>();
-        Debug.Log($"[SERVER DETECTOR] UnitIdentity çekildi MyTeamID ===" + myIdentity.TeamId.Value +"++++");
-        if (myIdentity == null)
+        soldier = GetComponentInParent<Soldier>();
+        Debug.Log($"[SERVER DETECTOR] UnitIdentity çekildi MyTeamID ===" + soldier.TeamId.Value +"++++");
+        if (soldier == null)
         {
             Debug.LogError("TargetDetector için gerekli olan UnitIdentity bulunamadý!");
 
@@ -50,7 +50,7 @@ public class TargetDetector : NetworkBehaviour
         if (potentialTargetParent != null)
         {
             // Tetiklenme Logu: Parent nesnenin adýný yazdýrýr.
-            Debug.Log($"[DETECTOR - FÝZÝK] Tetiklenme: {potentialTargetParent.name} (Parent) | Kendi Takým ID: {myIdentity.TeamId.Value}");
+            Debug.Log($"[DETECTOR - FÝZÝK] Tetiklenme: {potentialTargetParent.name} (Parent) | Kendi Takým ID: {soldier.TeamId.Value}");
 
             // 2. YALNIZCA SUNUCUDA ÇALIÞACAK KRÝTÝK OYUN MANTIÐI
             // Bu birim Sunucu tarafýndan kontrol ediliyorsa, hedefleme kararlarýný al.
@@ -60,14 +60,14 @@ public class TargetDetector : NetworkBehaviour
                 if (potentialTargetParent.TryGetComponent<Soldier>(out var unitIdentity))
                 {
                     // Kendi birim bilgimizin varlýðýný kontrol et (Hata korumasý)
-                    if (myIdentity == null)
+                    if (soldier == null)
                     {
                         Debug.LogError("[SERVER DETECTOR] Kendi kimlik bilgisi (myIdentity) bulunamadý!");
                         return;
                     }
 
                     // Takým ID'lerini karþýlaþtýr ve logla
-                    var myTeam = myIdentity.TeamId.Value;
+                    var myTeam = soldier.TeamId.Value;
                     var otherTeam = unitIdentity.TeamId.Value;
                     Debug.Log($"[SERVER DETECTOR KRÝTÝK ANALÝZ] Kendi: {myTeam}, Diðer: {otherTeam} | Ýsim: {potentialTargetParent.name}");
 
@@ -78,9 +78,10 @@ public class TargetDetector : NetworkBehaviour
                         Debug.Log($"[SERVER DETECTOR] DÜÞMAN TESPÝT EDÝLDÝ! Hedef: {potentialTargetParent.name}");
 
                         // Hedefle ilgili kararlarý (durma, hedef atama) SADECE SUNUCU alýr.
-                        controllerNavMesh.StopUnit();
-                        // soldiersControllerNavMesh.GiveMeNewTarget(potentialTargetParent); 
-              
+                        //controllerNavMesh.StopUnit();
+                        controllerNavMesh.GiveMeNewTarget(potentialTargetParent);
+                        controllerAttack.StartAttacking(potentialTargetParent);
+
                         // Að üzerindeki tüm istemcilere birimin durduðu bilgisini Network/RPC ile göndermeniz gerekebilir.
                         // Bu, NavMesh Agent'ýn durma iþleminin yerel olarak görselleþtirilmesini saðlar.
 
@@ -92,7 +93,7 @@ public class TargetDetector : NetworkBehaviour
         else
         {
             // Parent'ý olmayan objelerin (örneðin yerdeki bir powerup) tetiklenme logu
-            Debug.Log($"[DETECTOR - FÝZÝK] Tetiklenme: {other.transform.name} (Kendi) | Kendi Takým ID: {myIdentity.TeamId.Value}");
+            Debug.Log($"[DETECTOR - FÝZÝK] Tetiklenme: {other.transform.name} (Kendi) | Kendi Takým ID: {soldier.TeamId.Value}");
         }
         // Genel Tetiklenme Logu: Hangi nesne olursa olsun tetiklendiðini bildirir.
     }
