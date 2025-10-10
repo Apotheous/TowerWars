@@ -1,15 +1,22 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class TargetDetector : NetworkBehaviour
 {
-    [SerializeField] private SoldiersControllerNavMesh controllerNavMesh;
-    [SerializeField] private SoldiersAttackController controllerAttack;
-    [SerializeField] private Soldier soldier; // Kendi takým bilgimizi tutan referans
+    private SoldiersControllerNavMesh controllerNavMesh;
+    private SoldiersAttackController controllerAttack;
+    private Soldier soldier; // Kendi takým bilgimizi tutan referans
     [SerializeField] Transform target; // Þu an kullanýlmýyor, ama gelecekte hedefi tutmak için kullanýlabilir.
+
+
+    // Potansiyel düþmanlarý tutan liste
+    private List<Transform> detectedTargets = new List<Transform>();
 
     public void WhenNetworkSpawn()
     {
+        // Yalnýzca Sunucuda gerekli bileþenleri çekme
+        if (!IsServer) return;
         Debug.Log($"[SERVER DETECTOR] Baþladý OnNetworkSpawn");
         // SoldiersControllerNavMesh'e ulaþmanýn en saðlam yolu:
         if (controllerNavMesh == null)
@@ -28,20 +35,27 @@ public class TargetDetector : NetworkBehaviour
         {
             Debug.Log($"[SERVER DETECTOR] SoldiersAttackController zaten atanmýþ");
         }
-
         // Kendi UnitIdentity'mizi bul (takým bilgisi için kritik).
-        soldier = GetComponentInParent<Soldier>();
-        Debug.Log($"[SERVER DETECTOR] UnitIdentity çekildi MyTeamID ===" + soldier.TeamId.Value +"++++");
         if (soldier == null)
         {
-            Debug.LogError("TargetDetector için gerekli olan UnitIdentity bulunamadý!");
-
+            soldier = GetComponentInParent<Soldier>();
+            if (soldier != null)
+            {
+                Debug.Log($"[SERVER DETECTOR] Soldier çekildi MyTeamID ===" + soldier.TeamId.Value + "++++");
+            }
+            else
+            {
+                Debug.LogError("TargetDetector için gerekli olan Soldier bulunamadý!");
+            }
         }
+       
 
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // Yalnýzca Sunucuda çalýþacak KRÝTÝK OYUN MANTIÐI
+        if (!IsServer || soldier == null) return;
 
         // 1. GENEL LOG: Kimin neye çarptýðýný her iki tarafta da yazdýr.
         // Bu, debug için önemlidir, tetikleyicinin çalýþýp çalýþmadýðýný gösterir.
@@ -74,18 +88,22 @@ public class TargetDetector : NetworkBehaviour
                     // 3. DÜÞMAN KONTROLÜ
                     if (myTeam != otherTeam)
                     {
-                        // Düþman Tespit Edildi Logu
-                        Debug.Log($"[SERVER DETECTOR] DÜÞMAN TESPÝT EDÝLDÝ! Hedef: {potentialTargetParent.name}");
+                        // Listede zaten yoksa listeye ekle
+                        if (!detectedTargets.Contains(potentialTargetParent))
+                        {
+                            detectedTargets.Add(potentialTargetParent);
+                            Debug.Log($"[SERVER DETECTOR] {potentialTargetParent.name} hedefler listesine eklendi. Toplam hedef: {detectedTargets.Count}");
 
-                        // Hedefle ilgili kararlarý (durma, hedef atama) SADECE SUNUCU alýr.
-                        //controllerNavMesh.StopUnit();
-                        controllerNavMesh.GiveMeNewTarget(potentialTargetParent);
-                        controllerAttack.StartAttacking(potentialTargetParent);
-
-                        // Að üzerindeki tüm istemcilere birimin durduðu bilgisini Network/RPC ile göndermeniz gerekebilir.
-                        // Bu, NavMesh Agent'ýn durma iþleminin yerel olarak görselleþtirilmesini saðlar.
-
-                        Debug.Log($"[SERVER DETECTOR] Durma emri verildi ve yeni hedef kararý alýnýyor.");
+                            // Liste boþken bir düþman geldiyse, saldýrý/yönlendirme kararý al.
+                            // Bu mantýk, askerin her yeni düþman girdiðinde deðil,
+                            // sadece þu anda bir hedefi yoksa yeni hedef seçmesini saðlar.
+                            if (detectedTargets.Count == 1)
+                            {
+                                // Bu noktada, en iyi hedefi seçme ve controller'a atama mantýðý devreye girer.
+                                // Þimdilik sadece yeni giren hedefi seçelim:
+                                AssignBestTarget();
+                            }
+                        }
                     }
                 }
             }
@@ -96,5 +114,56 @@ public class TargetDetector : NetworkBehaviour
             Debug.Log($"[DETECTOR - FÝZÝK] Tetiklenme: {other.transform.name} (Kendi) | Kendi Takým ID: {soldier.TeamId.Value}");
         }
         // Genel Tetiklenme Logu: Hangi nesne olursa olsun tetiklendiðini bildirir.
+    }
+
+    // --- YENÝ LOGIC: HEDEF ÇIKARMA ---
+    private void OnTriggerExit(Collider other)
+    {
+        // Yalnýzca Sunucuda çalýþacak KRÝTÝK OYUN MANTIÐI
+        if (!IsServer || soldier == null) return;
+
+        Transform potentialTargetParent = other.transform.parent;
+
+        if (potentialTargetParent != null && potentialTargetParent.TryGetComponent<Soldier>(out _))
+        {
+            // Listeden çýkarma iþlemi (Takým kontrolüne gerek yok, listede olan çýkarýlýr)
+            if (detectedTargets.Contains(potentialTargetParent))
+            {
+                detectedTargets.Remove(potentialTargetParent);
+                Debug.Log($"[SERVER DETECTOR] {potentialTargetParent.name} alandan çýktý ve listeden çýkarýldý. Kalan hedef: {detectedTargets.Count}");
+
+                // Eðer çýkan birim þu anki hedefimizse, yeni bir hedef seçmeliyiz.
+                if (controllerAttack.GetCurrentTarget() == potentialTargetParent)
+                {
+                    AssignBestTarget();
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// Algýlanan hedefler listesinden en uygun olaný seçer ve Controller'lara atar.
+    /// (Þimdilik: Sadece listedeki ilk elemaný seçer)
+    /// </summary>
+    private void AssignBestTarget()
+    {
+        if (detectedTargets.Count > 0)
+        {
+            // **GERÇEK OYUN MANTIÐI BURAYA GELMELÝ:**
+            // Örneðin: enYakýnHedef = FindClosestTarget(detectedTargets);
+            // Þimdilik: Liste doluysa ilk elemaný seç
+            Transform newTarget = detectedTargets[0];
+
+            // NavMesh ve Saldýrý Controller'larýna hedefi bildir.
+            controllerNavMesh.GiveMeNewTarget(newTarget);
+            controllerAttack.StartAttacking(newTarget);
+            Debug.Log($"[SERVER DETECTOR] YENÝ HEDEF SEÇÝLDÝ: {newTarget.name}");
+        }
+        else
+        {
+            // Hiç hedef kalmadýysa
+            controllerNavMesh.GiveMeNewTarget(null); // veya bir sonraki default hedefine gitmesini saðla
+            controllerAttack.StopAttacking();
+            Debug.Log("[SERVER DETECTOR] Tüm hedefler alandan çýktý, saldýrý durduruldu.");
+        }
     }
 }

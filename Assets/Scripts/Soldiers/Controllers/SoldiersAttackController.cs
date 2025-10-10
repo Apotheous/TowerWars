@@ -21,6 +21,7 @@ public class SoldiersAttackController : NetworkBehaviour
     private SoldiersControllerNavMesh movementController;
     private Soldier mySoldierInfo;
 
+    private Transform myCurrentTarget;
 
     private Coroutine attackCoroutine; // Çalýþan Coroutine'e referans tutar.
 
@@ -55,7 +56,10 @@ public class SoldiersAttackController : NetworkBehaviour
             Debug.LogError("FireRate sýfýr veya negatif! Varsayýlan gecikme (0.1s) kullanýlýyor.");
         }
     }
-
+    public Transform GetCurrentTarget() 
+    {
+        return myCurrentTarget;
+    }
     /// <summary>
     /// Saldýrý döngüsünü baþlatýr. (Örn: Hedef menzile girdiðinde SoldiersControllerNavMesh çaðýrabilir)
     /// </summary>
@@ -63,9 +67,10 @@ public class SoldiersAttackController : NetworkBehaviour
     {
         // Zaten bir saldýrý döngüsü çalýþýyorsa tekrar baþlatma.
         if (attackCoroutine != null) return;
-
+        myCurrentTarget = currentTarget;
         // Saldýrý Coroutine'ini baþlat.
         attackCoroutine = StartCoroutine(AttackCoroutine(currentTarget));
+
     }
 
     /// <summary>
