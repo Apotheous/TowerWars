@@ -55,7 +55,7 @@ public class TestBullet : NetworkBehaviour
         {
             // Hasarýmýz zaten sýfýrlandýysa veya bir þekil2de mermi geçersizse bir þey yapma.
             if (damageAmount <= 0) return;
-            if (other.gameObject.name == "TargetDetector")
+            if (other.gameObject.name == "TargetDetector" || other.gameObject.name == "bullet(Clone)")
             {
                 return;
             }
