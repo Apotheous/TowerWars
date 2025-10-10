@@ -32,11 +32,13 @@ public class TestBullet : NetworkBehaviour
     // Mermiyi yok eden metot
     private void DestroyBullet()
     {
+        Debug.Log("Mermi yok ediliyor.");
         // Eðer hala network'te ise despawn et.
         if (NetworkObject != null && NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn();
         }
+
     }
 
     private void Update()
@@ -49,38 +51,41 @@ public class TestBullet : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Çarpýþma ve hasar mantýðý SADECE server'da çalýþmalý.
-        if (!IsServer) return;
-
-        // Hasarýmýz zaten sýfýrlandýysa veya bir þekil2de mermi geçersizse bir þey yapma.
-        if (damageAmount <= 0) return;
-
-        // Çarptýðýmýz objenin kimlik bilgisi var mý?
-        var targetIdentity = other.GetComponent<Soldier>();
-        if (targetIdentity != null)
+        if (IsServer)
         {
-            // Eðer çarptýðýmýz þey kendi takýmýmýzdansa, hasar verme ve yok ol.
-            if (targetIdentity.TeamId.Value == ownerTeamId)
+            // Hasarýmýz zaten sýfýrlandýysa veya bir þekil2de mermi geçersizse bir þey yapma.
+            if (damageAmount <= 0) return;
+            if (other.gameObject.name == "TargetDetector")
             {
-                // Kendi takým arkadaþýna çarptýn. Hasar verme.
-                DestroyBullet();
-                return; // Metodun devamýný çalýþtýrma.
+                return;
             }
-        }
+            // Çarptýðýmýz objenin kimlik bilgisi var mý?
+            var targetIdentity = other.GetComponent<Soldier>();
+            if (targetIdentity != null)
+            {
+                // Eðer çarptýðýmýz þey kendi takýmýmýzdansa, hasar verme ve yok ol.
+                if (targetIdentity.TeamId.Value == ownerTeamId )
+                {
+                    // Kendi takým arkadaþýna çarptýn. Hasar verme.
+                    Debug.Log("Mermi yok edilecek. == " + other.name);
+                    DestroyBullet();
+                    return; // Metodun devamýný çalýþtýrma.
+                }
+            }
 
-        // Çarptýðýmýz þeyin caný var mý? (IDamageable)
-        var damageableTarget = other.GetComponent<IDamageable>();
-        if (damageableTarget != null)
-        {
-            // Düþmana çarptýk! Hasar ver.
-            damageableTarget.TakeDamage(damageAmount);
-        }
+            // Çarptýðýmýz þeyin caný var mý? (IDamageable)
+            var damageableTarget = other.GetComponent<IDamageable>();
+            if (damageableTarget != null)
+            {
+                // Düþmana çarptýk! Hasar ver.
+                damageableTarget.TakeDamage(damageAmount);
+            }
 
-        // Mermi bir þeye çarptýðý için (düþman, dost, duvar fark etmez) görevini tamamladý.
-        // Hasarýný sýfýrla ve kendini yok et.
-        damageAmount = 0;
-        DestroyBullet();
+            // Mermi bir þeye çarptýðý için (düþman, dost, duvar fark etmez) görevini tamamladý.
+            // Hasarýný sýfýrla ve kendini yok et.
+            damageAmount = 0;
+            
+            DestroyBullet();
+        }
     }
-
-
-
 }

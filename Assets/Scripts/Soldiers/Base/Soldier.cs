@@ -111,8 +111,8 @@ public class Soldier : NetworkBehaviour, IDamageable
 
     public void Die()
     {
-        gameObject.SetActive(false);
-        // GetComponent<NetworkObject>().Despawn(); // alternatifi
+        //gameObject.SetActive(false);
+        GetComponent<NetworkObject>().Despawn(); // alternatifi
     }
 
 
