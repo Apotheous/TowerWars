@@ -93,12 +93,11 @@ public class TargetDetector : NetworkBehaviour
                         // Liste boþken bir düþman geldiyse, saldýrý/yönlendirme kararý al.
                         // Bu mantýk, askerin her yeni düþman girdiðinde deðil,
                         // sadece þu anda bir hedefi yoksa yeni hedef seçmesini saðlar.
-                        if (detectedTargets.Count == 1)
-                        {
-                            // Bu noktada, en iyi hedefi seçme ve controller'a atama mantýðý devreye girer.
-                            // Þimdilik sadece yeni giren hedefi seçelim:
-                            AssignBestTarget();
-                        }
+               
+                        // Bu noktada, en iyi hedefi seçme ve controller'a atama mantýðý devreye girer.
+                        // Þimdilik sadece yeni giren hedefi seçelim:
+                        AssignBestTarget();
+                        
                     }
                 }
             }
