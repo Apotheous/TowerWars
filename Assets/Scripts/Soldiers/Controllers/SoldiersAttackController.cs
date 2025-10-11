@@ -20,7 +20,7 @@ public class SoldiersAttackController : NetworkBehaviour
     // Diðer component'lere referanslar
     private SoldiersControllerNavMesh movementController;
     private Soldier mySoldierInfo;
-
+    private TargetDetector myTargetDetector; // YENÝ: TargetDetector referansý
     private Transform myCurrentTarget;
 
     private Coroutine attackCoroutine; // Çalýþan Coroutine'e referans tutar.
@@ -32,6 +32,7 @@ public class SoldiersAttackController : NetworkBehaviour
     {
         movementController = GetComponent<SoldiersControllerNavMesh>();
         mySoldierInfo = GetComponent<Soldier>(); // Kendi Soldier script'imizi alýyoruz.
+        myTargetDetector = GetComponentInChildren<TargetDetector>();
     }
 
     public override void OnNetworkSpawn()
@@ -60,6 +61,8 @@ public class SoldiersAttackController : NetworkBehaviour
     {
         return myCurrentTarget;
     }
+
+
     /// <summary>
     /// Saldýrý döngüsünü baþlatýr. (Örn: Hedef menzile girdiðinde SoldiersControllerNavMesh çaðýrabilir)
     /// </summary>
@@ -82,6 +85,7 @@ public class SoldiersAttackController : NetworkBehaviour
         {
             StopCoroutine(attackCoroutine);
             attackCoroutine = null; // Coroutine'i durdurduktan sonra referansý temizle.
+            myCurrentTarget = null; // Hedef bilgisini de temizle
         }
     }
 
@@ -92,24 +96,35 @@ public class SoldiersAttackController : NetworkBehaviour
     {
         while (true) // Coroutine'i StopAttacking() çaðrýlana kadar sonsuza kadar çalýþtýr.
         {
-            
 
-            // 1. Hedef varlýðýný ve menzili kontrol et.
-            if (currentTarget != null)
+
+            // 1. HEDEF VARLIÐI VE GEÇERLÝLÝK KONTROLÜ (YENÝ EKLEME)
+            // myCurrentTarget == null (Unity objesi destroy edildi) VEYA 
+            // NetworkObject == null (Unit Netcode tarafýndan Despawn edildi)
+            if (myCurrentTarget == null || (myCurrentTarget.TryGetComponent<NetworkObject>(out var netObj) && !netObj.IsSpawned))
             {
-                float distanceToTarget = Vector3.Distance(transform.position, currentTarget.position);
-
-                if (distanceToTarget <= attackRange)
+                // Hedef yoksa/öldüyse: Saldýrýyý durdur ve Detector'a yeni hedef seçmesini söyle.
+                StopAttacking();
+                if (myTargetDetector != null)
                 {
-                    // Menzildeyse: Yönünü hedefe çevir ve ateþ et.
-                    transform.LookAt(currentTarget.position);
-                    Attack();
+                    // Detector, mevcut listedeki ölü hedefleri temizleyecek ve yeni hedef seçecek.
+                    myTargetDetector.AssignBestTarget();
                 }
-                // Hedeften çýkarsa, bu Coroutine devam eder ama ateþ etmez.
-                // Ýsteðe baðlý olarak, menzil dýþýndaysa StopAttacking() çaðrýlabilir.
+                yield break; // Coroutine'i bitir.
             }
 
-            // 2. Belirlenen atýþ hýzý kadar bekle.
+            // 2. Menzil kontrolü ve saldýrý mantýðý.
+            float distanceToTarget = Vector3.Distance(transform.position, myCurrentTarget.position); // myCurrentTarget kullanýldý
+
+            if (distanceToTarget <= attackRange)
+            {
+                // Menzildeyse: Yönünü hedefe çevir ve ateþ et.
+                transform.LookAt(myCurrentTarget.position);
+                Attack();
+            }
+            // Hedeften çýkarsa, bu Coroutine devam eder ama ateþ etmez.
+
+            // 3. Belirlenen atýþ hýzý kadar bekle.
             yield return attackDelay;
         }
     }
