@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class PlayerSC : NetworkBehaviour ,IDamageable
 {
-
-
+    // Bu değişken tüm client'lara senkronize edilecek.
+    // ReadPermission.Everyone -> Herkes okuyabilir
+    // WritePermission.Server -> Sadece server değiştirebilir
+    public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+    
     #region Player Data
     [Header("Player Stats")]
     // NetworkVariable olarak Player Data’yı direkt burada tanımlıyoruz
@@ -70,6 +75,33 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         {
             Debug.Log("[PlayerSC] LEVEL UP TRIGGERED!");
         };
+
+        // SUNUCU TARAFINDA BAŞLATMA (TeamId ve İlk Değerler)
+        if (IsServer)
+        {
+            // 1. TeamId Ataması (Önerilen basit ve kısa yol)
+            // OwnerClientId'yi modül alarak TeamId'ye dönüştürme:
+            // (OwnerClientId % 2) + 1  -> 1. oyuncu Team 1, 2. oyuncu Team 2, 3. oyuncu Team 1, vb.
+            // Bu, 1 ve 2 ID'li takımlar arasında döngüsel atama yapar.
+            TeamId.Value = (int)(OwnerClientId % 2) + 1;
+
+            // Log'a yazdır (Server'da)
+            Debug.Log($"[Server] Player {OwnerClientId} spawned and assigned to TeamId: {TeamId.Value}");
+
+            // Client'lara senkronize edilen objenin adını sunucuda değiştirmek
+            // localPlayer.gameObject.name = "Player_" + NetworkManager.Singleton.LocalClientId;
+            // yerine Sunucudaki NetworkObject'un adını değiştiririz.
+            gameObject.name = "Player_" + OwnerClientId;
+        }
+
+        // CLIENT TARAFINDA GÖRSEL BAŞLATMA (Opsiyonel)
+        if (IsOwner)
+        {
+            // Bu oyuncunun adını kendi client'ında göster
+            gameObject.name = "MY_PLAYER_" + OwnerClientId;
+        }
+
+
     }
 
     private void OnWinnerDeclared(ulong previousValue, ulong newValue)

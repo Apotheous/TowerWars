@@ -101,6 +101,40 @@ public class TargetDetector : NetworkBehaviour
                     }
                 }
             }
+            //else if (potentialTargetParent.TryGetComponent<PlayerSC>(out var baseIdentity))
+            //{
+            //    // Kendi birim bilgimizin varlýðýný kontrol et (Hata korumasý)
+            //    if (soldier == null)
+            //    {
+            //        Debug.LogError("[SERVER DETECTOR] Kendi kimlik bilgisi (myIdentity) bulunamadý!");
+            //        return;
+            //    }
+
+            //    // Takým ID'lerini karþýlaþtýr ve logla
+            //    var myTeam = soldier.TeamId.Value;
+            //    var otherTeam = baseIdentity.TeamId.Value;
+            //    Debug.Log($"[SERVER DETECTOR KRÝTÝK ANALÝZ] Kendi: {myTeam}, Diðer: {otherTeam} | Ýsim: {potentialTargetParent.name}");
+
+            //    // 3. DÜÞMAN KONTROLÜ
+            //    if (myTeam != otherTeam)
+            //    {
+            //        // Listede zaten yoksa listeye ekle
+            //        if (!detectedTargets.Contains(potentialTargetParent))
+            //        {
+            //            detectedTargets.Add(potentialTargetParent);
+            //            Debug.Log($"[SERVER DETECTOR] {potentialTargetParent.name} hedefler listesine eklendi. Toplam hedef: {detectedTargets.Count}");
+
+            //            // Liste boþken bir düþman geldiyse, saldýrý/yönlendirme kararý al.
+            //            // Bu mantýk, askerin her yeni düþman girdiðinde deðil,
+            //            // sadece þu anda bir hedefi yoksa yeni hedef seçmesini saðlar.
+
+            //            // Bu noktada, en iyi hedefi seçme ve controller'a atama mantýðý devreye girer.
+            //            // Þimdilik sadece yeni giren hedefi seçelim:
+            //            AssignBestTarget();
+
+            //        }
+            //    }
+            //}
         }
         else
         {
