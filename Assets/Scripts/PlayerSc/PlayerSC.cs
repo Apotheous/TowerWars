@@ -79,11 +79,15 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         // SUNUCU TARAFINDA BAŞLATMA (TeamId ve İlk Değerler)
         if (IsServer)
         {
-            // 1. TeamId Ataması (Önerilen basit ve kısa yol)
-            // OwnerClientId'yi modül alarak TeamId'ye dönüştürme:
-            // (OwnerClientId % 2) + 1  -> 1. oyuncu Team 1, 2. oyuncu Team 2, 3. oyuncu Team 1, vb.
-            // Bu, 1 ve 2 ID'li takımlar arasında döngüsel atama yapar.
-            TeamId.Value = (int)(OwnerClientId % 2) + 1;
+            // YENİ MANTIK: ClientId 1 -> Team 1; ClientId 2 -> Team 2
+            if (OwnerClientId == 1)
+            {
+                TeamId.Value = 1;
+            }
+            else if (OwnerClientId == 2)
+            {
+                TeamId.Value = 2;
+            }
 
             // Log'a yazdır (Server'da)
             Debug.Log($"[Server] Player {OwnerClientId} spawned and assigned to TeamId: {TeamId.Value}");
