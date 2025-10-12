@@ -96,6 +96,12 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
             // localPlayer.gameObject.name = "Player_" + NetworkManager.Singleton.LocalClientId;
             // yerine Sunucudaki NetworkObject'un adını değiştiririz.
             gameObject.name = "Player_" + OwnerClientId;
+
+            // TeamId'nin burada ayarlandığından emin olun (Örn: TeamId.Value = 1;)
+            if (OneVsOneModePlayerSCHolder.Instance != null)
+            {
+                OneVsOneModePlayerSCHolder.Instance.RegisterPlayer(TeamId.Value, this);
+            }
         }
 
         // CLIENT TARAFINDA GÖRSEL BAŞLATMA (Opsiyonel)

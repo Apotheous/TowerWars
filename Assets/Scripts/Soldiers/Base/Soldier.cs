@@ -111,10 +111,47 @@ public class Soldier : NetworkBehaviour, IDamageable
 
     public void Die()
     {
-        //gameObject.SetActive(false);
-        GetComponent<NetworkObject>().Despawn(); // alternatifi
+        // YALNIZCA SUNUCUDA ÇALIÞTIR!
+        if (!IsServer) return;
+        // Ölen askerin düþman takým ID'sini bul
+        int killingPlayerTeamId = (TeamId.Value == 1) ? 2 : 1;
+
+        // YÖNETÝCÝ ARACILIÐIYLA DÝREKT ERÝÞÝM (O(1))
+        PlayerSC enemyPlayerSC = OneVsOneModePlayerSCHolder.Instance.GetPlayerByTeamId(killingPlayerTeamId);
+
+        if (enemyPlayerSC != null)
+        {
+            enemyPlayerSC.UpdateMyScrap(myPrize);
+            Debug.Log($"[Server] Manager: Team {killingPlayerTeamId} gained {myPrize} scrap.");
+        }
+
+        GetComponent<NetworkObject>().Despawn();
+        //// Ölen askerin düþmanýnýn kim olduðunu bul (Örn: TeamId 1 ise düþman TeamId 2)
+        //int killingPlayerTeamId = (TeamId.Value == 1) ? 2 : 1;
+
+        //// Askerin ödülünü PlayerSC'ye gönder (örneðin myPrize kadar scrap ver)
+        //GiveScrapToKillingPlayer(killingPlayerTeamId, myPrize);
+
+        ////gameObject.SetActive(false);
+        //GetComponent<NetworkObject>().Despawn();
     }
 
-
+    // Yeni metot: Öldüren oyuncuya Scrap verir
+    private void GiveScrapToKillingPlayer(int winningTeamId, float amount)
+    {
+        // Bütün NetworkObject'lar içinde PlayerSC'leri ara
+        foreach (var playerSC in FindObjectsOfType<PlayerSC>())
+        {
+            if (playerSC.TeamId.Value == winningTeamId)
+            {
+                // Rakip oyuncu bulundu, Scrap miktarýný Server'da deðiþtir.
+                // Bu metot zaten Server'da çalýþtýðý için direkt çaðýrmak güvenlidir.
+                playerSC.UpdateMyScrap(amount);
+                Debug.Log($"[Server] Team {winningTeamId} player gained {amount} scrap for killing a soldier.");
+                return;
+            }
+        }
+        Debug.LogError($"[Server] PlayerSC with TeamId {winningTeamId} not found to give scrap!");
+    }
 
 }
