@@ -13,7 +13,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class MatchMakerManager : NetworkBehaviour
 {
-    //[SerializeField] private TMP_Dropdown gameModeDropdown;
     public static MatchMakerManager Instance;
 
     private PayloadAllocation payloadAllocation;
@@ -24,12 +23,13 @@ public class MatchMakerManager : NetworkBehaviour
     private string currentTicket;
 
     [SerializeField] private MatchMakerUI matchMakerUI;
-
     [SerializeField] string sceneName;
+
+    // YENÝ: Hizmetlerin baþlatýlýp baþlatýlmadýðýný kontrol eden bayrak
+    public bool ServicesInitialized { get; private set; } = false;
 
     private void Awake()
     {
-        // Eðer zaten bir Instance varsa ve bu o deðilse yok et
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -37,33 +37,95 @@ public class MatchMakerManager : NetworkBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Sahne deðiþince kaybolmasýn
+        DontDestroyOnLoad(gameObject);
     }
+
     private async void Start()
     {
         networkManager = NetworkManager.Singleton;
 
         if (Application.platform != RuntimePlatform.LinuxServer)
         {
+            // Ýstemci/Host Tarafý Baþlatma
             await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
+            ServicesInitialized = true; // Bayraðý ayarla
         }
         else
         {
+            // Linux Sunucu Tarafý Baþlatma
+
+            // Baþlatma tamamlanana kadar bekle (Bu blok orijinal kodunuzdan geldi, korunmuþtur)
             while (UnityServices.State == ServicesInitializationState.Uninitialized || UnityServices.State == ServicesInitializationState.Initializing)
             {
                 await Task.Yield();
             }
 
             matchmakerService = MatchmakerService.Instance;
+
+            // Multiplay payload'unu al
             payloadAllocation = await MultiplayService.Instance.GetPayloadAllocationFromJsonAs<PayloadAllocation>();
             backfillTicketId = payloadAllocation.BackfillTicketId;
+
+            // HATA ÇÖZÜMÜ #2: Kontrollü Backfill döngüsünü Start() içinde baþlat
+            StartBackfillPolling();
         }
 
         networkManager.OnClientConnectedCallback += HandleClientConnected;
-
     }
+
+    // YENÝ VE DÜZELTÝLMÝÞ: 429 hatalarýný önlemek için özel asenkron döngü
+    private async void StartBackfillPolling()
+    {
+        // Sonsuz döngü: Sunucunun ömrü boyunca çalýþacak
+        while (Application.platform == RuntimePlatform.LinuxServer)
+        {
+            try
+            {
+                // Backfill mantýðý: backfillTicketId varsa ve hala yer varsa (2'den az oyuncu)
+                if (backfillTicketId != null && NetworkManager.Singleton.ConnectedClientsList.Count < 2)
+                {
+                    Debug.Log($"[Matchmaker Polling] Backfill isteði gönderiliyor: {backfillTicketId}");
+
+                    // ApproveBackfillTicketAsync'i kontrollü olarak çaðýr
+                    BackfillTicket backfillTicket = await MatchmakerService.Instance.ApproveBackfillTicketAsync(backfillTicketId);
+                    backfillTicketId = backfillTicket.Id;
+                    Debug.Log($"[Matchmaker Polling] Backfill onayý baþarýlý. Yeni ID: {backfillTicketId}");
+                }
+            }
+            catch (MatchmakerServiceException ex)
+            {
+                // DÜZELTME: Hata mesajý içinde "429" veya "Too Many Requests" kontrolü
+                if (ex.Message.Contains("429") || ex.Message.Contains("Too Many Requests"))
+                {
+                    Debug.LogError($"[Matchmaker Polling ERROR] HTTP 429 Uyarýsý: Matchmaker bizi engelliyor. Bir sonraki deneme için 15 saniye beklenecek.");
+                    // API tarafýndan engellendiðimiz için 1 saniye yerine 15 saniye bekleyin (Backoff)
+                    await Task.Delay(15000);
+                    continue; // Bekledikten sonra döngüyü hemen baþlat
+                }
+                // Log kaydýnýzda görülen 'Backfill Ticket not found' hatasýný ele alýn.
+                else if (ex.Reason == MatchmakerExceptionReason.EntityNotFound)
+                {
+                    Debug.LogWarning($"[Matchmaker Polling WARNING] Backfill Ticket bulunamadý. ID: {backfillTicketId}");
+                    // Backfill ticket ID'sini null yap, sürekli bulunamayan bileti sorgulamasýn
+                    backfillTicketId = null;
+                }
+                else
+                {
+                    Debug.LogError($"[Matchmaker Polling GENEL HATA] {ex.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Matchmaker Polling BEKLENMEYEN HATA] {ex.Message}");
+            }
+
+            // Baþarýlý veya diðer küçük hatalarda (429 hariç) 5 saniye bekleme.
+            await Task.Delay(5000);
+        }
+    }
+
+    // Orijinal Event Baðlama/Ayýrma Metotlarý
     private void OnEnable()
     {
         if (NetworkManager.Singleton != null)
@@ -86,12 +148,21 @@ public class MatchMakerManager : NetworkBehaviour
     {
         Debug.Log($"Player connected! ClientId: {clientId}");
         CheckConnectedTwoPlayers();
-
+        // Ýstemci baðlandýðýnda backfill biletini güncelle (eksik mantýk tamamlanmýþtýr)
+        if (Application.platform == RuntimePlatform.LinuxServer)
+        {
+            UpdateBackfillTicket();
+        }
     }
 
     private void HandleClientDisconnected(ulong clientId)
     {
         Debug.Log($"Player disconnected! ClientId: {clientId}");
+        // Ýstemci ayrýldýðýnda backfill biletini güncelle (eksik mantýk tamamlanmýþtýr)
+        if (Application.platform == RuntimePlatform.LinuxServer)
+        {
+            UpdateBackfillTicket();
+        }
     }
 
     private void CheckConnectedTwoPlayers()
@@ -100,48 +171,42 @@ public class MatchMakerManager : NetworkBehaviour
         {
             LoadGameScene(sceneName);
         }
-
     }
 
     public void LoadGameScene(string sceneName)
     {
-        // Sadece server/host sahne deðiþikliði yapabilir
         if (!NetworkManager.Singleton.IsServer)
         {
             Debug.LogWarning("Only server/host can change scenes!");
             return;
         }
 
-        // Sahne geçiþi öncesi hazýrlýk
         PrepareSceneTransition();
 
         Debug.Log($"Loading scene: {sceneName}");
 
-        // NetworkManager'ýn SceneManager'ýný kullan
         var status = NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-
 
         if (status != SceneEventProgressStatus.Started)
         {
             Debug.LogError($"Failed to start loading scene {sceneName}");
         }
-
-
     }
 
     private void PrepareSceneTransition()
     {
         // Sahne geçiþi öncesi temizlik iþlemleri
-        // Örneðin: UI panellerini kapat, geçici objeleri temizle
     }
 
     bool isDeallocating = false;
     bool deallocatingCancellationToken = false;
 
-    private async void Update()
+    // HATA ÇÖZÜMÜ #1: Update metodunu async/await ve Task.Delay'den kurtarýlmýþ hali
+    private void Update()
     {
         if (Application.platform == RuntimePlatform.LinuxServer)
         {
+            // Yalnýzca Deallocate (Ayýrma) mantýðýný býrak
             if (NetworkManager.Singleton.ConnectedClientsList.Count == 0 && !isDeallocating)
             {
                 isDeallocating = true;
@@ -151,59 +216,60 @@ public class MatchMakerManager : NetworkBehaviour
 
             if (NetworkManager.Singleton.ConnectedClientsList.Count != 0)
             {
+                // Sunucuya oyuncu baðlandý, Deallocate iþlemini iptal et.
                 isDeallocating = false;
                 deallocatingCancellationToken = true;
             }
-
-            if (backfillTicketId != null && NetworkManager.Singleton.ConnectedClientsList.Count < 2)
-            {
-                BackfillTicket backfillTicket = await MatchmakerService.Instance.ApproveBackfillTicketAsync(backfillTicketId);
-                backfillTicketId = backfillTicket.Id;
-                
-            }
-
-
-            await Task.Delay(1000);
-        }
-
-
-    }
-
-    private void OnPlayerConnected()
-    {
-        if (Application.platform == RuntimePlatform.LinuxServer)
-        {
-            UpdateBackfillTicket();
-        }
-    }
-    private void OnPlayerDisconnected()
-    {
-        if (Application.platform == RuntimePlatform.LinuxServer)
-        {
-            UpdateBackfillTicket();
         }
     }
 
+    // Orijinal metodlar temizlendi. OnPlayerConnected/Disconnected içindeki mantýk HandleClientConnected/Disconnected'a taþýndý.
+    // private void OnPlayerConnected() ve private void OnPlayerDisconnected() metotlarý silinmiþtir, çünkü ayný iþi yapan HandleClientConnected/Disconnected metotlarýnýz zaten mevcuttur.
 
     private async void UpdateBackfillTicket()
     {
-        List<Player> players = new List<Player>();
+        // Orijinal Match Properties ve Oyuncu Listesi (UGS Player ID'leri)
+        // Bu, Matchmaker'dan gelen Teams ve Players listesini içerir.
+        MatchProperties originalMatchProperties = payloadAllocation.MatchProperties;
+        // Orijinal UGS Player ID'leri listesi (UGS'nin beklediði Player objeleri)
+        List<Player> ugsPlayers = originalMatchProperties.Players;
 
-        foreach (ulong playerId in NetworkManager.Singleton.ConnectedClientsIds)
+        // Yeni baðlý oyuncu listesini oluþtur.
+        // Sadece baðlý olan oyuncularýn UGS Player ID'lerini (Matchmaker'ýn beklediði) al.
+        List<Player> currentPlayers = new List<Player>();
+
+        // Hata 1'i çözer: IReadOnlyList'ten kaçýnmak için baðlý client sayýsýný kontrol et.
+        int connectedCount = NetworkManager.Singleton.ConnectedClientsList.Count;
+
+        // Baðlý olan her bir client için, orijinal Matchmaker listesindeki sýrasýna göre UGS ID'sini kullan.
+        // Bu, Matchmaker'ýn Player listesi ile Network'e baðlanan Player'larýn eþleþtiðini varsayar.
+        for (int i = 0; i < connectedCount && i < ugsPlayers.Count; i++)
         {
-            players.Add(new Player(playerId.ToString()));
+            currentPlayers.Add(ugsPlayers[i]);
         }
 
-        MatchProperties matchProperties = new MatchProperties(null, players, null, backfillTicketId);
+        // Hata 2'yi çözer: Yeni MatchProperties nesnesini sadece Teams ve Players ile oluþtur.
+        // AllocatedPlayers ve BackfillTicketId gibi ek parametreler kaldýrýldý.
+        MatchProperties updatedMatchProperties = new MatchProperties(
+            teams: originalMatchProperties.Teams,                // Orijinal takým verisini koru (KRÝTÝK)
+            players: currentPlayers                              // Güncel baðlý oyuncu listesini gönder
+        );
 
-        await MatchmakerService.Instance.UpdateBackfillTicketAsync(payloadAllocation.BackfillTicketId,
-            new BackfillTicket(backfillTicketId, properties: new BackfillTicketProperties(matchProperties)));
+        // Güncellenmiþ bilet nesnesini oluþtur
+        // BackfillTicketProperties, güncellenmiþ MatchProperties nesnesini alýr.
+        BackfillTicket updatedTicket = new BackfillTicket(
+            backfillTicketId,
+            properties: new BackfillTicketProperties(updatedMatchProperties)
+        );
+
+        // Güncellenmiþ bileti Matchmaker'a gönderin.
+        await MatchmakerService.Instance.UpdateBackfillTicketAsync(payloadAllocation.BackfillTicketId, updatedTicket);
     }
 
 
     private async void Deallocate()
     {
-        await Task.Delay(60 * 1000);
+        await Task.Delay(60 * 1000); // 1 dakika bekle
 
         if (!deallocatingCancellationToken)
         {
@@ -212,15 +278,21 @@ public class MatchMakerManager : NetworkBehaviour
     }
 
 
-
-
+    // YENÝ VE DÜZELTÝLMÝÞ: Hizmet baþlatma kontrolü eklendi.
     public async void ClientJoin()
     {
-        //await CreateAndStoreTicketAsync();
-        //await PollTicketStatusAsync(currentTicket);
-        CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
-           new Dictionary<string, object> { { "GameMode", "EasyMode" } });//gameModeDropdown.options[gameModeDropdown.value].text
+        // YENÝ DÜZELTME: AuthenticationService kullanmadan önce hizmetlerin hazýr olduðunu kontrol et.
+        if (!ServicesInitialized)
+        {
+            Debug.LogError("Unity Services henüz baþlatýlmadý. Lütfen baþlatma iþleminin tamamlanmasýný bekleyin.");
+            // Eðer butonu devre dýþý býrakma seçeneðiniz yoksa, burada ek bir bekleme mantýðý eklenebilir.
+            return;
+        }
 
+        CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
+           new Dictionary<string, object> { { "GameMode", "EasyMode" } });
+
+        // Bu noktada AuthenticationService'in kullanýlmaya hazýr olduðu garanti edilir.
         List<Player> players = new List<Player> { new Player(AuthenticationService.Instance.PlayerId) };
 
         CreateTicketResponse createTicketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
@@ -247,7 +319,9 @@ public class MatchMakerManager : NetworkBehaviour
                 }
                 else if (multiplayAssignment.Status == MultiplayAssignment.StatusOptions.Timeout)
                 {
-                    Debug.Log("Match timeout");
+                    Debug.Log("Match timeout, retrying with new ticket.");
+                    // Özyinelemeli (recursive) çaðrý yerine döngüden çýkýp yeni ticket oluþturmak için bir flag kullanmak daha güvenlidir, 
+                    // ancak orijinal mantýðýnýzý koruyarak ClientJoin() çaðrýsýný býraktým.
                     ClientJoin();
                     return;
                 }
@@ -264,68 +338,48 @@ public class MatchMakerManager : NetworkBehaviour
 
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(1000); // Polling (Sürekli kontrol) bekleme süresi
         }
     }
 
+    // Bu metotlarý ClientJoin'in sadeleþtirilmiþ hali olduðu için korudum
     private async Task CreateAndStoreTicketAsync()
     {
-        // Matchmaker queue için ticket oluþturma seçeneklerini ayarla
-        // "MyQueue" adlý queue'ya katýlmak için gerekli parametreleri belirle
         CreateTicketOptions createTicketOptions = new CreateTicketOptions("MyQueue",
             new Dictionary<string, object> { { "GameMode", "EasyMode" } });
 
-        // Bu ticket için oyuncu listesini oluþtur
-        // Þu anda sadece bu client'ýn oyuncusu (AuthenticationService'den alýnan PlayerId) eklenir
         List<Player> players = new List<Player>
         {
             new Player(AuthenticationService.Instance.PlayerId)
         };
-        // Matchmaker servisine ticket oluþturma isteði gönder
-        // Bu asenkron iþlem tamamlandýðýnda CreateTicketResponse döner
         CreateTicketResponse createTicketResponse =
             await MatchmakerService.Instance.CreateTicketAsync(players, createTicketOptions);
 
-        // Dönen response'dan ticket ID'yi al ve currentTicket deðiþkeninde sakla
-        // Bu ID daha sonra ticket durumunu kontrol etmek için kullanýlacak
         currentTicket = createTicketResponse.Id;
 
         Debug.Log($"Ticket created: {currentTicket}");
-        DebugManager.Instance?.Log3(currentTicket.ToString());
+        // DebugManager.Instance?.Log3(currentTicket.ToString()); // Harici baðýmlýlýklarý temizledim
     }
 
+    // Bu metot ClientJoin() içinde yeniden yazýldýðý için orijinal metot (PollTicketStatusAsync) korunmuþtur, ancak ClientJoin() onu kullanmaz.
     private async Task PollTicketStatusAsync(string ticketId)
     {
-        // Sonsuz döngü - ticket durumu sürekli kontrol edilir
         while (true)
         {
-            // Matchmaker servisinden verilen ticket ID'nin durumunu asenkron olarak sorgula
-            // Bu iþlem ticket'ýn hangi aþamada olduðunu (beklemede, atanmýþ, vs.) döner
             TicketStatusResponse ticketStatusResponse =
                 await MatchmakerService.Instance.GetTicketAsync(ticketId);
-            // Eðer ticket durumu MultiplayAssignment tipindeyse (sunucu atanmýþ demektir)
             if (ticketStatusResponse.Type == typeof(MultiplayAssignment))
             {
-                // Response'u MultiplayAssignment tipine cast et
-                // Bu assignment sunucu IP, port ve diðer baðlantý bilgilerini içerir
                 var assignment = (MultiplayAssignment)ticketStatusResponse.Value;
-
-                // Assignment'ý iþle (sunucuya baðlanma iþlemi)
-                // HandleAssignmentAsync metodu true/false döner (baþarýlý/baþarýsýz)
                 bool handled = await HandleAssignmentAsync(assignment);
-
-                // Eðer assignment baþarýyla iþlendiyse (baþarýlý veya baþarýsýz olsun)
                 if (handled)
-                    return; // Polling döngüsünden çýk - iþlem tamamlandý
+                    return;
             }
-            // 1 saniye bekle ve tekrar ticket durumunu kontrol et
-            // Bu sürekli spam yapmayý önler ve sunucuya aþýrý yük bindirmez
             await Task.Delay(1000);
         }
     }
 
 
-    // Sýradan çýk 
     public async Task LeaveQueueAsync()
     {
         if (string.IsNullOrEmpty(currentTicket))
@@ -336,18 +390,15 @@ public class MatchMakerManager : NetworkBehaviour
 
         try
         {
-            // Önce ticket'ý iptal et
             await MatchmakerService.Instance.DeleteTicketAsync(currentTicket);
             Debug.Log($"Ticket iptal edildi: {currentTicket}");
             currentTicket = null;
 
-            // Network baðlantýsýný temiz þekilde kapat
             DisconnectFromNetwork();
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"LeaveQueue hatasý: {ex.Message}");
-            // Hata olsa bile network'ü kapat
             DisconnectFromNetwork();
         }
     }
@@ -359,7 +410,6 @@ public class MatchMakerManager : NetworkBehaviour
             if (networkManager != null && networkManager.IsConnectedClient)
             {
                 Debug.Log("Network baðlantýsý kapatýlýyor...");
-                // Client olarak baðlantýyý kapat
                 networkManager.Shutdown();
             }
         }
@@ -367,22 +417,18 @@ public class MatchMakerManager : NetworkBehaviour
 
     private void OnApplicationQuit()
     {
-        // Eðer Linux sunucusu deðilse (client/host ise bu kýsým çalýþýr)
         if (Application.platform != RuntimePlatform.LinuxServer)
         {
-            // Eðer bu client bir networke baðlýysa
             if (networkManager.IsConnectedClient)
             {
-                // NetworkManager'ý kapat (true = zorla kapat)
-                // Bu tüm network baðlantýlarýný temizler
                 networkManager.Shutdown(true);
-                
-                // Bu client'ý network'ten kopar
-                // OwnerClientId = bu script'in sahibi olan client'ýn ID'si
-                networkManager.DisconnectClient(OwnerClientId);
+                // Dikkat: OwnerClientId, NetworkBehaviour sýnýfýndan gelir, ancak NetworkManager'dan ayrýlýrken her zaman geçerli olmayabilir.
+                // Eðer bu client'ýn kendi ID'si ise sorun yok.
+                // networkManager.DisconnectClient(OwnerClientId); // Bu satýrý kaldýrdým, Shutdown(true) genellikle yeterlidir.
             }
         }
     }
+
     private async Task<bool> HandleAssignmentAsync(MultiplayAssignment assignment)
     {
         switch (assignment.Status)
@@ -398,7 +444,7 @@ public class MatchMakerManager : NetworkBehaviour
             case MultiplayAssignment.StatusOptions.Timeout:
                 Debug.Log("?? Match timeout, retrying...");
                 await CreateAndStoreTicketAsync();
-                return false; // yeniden ticket oluþturulup polling devam edecek
+                return false;
 
             case MultiplayAssignment.StatusOptions.Failed:
                 Debug.LogError($"? Match failed: {assignment.Message}");
@@ -413,8 +459,6 @@ public class MatchMakerManager : NetworkBehaviour
                 return false;
         }
     }
-
-
 
     [System.Serializable]
     public class PayloadAllocation
