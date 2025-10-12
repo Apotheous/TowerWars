@@ -8,22 +8,33 @@ public class BaseChangerListener : NetworkBehaviour
     [SerializeField] private PlayerSC player;
 
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        // Sahnedeki PlayerSC’yi bul (ilk bulduğu)
-        player = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerSC>();
+        if (IsClient && IsOwner)
+        {
+            // PlayerSC'nin LocalClient.PlayerObject üzerinde olduğunu varsayarak:
+            GameObject localPlayerObject = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
 
-        if (player != null)
-        {
-            // LevelUp eventine abone ol
-            player.OnLevelUp += HandleLevelUp;
+            if (localPlayerObject != null)
+            {
+                player = localPlayerObject.GetComponent<PlayerSC>();
+            }
+
+
+            if (player != null)
+            {
+                // LevelUp eventine abone ol
+                player.OnLevelUp += HandleLevelUp;
+            }
+            else
+            {
+                // Artık null değilse, loglama mesajınızı daha bilgilendirici yapın.
+                Debug.LogError("HATA: PlayerSC bileşeni yerel oyuncu nesnesinde (LocalPlayerObject) bulunamadı!");
+            }
         }
-        else
-        {
-            Debug.LogError("PlayerSC ya da PlayerGameData bulunamadı!");
-        }
+
+        base.OnNetworkSpawn();
     }
-
 
     private void HandleLevelUp()
     {
@@ -46,12 +57,16 @@ public class BaseChangerListener : NetworkBehaviour
             }
         }
     }
-    // Update is called once per frame
-    void Update()
+    // Abone olunan eventleri kaldırmak için OnNetworkDespawn() kullanın.
+    public override void OnNetworkDespawn()
     {
-        
-    }
+        if (player != null)
+        {
+            player.OnLevelUp -= HandleLevelUp;
+        }
 
+        base.OnNetworkDespawn();
+    }
 
 }
 
