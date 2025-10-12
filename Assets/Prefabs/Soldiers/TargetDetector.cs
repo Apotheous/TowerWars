@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TargetDetector : NetworkBehaviour
+public class TargetDetector : MonoBehaviour
 {
     private SoldiersControllerNavMesh controllerNavMesh;
     private SoldiersAttackController controllerAttack;
     private Soldier soldier; // Kendi takým bilgimizi tutan referans
-    [SerializeField] Transform target; // Þu an kullanýlmýyor, ama gelecekte hedefi tutmak için kullanýlabilir.
 
 
     // Potansiyel düþmanlarý tutan liste
@@ -15,8 +14,8 @@ public class TargetDetector : NetworkBehaviour
 
     public void WhenNetworkSpawn()
     {
-        // Yalnýzca Sunucuda gerekli bileþenleri çekme
-        if (!IsServer) return;
+        //// Yalnýzca Sunucuda gerekli bileþenleri çekme
+        //if (!IsServer) return;
         Debug.Log($"[SERVER DETECTOR] Baþladý OnNetworkSpawn");
         // SoldiersControllerNavMesh'e ulaþmanýn en saðlam yolu:
         if (controllerNavMesh == null)
@@ -55,7 +54,7 @@ public class TargetDetector : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Yalnýzca Sunucuda çalýþacak KRÝTÝK OYUN MANTIÐI
-        if (!IsServer || soldier == null) return;
+        //if (!IsServer || soldier == null) return;
 
         // 1. GENEL LOG: Kimin neye çarptýðýný her iki tarafta da yazdýr.
         // Bu, debug için önemlidir, tetikleyicinin çalýþýp çalýþmadýðýný gösterir.
@@ -148,7 +147,7 @@ public class TargetDetector : NetworkBehaviour
     private void OnTriggerExit(Collider other)
     {
         // Yalnýzca Sunucuda çalýþacak KRÝTÝK OYUN MANTIÐI
-        if (!IsServer || soldier == null) return;
+        //if (!IsServer || soldier == null) return;
 
         Transform potentialTargetParent = other.transform.parent;
 
