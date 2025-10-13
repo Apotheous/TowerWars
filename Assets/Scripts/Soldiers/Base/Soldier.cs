@@ -7,22 +7,15 @@ using UnityEngine.UI;
 public class Soldier : NetworkBehaviour, IDamageable
 {
     public Player_Game_Mode_Manager.PlayerAge age;
+
     [SerializeField] private float MaxHealth = 100f;
 
-
-
-    // Health deðerini aðda senkronize tutuyoruz
     private NetworkVariable<float> myHealth = new NetworkVariable<float>(
         100f,  // varsayýlan deðer
         NetworkVariableReadPermission.Everyone,  // herkes okuyabilir
         NetworkVariableWritePermission.Server    // sadece server yazabilir
     );
 
-    //PlayerProductionManagement ProduceNextUnit() dunda dolduruluyor.
-
-    // Bu deðiþken tüm client'lara senkronize edilecek.
-    // ReadPermission.Everyone -> Herkes okuyabilir
-    // WritePermission.Server -> Sadece server deðiþtirebilir
     public NetworkVariable<int> TeamId = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
@@ -31,7 +24,8 @@ public class Soldier : NetworkBehaviour, IDamageable
     public Image healthBar;
 
     [SerializeField] private float myCost;
-    [SerializeField] private float myPrize;
+    [SerializeField] private float myPrizeScrap;
+    [SerializeField] private float myPrizeExp;
     [SerializeField] private Transform myBarrel;
     [SerializeField] private float myRange;
 
@@ -49,9 +43,6 @@ public class Soldier : NetworkBehaviour, IDamageable
             myHealth.Value = MaxHealth;
 
             gameObject.name = TeamId.Value.ToString();
-
-            // Örneðin, burada takýmýna göre bir hedef bulma mantýðý çalýþtýrýlabilir.
-            // FindInitialTarget(); 
 
 
             // 1. TeamId'yi GÜVENLÝ bir þekilde al ve sakla
@@ -121,37 +112,15 @@ public class Soldier : NetworkBehaviour, IDamageable
 
         if (enemyPlayerSC != null)
         {
-            enemyPlayerSC.UpdateMyScrap(myPrize);
-            Debug.Log($"[Server] Manager: Team {killingPlayerTeamId} gained {myPrize} scrap.");
+            enemyPlayerSC.UpdateMyScrap(myPrizeScrap);
+            enemyPlayerSC.UpdateExpPointIncrease(myPrizeExp);
+
+            Debug.Log($"[Server] Manager: Team {killingPlayerTeamId} gained {myPrizeScrap} scrap.");
         }
 
         GetComponent<NetworkObject>().Despawn();
-        //// Ölen askerin düþmanýnýn kim olduðunu bul (Örn: TeamId 1 ise düþman TeamId 2)
-        //int killingPlayerTeamId = (TeamId.Value == 1) ? 2 : 1;
 
-        //// Askerin ödülünü PlayerSC'ye gönder (örneðin myPrize kadar scrap ver)
-        //GiveScrapToKillingPlayer(killingPlayerTeamId, myPrize);
-
-        ////gameObject.SetActive(false);
-        //GetComponent<NetworkObject>().Despawn();
     }
 
-    // Yeni metot: Öldüren oyuncuya Scrap verir
-    private void GiveScrapToKillingPlayer(int winningTeamId, float amount)
-    {
-        // Bütün NetworkObject'lar içinde PlayerSC'leri ara
-        foreach (var playerSC in FindObjectsOfType<PlayerSC>())
-        {
-            if (playerSC.TeamId.Value == winningTeamId)
-            {
-                // Rakip oyuncu bulundu, Scrap miktarýný Server'da deðiþtir.
-                // Bu metot zaten Server'da çalýþtýðý için direkt çaðýrmak güvenlidir.
-                playerSC.UpdateMyScrap(amount);
-                Debug.Log($"[Server] Team {winningTeamId} player gained {amount} scrap for killing a soldier.");
-                return;
-            }
-        }
-        Debug.LogError($"[Server] PlayerSC with TeamId {winningTeamId} not found to give scrap!");
-    }
 
 }

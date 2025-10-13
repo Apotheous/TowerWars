@@ -61,7 +61,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
         // NetworkVariable değişimlerini dinle
         myExpPoint.OnValueChanged += OnExpPointChanged;
-
+        myExpPoint.OnValueChanged += HandleTechPointChanged;
         // WinnerClientId değişimini özel olarak ele al
         WinnerClientId.OnValueChanged += OnWinnerDeclared;
 
@@ -114,6 +114,22 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     }
 
+
+      // YENİ: Ağdan kaldırılırken abonelikleri sonlandırma
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+
+        // === ABONELİKLERİN SONLANDIRILMASI ===
+        // Obje yok edilmeden önce NetworkVariable olay listesinden kendini çıkarır.
+        mycurrentHealth.OnValueChanged -= OnHealthChanged;
+        myCurrentScrap.OnValueChanged -= OnMyScrapChanged;
+        myExpPoint.OnValueChanged -= OnExpPointChanged;
+        myExpPoint.OnValueChanged -= HandleTechPointChanged;
+        WinnerClientId.OnValueChanged -= OnWinnerDeclared;
+        
+        Debug.Log($"[PlayerSC-{OwnerClientId}] Abonelikler sonlandırıldı ve Network Despawn oldu.");
+    }
     private void OnWinnerDeclared(ulong previousValue, ulong newValue)
     {
         if (newValue != 0) // 0 = kimse kazanmadı varsayalım
@@ -149,51 +165,6 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         }
     }
 
-
-
-
-    #endregion
-
-
-    private void Update()
-    {
-        if (!IsOwner) return;
-        //Move();
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            FireBulletServerRpc();
-        }
-    }
-
-
-
-
-
-
-
-
-    #region Movement and fire Yalandan
-
-
-    [ServerRpc]
-    private void FireBulletServerRpc()
-    {
-        // Server authoritative spawn
-        GameObject bullet = Instantiate(bulletPrefab, myweapon.position, myweapon.rotation);
-        bullet.GetComponent<NetworkObject>().Spawn();
-    }
-
-    //private void Move()
-    //{
-
-
-    //    float h = Input.GetAxis("Horizontal"); // A, D veya Sol/Sağ ok
-    //    float v = Input.GetAxis("Vertical");   // W, S veya Yukarı/Aşağı ok
-
-    //    Vector3 move = new Vector3(h, 0f, v) * movementSpeedBase * Time.deltaTime;
-    //    transform.Translate(move, Space.World);
-    //}
     #endregion
 
 

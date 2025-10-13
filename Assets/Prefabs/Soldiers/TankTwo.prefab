@@ -55,7 +55,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4036190795
+  GlobalObjectIdHash: 1080915242
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -82,7 +82,8 @@ MonoBehaviour:
     m_InternalValue: 0
   healthBar: {fileID: 7547361602274862805}
   myCost: 50
-  myPrize: 50
+  myPrizeScrap: 7
+  myPrizeExp: 9
   myBarrel: {fileID: 1265268758880465537}
   myRange: 5
   soldiersControllerNavMesh: {fileID: 4688456907441993285}
