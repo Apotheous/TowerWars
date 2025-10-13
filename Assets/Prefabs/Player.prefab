@@ -1069,7 +1069,6 @@ GameObject:
   - component: {fileID: 6560944538289043924}
   - component: {fileID: 4848729060253430503}
   - component: {fileID: 3637164451992079630}
-  - component: {fileID: 736062400297200390}
   m_Layer: 0
   m_Name: SoldierSpawnPoint
   m_TagString: Untagged
@@ -1142,19 +1141,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &736062400297200390
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3402458064456811048}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 38.972343, y: 25.76948, z: 33.456314}
-  m_Center: {x: 0.17418623, y: -3.006984, z: -0.28638482}
 --- !u!1 &3431479770032975116
 GameObject:
   m_ObjectHideFlags: 0
