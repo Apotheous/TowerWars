@@ -16,7 +16,6 @@ public class TestBullet : NetworkBehaviour
     // Bu metot, mermi spawn olmadan hemen önce SADECE server'da çaðrýlacak.
     public void Initialize(int teamId, float damage)
     {
-        Debug.Log($"[SERVER/BULLET INIT] Mermi {gameObject.name} baþlatýldý. Takým ID: {teamId}, Hasar: {damage}");
         this.ownerTeamId = teamId;
         this.damageAmount = damage;
     }
@@ -27,27 +26,34 @@ public class TestBullet : NetworkBehaviour
         if (IsServer)
         {
             Invoke(nameof(DestroyBullet), lifetime);
-            Debug.Log($"[SERVER/BULLET SPAWN] Mermi {gameObject.name} Network'te spawn oldu. Ömür (lifetime): {lifetime}s. Takým: {ownerTeamId}");
-        }
-        else // Client tarafý için debug (opsiyonel)
-        {
-            Debug.Log($"[CLIENT/BULLET SPAWN] Mermi {gameObject.name} client'ta spawn edildi. ownerTeamId: {ownerTeamId}");
+            
         }
     }
 
     // Mermiyi yok eden metot
     private void DestroyBullet()
     {
-        // GÜNCELLENMÝÞ DEBUG LOG: Yok etme kararý
-        Debug.Log($"[SERVER/BULLET DESTROY] Mermi {gameObject.name} Despawn ediliyor (Ömür bitti).");
-        // Eðer hala network'te ise despawn et.
+        // Önemli: Yok etme iþlemi baþlamadan önce Invoke'u iptal et.
+        // Bu, çarpýþma ile yok etme ve ömürle yok etme arasýndaki çakýþmayý önler.
+        // NetworkObject null kontrolü eklendi, çünkü despawn sonrasý null olabilir.
         if (NetworkObject != null && NetworkObject.IsSpawned)
         {
-            NetworkObject.Despawn();
+            // Ýptal iþlemi sadece Server'da yapýlmalýdýr, Client'ta zaten zamanlanmýþ çaðrý yoktur.
+            if (IsServer)
+            {
+                CancelInvoke(nameof(DestroyBullet)); // Kalan Invoke'u iptal et
+                Debug.Log($"[SERVER/BULLET DESTROY] Mermi {gameObject.name} Despawn ediliyor (Ömür bitti).");
+                NetworkObject.Despawn();
+            }
+            else
+            {
+                // Client, NetworkDespawn olayý ile yok edilir, direkt Destroy kullanmaya gerek kalmaz.
+                Debug.Log($"[CLIENT/BULLET DESTROY] Mermi {gameObject.name} Network Despawn ediliyor.");
+            }
         }
         else
         {
-            // NetworkObject zaten yoksa veya despawn edilmiþse (örneðin çarpýþmadan dolayý)
+            // Network'te deðilse direkt yok et.
             Destroy(gameObject);
         }
 
@@ -65,31 +71,23 @@ public class TestBullet : NetworkBehaviour
         // Çarpýþma ve hasar mantýðý SADECE server'da çalýþmalý.
         if (IsServer)
         {
-            // YENÝ DEBUG LOG: Çarpýþma baþlangýcý
-            Debug.Log($"[SERVER/BULLET HIT] Mermi {gameObject.name} çarpýþtý. Çarpan: {other.gameObject.name} | Hasar: {damageAmount} | Sahip Takým: {ownerTeamId}");
             // Hasarýmýz zaten sýfýrlandýysa veya bir þekil2de mermi geçersizse bir þey yapma.
             if (damageAmount <= 0) 
             {
-                Debug.Log($"[SERVER/BULLET HIT] Mermi {gameObject.name} çarpýþtý ancak hasar zaten sýfýrlanmýþ. Ýþlem iptal.");
                 return;
             }
 
             if (other.gameObject.name == "TargetDetector" || other.gameObject.name == "bullet(Clone)")
             {
-                Debug.Log($"[SERVER/BULLET HIT] Mermi {gameObject.name}, {other.gameObject.name} ile çarpýþtý. Göz ardý ediliyor.");
                 return;
             }
             // Çarptýðýmýz objenin kimlik bilgisi var mý?
             var targetIdentity = other.GetComponent<Soldier>();
             if (targetIdentity != null)
             {
-                Debug.Log($"[SERVER/BULLET HIT] Hedef birim bulundu. Hedef Takým ID: {targetIdentity.TeamId.Value}");
                 // Eðer çarptýðýmýz þey kendi takýmýmýzdansa, hasar verme ve yok ol.
                 if (targetIdentity.TeamId.Value == ownerTeamId )
                 {
-                    // Kendi takým arkadaþýna çarptýn. Hasar verme.
-                    Debug.Log($"[SERVER/BULLET HIT] Kendi takým arkadaþýna ({other.name}) çarptý. Hasar verilmeyecek, mermi yoluna devam etsin.");
-                    
                     return; // Metodun devamýný çalýþtýrma.
                 }
             }
@@ -98,20 +96,11 @@ public class TestBullet : NetworkBehaviour
             var damageableTarget = other.GetComponent<IDamageable>();
             if (damageableTarget != null)
             {
-                Debug.Log($"[SERVER/BULLET HIT] Hasar verilebilir düþmana ({other.name}) çarptý. {damageAmount} hasar veriliyor.");
-                // Düþmana çarptýk! Hasar ver.
                 damageableTarget.TakeDamage(damageAmount);
             }
-            else
-            {
-                // Düþman olmayan bir þeye çarptý (örneðin duvar, arazi, base vb.)
-                Debug.Log($"[SERVER/BULLET HIT] Hasar verilemez bir cisme ({other.name}) çarptý.");
-            }
-
-            // Mermi bir þeye çarptýðý için (düþman, dost, duvar fark etmez) görevini tamamladý.
-            // Hasarýný sýfýrla ve kendini yok et.
+     
             damageAmount = 0;
-            
+            CancelInvoke(nameof(DestroyBullet));
             DestroyBullet();
         }
     }

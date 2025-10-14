@@ -27,9 +27,9 @@ public class PlayerProductionManagement : NetworkBehaviour
         UnitData data = unitDatabase.GetById(unitId);
         if (data == null) { Debug.LogError($"[Unit] ID '{unitId}' bulunamadý!"); return; }
 
-        if (playerSC.myCurrentScrap.Value >= data.cost)
+        if (playerSC.GetMyCurrentScrap() >= data.cost)
         {
-            playerSC.myCurrentScrap.Value -= data.cost;
+            playerSC.UpdateMyScrap(data.cost);
             productionUnitQueue.Enqueue((unitId, clientId));
             if (!isProducingUnit) StartCoroutine(ProduceNextUnit());
         }
@@ -44,9 +44,9 @@ public class PlayerProductionManagement : NetworkBehaviour
         TurretData data = turretDatabase.GetById(unitId);
         if (data == null) { Debug.LogError($"[Turret] ID '{unitId}' bulunamadý!"); return; }
 
-        if (playerSC.myCurrentScrap.Value >= data.cost)
+        if (playerSC.GetMyCurrentScrap() >= data.cost)
         {
-            playerSC.myCurrentScrap.Value -= data.cost;
+            playerSC.UpdateMyScrap(data.cost);
             // Sýraya artýk pozisyon ve sahip bilgisini de ekliyoruz
             productionTurretQueue.Enqueue((unitId, positionIndex, clientId));
             if (!isProducingTurret) StartCoroutine(ProduceNextTurret());

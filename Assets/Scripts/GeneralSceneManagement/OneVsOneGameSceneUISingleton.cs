@@ -161,7 +161,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
             Destroy(child.gameObject);
 
         // Çað bilgisi
-        var age = myPlayerAge.age;
+        var age = myPlayerAge.CurrentAge;
 
    
         foreach (var unit in allSoldiers)
@@ -191,7 +191,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
             Destroy(child.gameObject);
 
         // Çað bilgisi
-        var age = myPlayerAge.age;
+        var age = myPlayerAge.CurrentAge;
 
    
         foreach (var unit in allTurrets)
