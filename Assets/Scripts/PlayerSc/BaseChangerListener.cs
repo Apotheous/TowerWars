@@ -47,13 +47,11 @@ public class BaseChangerListener : NetworkBehaviour
 
             if (clientId == 1) // İlk oyuncu
             {
-                DebugManager.Instance.Log2("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!--------");
-
+                Debug.Log("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!--------");
             }
             else if (clientId == 2) // İkinci oyuncu
             {
-                DebugManager.Instance.Log("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!++++++");
-
+                Debug.Log("[BaseChanger] TechPoint 100 oldu →------ LEVEL UP tetiklendi!++++++");
             }
         }
     }

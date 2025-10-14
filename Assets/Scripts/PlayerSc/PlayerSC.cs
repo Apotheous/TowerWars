@@ -18,6 +18,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     private readonly NetworkVariable<float> mycurrentHealth = new NetworkVariable<float>();
 
     private readonly NetworkVariable<float> myExpPoint = new NetworkVariable<float>(0);
+    private readonly NetworkVariable<float> myEasdadxpPoint = new NetworkVariable<float>(0);
 
     private readonly NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>(999999);
     // Custom eventler
@@ -29,10 +30,10 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     public event Action<float, float> OnTechPointChanged;
     public event Action OnLevelUp;
 
-    private const float LEVEL_UP_IceAge = 500f;
-    private const float LEVEL_UP_MediavelAge = 1000f;
-    private const float LEVEL_UP_ModernAge = 1500f;
-    private const float LEVEL_UP_SpaceAge = 2000f;
+    private const float LEVEL_UP_IceAge = 0f;
+    private const float LEVEL_UP_MediavelAge = 500f;
+    private const float LEVEL_UP_ModernAge = 1000f;
+    private const float LEVEL_UP_SpaceAge = 1500f;
 
 
     #endregion
@@ -55,8 +56,10 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         //Stat abonelikleri
         mycurrentHealth.OnValueChanged += OnHealthChanged;
         myCurrentScrap.OnValueChanged += OnMyScrapChanged;
+
         myExpPoint.OnValueChanged += OnExpPointChanged;
         myExpPoint.OnValueChanged += HandleTechPointChanged;
+        
         WinnerClientId.OnValueChanged += OnWinnerDeclared;
         //OnLevelUp += HandleLevelUpServerAction;
         // Debug için event subscribe (isteğe bağlı)
@@ -275,20 +278,21 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     {
         // Event forward
         OnTechPointChanged?.Invoke(oldValue, newValue);
-
+        Debug.Log("HandleTechPointChanged = playerCurrent Age =" +player_Game_Mode_Manager.CurrentAge +"oldExpVal ="+oldValue+"NewExpVal = "+newValue );
         // Yaş yükseltme işlemini Server'da yetkili olarak yönet
-        if (player_Game_Mode_Manager.CurrentAge== Player_Game_Mode_Manager.PlayerAge.IceAge &&  newValue >= LEVEL_UP_IceAge && oldValue < LEVEL_UP_IceAge)
+        if (player_Game_Mode_Manager.CurrentAge== Player_Game_Mode_Manager.PlayerAge.IceAge &&  newValue >= LEVEL_UP_MediavelAge )
         {
             if (IsServer)
             {
                 player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.MediavalAge);
                 Debug.Log("Player leveled up to Mediaval Age!");
+                Debug.Log("HandleTechPointChanged 111 = playerCurrent Age =" + player_Game_Mode_Manager.CurrentAge + "oldExpVal =" + oldValue + "NewExpVal = " + newValue);
                 //myExpPoint.Value -= LEVEL_UP_IceAge; // ExpPoint'i düşür
             }
             Debug.Log("Player leveled up to Mediaval Age!");
             OnLevelUp?.Invoke();
         }
-        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && newValue >= LEVEL_UP_MediavelAge && oldValue < LEVEL_UP_MediavelAge)
+        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && newValue >= LEVEL_UP_ModernAge )
         {
             if (IsServer)
             {
@@ -299,7 +303,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
             Debug.Log("Player leveled up to Modern Age!");
             OnLevelUp?.Invoke();
         }
-        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && newValue >= LEVEL_UP_ModernAge && oldValue < LEVEL_UP_ModernAge)
+        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && newValue >= LEVEL_UP_SpaceAge)
         {
             if (IsServer)
             {

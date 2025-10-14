@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,6 +12,9 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         PlayerAge.ModernAge,
         PlayerAge.SpaceAge
     };
+
+    // YENİ: Çağ geçiş aralığı
+    private const float AGE_UPDATE_INTERVAL = 2f;
 
     // --- ENUMLAR ---
     public enum PlayerMode
@@ -42,9 +43,6 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     [SerializeField] private GameObject SpaceAgeVisibility;
 
     // --- NETWORK VARIABLES ---
-    // [SerializeField] public PlayerAge age; // ESKİ YEREL DEĞİŞKEN SİLİNDİ
-
-    // YENİ: Yaş NetworkVariable olarak tanımlandı
     private NetworkVariable<PlayerAge> _currentAge = new NetworkVariable<PlayerAge>(
         PlayerAge.IceAge,
         NetworkVariableReadPermission.Everyone,
@@ -95,10 +93,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         // Bu, hem modu hem de ilk çağı (IceAge) başlatır.
         HandleModeChange(_currentMode.Value);
 
-        if (IsServer)
-        {
-            _currentAge.Value = PlayerAge.IceAge;
-        }
+ 
     }
 
     // YENİ: OnNetworkDespawn'da abonelikleri temizle
@@ -112,10 +107,8 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
             HandleModeChange(newValue);
         };
 
-        _currentAge.OnValueChanged -= (oldValue, newValue) =>
-        {
-            HandleModeChange(CurrentMode);
-        };
+        // Bu abonelik artık UpdateAgeVisuals'i çağırıyor. Tekrar yazmaya gerek yok.
+        // _currentAge.OnValueChanged -= (oldValue, newValue) => { ... };
     }
 
     /// <summary>
@@ -135,7 +128,11 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
 
             // Yaşı NetworkVariable üzerinden değiştir. Bu, Client'larda OnValueChanged'ı tetikler.
             _currentAge.Value = nextAge;
+
+            // NetworkVariable Server'da OnValueChanged tetiklemediği için
+            // görsel güncellemeyi manuel olarak çağırıyoruz.
             UpdateAgeVisuals();
+
             Debug.Log($"[Server] Player's age successfully upgraded to: {nextAge}");
 
             // UpdateAgeVisualsClientRpc'ye artık gerek yok. Otomatik senkronizasyon var.
@@ -146,6 +143,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         }
     }
 
+    // ... (Diğer metotlar olduğu gibi kaldı: VisibilityCloseOthers, HandleModeChange, UpdateAgeVisuals, SetAgeServerRpc, RequestStartGameServerRpc, AllPlayersReady)
     private void VisibilityCloseOthers(GameObject onAgeGo)
     {
         foreach (var vis in Visibilities)
@@ -156,10 +154,9 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
             {
                 if (vis) vis.SetActive(false);
             }
-
         }
     }
-    
+
     // Public yapıldı, böylece _currentMode.OnValueChanged eventi onu çağırabilir.
     public void HandleModeChange(PlayerMode newMode)
     {
@@ -169,7 +166,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
                 if (oneVSOneMode) oneVSOneMode.SetActive(false);
                 playerComponentController.SetComponentsActive(false);
                 // MainMenu'ye geçince tüm görselleri de kapatabiliriz (isteğe bağlı)
-                // VisibilityCloseOthers(null); 
+                VisibilityCloseOthers(null);
                 break;
 
             case PlayerMode.OneVsOne:
@@ -228,6 +225,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
             VisibilityCloseOthers(SpaceAgeVisibility);
         }
     }
+
     /// <summary>
     /// PlayerSC'den gelen ServerRpc talebiyle oyuncunun yaşını doğrudan ayarlar.
     /// </summary>
@@ -238,9 +236,9 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
 
         // Yaşı NetworkVariable üzerinden değiştir. Bu, Client'larda OnValueChanged'ı tetikler.
         _currentAge.Value = newAge;
-        UpdateAgeVisuals();
+        UpdateAgeVisuals(); // Server Yetkili olduğu için manuel güncelleme
         Debug.Log($"[Server] Age forcefully set to: {newAge}");
-        
+
         // HandleAgeChangeLevelUp metodu SİLİNDİ.
     }
     // ✅ Client sadece "başlamak istiyorum" diye talepte bulunur
