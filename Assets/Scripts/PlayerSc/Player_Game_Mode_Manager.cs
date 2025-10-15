@@ -4,17 +4,6 @@ using UnityEngine;
 
 public class Player_Game_Mode_Manager : NetworkBehaviour
 {
-    // YENİ: Yaş sırasını yöneten sabit bir dizi
-    private static readonly PlayerAge[] AgeProgression =
-    {
-        PlayerAge.IceAge,
-        PlayerAge.MediavalAge,
-        PlayerAge.ModernAge,
-        PlayerAge.SpaceAge
-    };
-
-    // YENİ: Çağ geçiş aralığı
-    private const float AGE_UPDATE_INTERVAL = 2f;
 
     // --- ENUMLAR ---
     public enum PlayerMode
@@ -135,37 +124,7 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Server'da oyuncunun yaşını bir sonraki seviyeye yükseltir.
-    /// </summary>
-    [ServerRpc(RequireOwnership = false)]
-    public void UpgradeAgeServerRpc()
-    {
-        if (!IsServer) return;
 
-        // Mevcut yaşın sırasını bul (Artık CurrentAge property'si kullanılıyor)
-        int currentAgeIndex = Array.IndexOf(AgeProgression, CurrentAge);
-
-        if (currentAgeIndex >= 0 && currentAgeIndex < AgeProgression.Length - 1)
-        {
-            PlayerAge nextAge = AgeProgression[currentAgeIndex + 1];
-
-            // Yaşı NetworkVariable üzerinden değiştir. Bu, Client'larda OnValueChanged'ı tetikler.
-            _currentAge.Value = nextAge;
-
-            // NetworkVariable Server'da OnValueChanged tetiklemediği için
-            // görsel güncellemeyi manuel olarak çağırıyoruz.
-            UpdateAgeVisuals();
-
-            Debug.Log($"[Server] Player's age successfully upgraded to: {nextAge}");
-
-            // UpdateAgeVisualsClientRpc'ye artık gerek yok. Otomatik senkronizasyon var.
-        }
-        else
-        {
-            Debug.LogWarning("[Server] Cannot upgrade age: Already at the final age (SpaceAge).");
-        }
-    }
 
     // ... (Diğer metotlar olduğu gibi kaldı: VisibilityCloseOthers, HandleModeChange, UpdateAgeVisuals, SetAgeServerRpc, RequestStartGameServerRpc, AllPlayersReady)
     private void VisibilityCloseOthers(GameObject onAgeGo)

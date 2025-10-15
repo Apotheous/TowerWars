@@ -44,12 +44,20 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     public NetworkVariable<ulong> WinnerClientId = new NetworkVariable<ulong>(0);
 
-    private Player_Game_Mode_Manager player_Game_Mode_Manager;
+    [SerializeField]private Player_Game_Mode_Manager player_Game_Mode_Manager;
 
     public override void OnNetworkSpawn()
     {
         mycurrentHealth.Value = initalHealth.Value;
-        player_Game_Mode_Manager = gameObject.GetComponent<Player_Game_Mode_Manager>();
+        if (player_Game_Mode_Manager == null)
+        {
+            player_Game_Mode_Manager = gameObject.GetComponent<Player_Game_Mode_Manager>();
+        }
+        if (IsServer)
+        {
+            Debug.Log("Serverda player_Game_Mode_Manager doldu -- " + player_Game_Mode_Manager.gameObject.name);
+        }
+       
         //Stat abonelikleri
         mycurrentHealth.OnValueChanged += OnHealthChanged;
         myCurrentScrap.OnValueChanged += OnMyScrapChanged;
