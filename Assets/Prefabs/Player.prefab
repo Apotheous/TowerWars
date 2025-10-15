@@ -161,7 +161,6 @@ GameObject:
   - component: {fileID: 3473521663130239458}
   - component: {fileID: 1830836544445083796}
   - component: {fileID: 8317383942155078386}
-  - component: {fileID: 7672791723624637143}
   - component: {fileID: 8526755292245196328}
   - component: {fileID: 2706243705016327071}
   - component: {fileID: -5593812341764850184}
@@ -294,32 +293,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TeamId:
     m_InternalValue: 0
-  initalHealth:
-    m_InternalValue: 100
-  mycurrentHealth:
-    m_InternalValue: 100
-  myExpPoint:
-    m_InternalValue: 5000
-  myCurrentScrap:
-    m_InternalValue: 2000
   movementSpeedBase: 5
   myweapon: {fileID: 1428121347879896040}
   bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
   WinnerClientId:
     m_InternalValue: 0
---- !u!114 &7672791723624637143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 721576413610324778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 534afb19ca2c8ec41add0e4e04b520d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 8317383942155078386}
 --- !u!114 &8526755292245196328
 MonoBehaviour:
   m_ObjectHideFlags: 0

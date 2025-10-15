@@ -42,13 +42,7 @@ public class TestBullet : NetworkBehaviour
             if (IsServer)
             {
                 CancelInvoke(nameof(DestroyBullet)); // Kalan Invoke'u iptal et
-                Debug.Log($"[SERVER/BULLET DESTROY] Mermi {gameObject.name} Despawn ediliyor (Ömür bitti).");
                 NetworkObject.Despawn();
-            }
-            else
-            {
-                // Client, NetworkDespawn olayý ile yok edilir, direkt Destroy kullanmaya gerek kalmaz.
-                Debug.Log($"[CLIENT/BULLET DESTROY] Mermi {gameObject.name} Network Despawn ediliyor.");
             }
         }
         else

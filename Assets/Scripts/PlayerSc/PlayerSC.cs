@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.Netcode;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 
 public class PlayerSC : NetworkBehaviour ,IDamageable
@@ -24,10 +25,6 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     // Custom eventler
     public event Action<float, float> OnScrapChanged;
 
-
-
-    // Custom eventler
-    public event Action<float, float> OnTechPointChanged;
     public event Action OnLevelUp;
 
     private const float LEVEL_UP_IceAge = 0f;
@@ -58,16 +55,11 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         myCurrentScrap.OnValueChanged += OnMyScrapChanged;
 
         myExpPoint.OnValueChanged += OnExpPointChanged;
-        myExpPoint.OnValueChanged += HandleTechPointChanged;
+        //myExpPoint.OnValueChanged += HandleTechPointChanged;
         
         WinnerClientId.OnValueChanged += OnWinnerDeclared;
         //OnLevelUp += HandleLevelUpServerAction;
         // Debug için event subscribe (isteğe bağlı)
-        OnTechPointChanged += (oldValue, newValue) =>
-        {
-            Debug.Log($"[PlayerSC] TechPoint changed: {oldValue} → {newValue}");
-
-        };
 
         OnLevelUp += () =>
         {
@@ -124,29 +116,12 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         mycurrentHealth.OnValueChanged -= OnHealthChanged;
         myCurrentScrap.OnValueChanged -= OnMyScrapChanged;
         myExpPoint.OnValueChanged -= OnExpPointChanged;
-        myExpPoint.OnValueChanged -= HandleTechPointChanged;
+        //myExpPoint.OnValueChanged -= HandleTechPointChanged;
         WinnerClientId.OnValueChanged -= OnWinnerDeclared;
         //OnLevelUp -= HandleLevelUpServerAction;
         Debug.Log($"[PlayerSC-{OwnerClientId}] Abonelikler sonlandırıldı ve Network Despawn oldu.");
     }
 
-    /// <summary>
-    /// OnLevelUp eventi tetiklendiğinde, yalnızca Server'da yapılması gereken aksiyon.
-    /// </summary>
-    private void HandleLevelUpServerAction()
-    {
-        // Bu event tüm client'larda tetiklenir, ancak biz sadece Server'da işlem yapmalıyıız.
-        if (!IsServer) return;
-
-        Debug.Log($"[Server-PlayerSC] Level Up detected. Requesting Age Upgrade from Manager.");
-
-        // Manager'a ServerRpc göndererek yaş yükseltme işlemini başlat.
-        // Player_Game_Mode_Manager'ın Singleton ve DontDestroyOnLoad olduğunu varsayıyoruz.
-        if (player_Game_Mode_Manager != null)
-        {
-            player_Game_Mode_Manager.UpgradeAgeServerRpc();
-        }
-    }
     private void OnWinnerDeclared(ulong previousValue, ulong newValue)
     {
         if (newValue != 0) // 0 = kimse kazanmadı varsayalım
@@ -176,6 +151,12 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     }
     private void OnExpPointChanged(float previous, float current)
     {
+        if (IsServer)
+        {
+            HandleTechPointChanged(previous, current);
+            Debug.Log($"[OnExpPointChanged]Isowner - Player Current Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal =" + previous + "NewExpVal = " + current);
+        }
+        // UI Güncellemesini sadece Owner Client yapsın
         if (IsOwner)
         {
             OneVsOneGameSceneUISingleton.Instance.PlayerExpWrite(current);
@@ -276,45 +257,35 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     #region TechPoint Logic
     private void HandleTechPointChanged(float oldValue, float newValue)
     {
-        // Event forward
-        OnTechPointChanged?.Invoke(oldValue, newValue);
-        Debug.Log("HandleTechPointChanged = playerCurrent Age =" +player_Game_Mode_Manager.CurrentAge +"oldExpVal ="+oldValue+"NewExpVal = "+newValue );
-        // Yaş yükseltme işlemini Server'da yetkili olarak yönet
-        if (player_Game_Mode_Manager.CurrentAge== Player_Game_Mode_Manager.PlayerAge.IceAge &&  newValue >= LEVEL_UP_MediavelAge )
+        if (IsServer)
         {
-            if (IsServer)
+            if (player_Game_Mode_Manager != null)
             {
-                player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.MediavalAge);
-                Debug.Log("Player leveled up to Mediaval Age!");
-                Debug.Log("HandleTechPointChanged 111 = playerCurrent Age =" + player_Game_Mode_Manager.CurrentAge + "oldExpVal =" + oldValue + "NewExpVal = " + newValue);
-                //myExpPoint.Value -= LEVEL_UP_IceAge; // ExpPoint'i düşür
+                Debug.Log(" HandleTechPointChanged = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --"+TeamId.Value+"--");
+                // Yaş yükseltme işlemini Server'da yetkili olarak yönet
+                if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.IceAge && newValue >= LEVEL_UP_MediavelAge)
+                {
+                    Debug.Log("[PlayerSC] RPC CALL: SetAgeServerRpc MediavalAge."+ " --Player ID = --"+TeamId.Value+"--" ); 
+                    player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.MediavalAge);
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                }
+                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && newValue >= LEVEL_UP_ModernAge)
+                {
+                    Debug.Log("[PlayerSC] RPC CALL: SetAgeServerRpc ModernAge." + " --Player ID = --" + TeamId.Value + "--");
+                    player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.ModernAge);
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                }
+                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && newValue >= LEVEL_UP_SpaceAge)
+                {
+                    player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.SpaceAge);
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                }
             }
-            Debug.Log("Player leveled up to Mediaval Age!");
-            OnLevelUp?.Invoke();
-        }
-        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && newValue >= LEVEL_UP_ModernAge )
-        {
-            if (IsServer)
+            else
             {
-                player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.ModernAge);
-                Debug.Log("Player leveled up to Modern Age!");
-                //myExpPoint.Value -= LEVEL_UP_MediavelAge; // ExpPoint'i düşür
+                Debug.LogWarning("[PlayerSC] player_Game_Mode_Manager null referans hatası!");
             }
-            Debug.Log("Player leveled up to Modern Age!");
-            OnLevelUp?.Invoke();
         }
-        else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && newValue >= LEVEL_UP_SpaceAge)
-        {
-            if (IsServer)
-            {
-                player_Game_Mode_Manager.SetAgeServerRpc(Player_Game_Mode_Manager.PlayerAge.SpaceAge);
-                //myExpPoint.Value -= LEVEL_UP_ModernAge; // ExpPoint'i düşür
-                Debug.Log("Player leveled up to Space Age!");
-            }
-            Debug.Log("Player leveled up to Space Age!");
-            OnLevelUp?.Invoke();
-        }
-        // Son çağa geçişten sonra (Space Age) daha fazla kontrol eklenmedi.
     }
 
 

@@ -29,7 +29,7 @@ public class PlayerProductionManagement : NetworkBehaviour
 
         if (playerSC.GetMyCurrentScrap() >= data.cost)
         {
-            playerSC.UpdateMyScrap(data.cost);
+            playerSC.UpdateMyScrap(-data.cost);
             productionUnitQueue.Enqueue((unitId, clientId));
             if (!isProducingUnit) StartCoroutine(ProduceNextUnit());
         }
@@ -46,7 +46,7 @@ public class PlayerProductionManagement : NetworkBehaviour
 
         if (playerSC.GetMyCurrentScrap() >= data.cost)
         {
-            playerSC.UpdateMyScrap(data.cost);
+            playerSC.UpdateMyScrap(-data.cost);
             // Sýraya artýk pozisyon ve sahip bilgisini de ekliyoruz
             productionTurretQueue.Enqueue((unitId, positionIndex, clientId));
             if (!isProducingTurret) StartCoroutine(ProduceNextTurret());

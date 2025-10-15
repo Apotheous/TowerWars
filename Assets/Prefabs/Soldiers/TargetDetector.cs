@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 public class TargetDetector : MonoBehaviour
@@ -16,12 +15,11 @@ public class TargetDetector : MonoBehaviour
     {
         //// Yalnýzca Sunucuda gerekli bileþenleri çekme
         //if (!IsServer) return;
-        Debug.Log($"[SERVER DETECTOR] Baþladý OnNetworkSpawn");
+
         // SoldiersControllerNavMesh'e ulaþmanýn en saðlam yolu:
         if (controllerNavMesh == null)
         {
             controllerNavMesh = GetComponentInParent<SoldiersControllerNavMesh>();
-            Debug.Log($"[SERVER DETECTOR] SoldiersControllerNavMesh çekildi");
         }else
         {
             Debug.Log($"[SERVER DETECTOR] SoldiersControllerNavMesh zaten atanmýþ");
@@ -29,7 +27,6 @@ public class TargetDetector : MonoBehaviour
         if (controllerAttack == null)
         {
             controllerAttack = GetComponentInParent<SoldiersAttackController>();
-            Debug.Log($"[SERVER DETECTOR] SoldiersAttackController çekildi");
         }else
         {
             Debug.Log($"[SERVER DETECTOR] SoldiersAttackController zaten atanmýþ");
