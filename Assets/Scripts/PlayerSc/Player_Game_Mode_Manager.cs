@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Player_Game_Mode_Manager : NetworkBehaviour
 {
-
-    // --- ENUMLAR ---
     public enum PlayerMode
     {
         MainMenu,
@@ -58,8 +56,6 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         }
     }
 
-    // YENİ: Start() mantığı OnNetworkSpawn'a taşındı.
-    // ... (Sınıfın geri kalanı) ...
 
     public override void OnNetworkSpawn()
     {
@@ -71,13 +67,6 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
             OnModeChanged?.Invoke(newValue);
             HandleModeChange(newValue);
         };
-
-        // **DÜZELTME:** Yaş değişimi için aboneliği sadece bir kez yapıyoruz ve yeni metodumuza bağlıyoruz.
-        _currentAge.OnValueChanged += HandleAgeChanged;
-
-        // NetworkVariable'ların ilk değerleriyle HandleModeChange'i çağır
-        // Bu, hem modu hem de ilk çağı (IceAge) başlatır.
-        HandleModeChange(_currentMode.Value);
     }
 
     // YENİ: OnNetworkDespawn'da abonelikleri temizle
@@ -85,45 +74,13 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     {
         base.OnNetworkDespawn();
 
-        // Mode değişimi aboneliği, anonim metot olduğu için tam olarak temizlenemeyebilir.
-        // Ancak bu yapıyı kullanıyorsanız genelde NetworkManager kapanınca sorun çıkmaz.
-        // Yine de temiz bir kod için OnValueChanged'a abone olurken isimlendirilmiş metot kullanın.
-        // Şimdilik sadece kopyalanan kısımları temizliyoruz:
         _currentMode.OnValueChanged -= (oldValue, newValue) =>
         {
             OnModeChanged?.Invoke(newValue);
             HandleModeChange(newValue);
         };
 
-        // **DÜZELTME:** Yaş değişimi için aboneliği isimlendirilmiş metot üzerinden temizliyoruz.
-        _currentAge.OnValueChanged -= HandleAgeChanged;
-
-        // ÖNEMLİ NOT:
-        // _currentMode aboneliği, anonim (lambda) metot olduğu için -= ile temizleme tam olarak çalışmaz.
-        // C# 'da bu tür abonelikleri doğru temizlemek için abonelik esnasında da isimlendirilmiş bir metot 
-        // kullanmanız şiddetle tavsiye edilir. (Örn: `_currentMode.OnValueChanged += HandleModeChanged;`)
     }
-    // YENİ: Tek bir metot ile Age değişimi işlensin.
-    private void HandleAgeChanged(PlayerAge oldValue, PlayerAge newValue)
-    {
-        Debug.Log($"[Manager] Age changed from {oldValue} to {newValue}. Updating visuals.");
-
-        // Görsel güncellemeyi çağır. Bu, hem Server hem de Client'larda çalışır.
-        UpdateAgeVisuals();
-
-        // Sadece gerçekten bir Level Up (çağ değişimi) olduysa logları ve event'i tetikle
-        if (oldValue != newValue)
-        {
-            // PlayerSC'deki OnLevelUp eventini tetiklemek istiyorsanız, 
-            // buraya bir event mekanizması eklemelisiniz. 
-            // Şimdilik sadece loglama ile devam edelim, çünkü OnLevelUp event'i Manager'da yok.
-            Debug.Log($"Player leveled up to {newValue} Age! (Network Confirmed)");
-
-            // **Eğer PlayerSC'deki OnLevelUp event'ini tetiklemeniz gerekiyorsa,**
-            // **PlayerComponentController üzerinden bir metot çağrısı yapmanız gerekebilir.**
-        }
-    }
-
 
 
     // ... (Diğer metotlar olduğu gibi kaldı: VisibilityCloseOthers, HandleModeChange, UpdateAgeVisuals, SetAgeServerRpc, RequestStartGameServerRpc, AllPlayersReady)
@@ -175,9 +132,6 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
 
 
 
-    /// <summary>
-    /// PlayerSC'den gelen ServerRpc talebiyle oyuncunun yaşını doğrudan ayarlar.
-    /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void SetAgeServerRpc(PlayerAge newAge)
     {
