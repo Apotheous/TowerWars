@@ -41,7 +41,9 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     private NetworkVariable<PlayerMode> _currentMode = new NetworkVariable<PlayerMode>(PlayerMode.MainMenu);
 
     public event Action<PlayerMode> OnModeChanged;
-
+    // store handlers so unsubscribe works
+    private NetworkVariable<PlayerMode>.OnValueChangedDelegate modeChangedHandler;
+    private NetworkVariable<PlayerAge>.OnValueChangedDelegate ageChangedHandler;
     public PlayerMode CurrentMode
     {
         get => _currentMode.Value;
@@ -60,13 +62,17 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        // create named delegates (store them)
+        modeChangedHandler = OnModeNetworkChanged;
+        ageChangedHandler = OnAgeNetworkChanged;
 
-        // Mode değişimi için tek bir anonim metot aboneliği (Temizleme için lambda yerine metot kullanılmalıydı, ama şimdilik bırakıyorum)
-        _currentMode.OnValueChanged += (oldValue, newValue) =>
-        {
-            OnModeChanged?.Invoke(newValue);
-            HandleModeChange(newValue);
-        };
+        _currentMode.OnValueChanged += modeChangedHandler;
+        _currentAge.OnValueChanged += ageChangedHandler;
+
+        // If this object spawns in OneVsOne already, ensure visuals apply
+        // (safeguard for late-joining clients)
+        HandleModeChange(_currentMode.Value);
+        UpdateAgeVisuals(); // run once so clients reflect current age immediately
     }
 
     // YENİ: OnNetworkDespawn'da abonelikleri temizle
@@ -74,26 +80,34 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     {
         base.OnNetworkDespawn();
 
-        _currentMode.OnValueChanged -= (oldValue, newValue) =>
-        {
-            OnModeChanged?.Invoke(newValue);
-            HandleModeChange(newValue);
-        };
-
+        // unsubscribe the exact same delegates
+        if (modeChangedHandler != null) _currentMode.OnValueChanged -= modeChangedHandler;
+        if (ageChangedHandler != null) _currentAge.OnValueChanged -= ageChangedHandler;
     }
 
+    // Named handlers
+    private void OnModeNetworkChanged(PlayerMode oldMode, PlayerMode newMode)
+    {
+        OnModeChanged?.Invoke(newMode);
+        HandleModeChange(newMode);
+    }
 
+    private void OnAgeNetworkChanged(PlayerAge oldAge, PlayerAge newAge)
+    {
+        // DEBUG log to confirm client receives the change:
+        Debug.Log($"[Client/Manager] OnAgeNetworkChanged: {oldAge} -> {newAge} (IsServer={IsServer}, IsOwner={IsOwner})");
+
+        // Update visuals on client as well
+        UpdateAgeVisuals();
+    }
     // ... (Diğer metotlar olduğu gibi kaldı: VisibilityCloseOthers, HandleModeChange, UpdateAgeVisuals, SetAgeServerRpc, RequestStartGameServerRpc, AllPlayersReady)
     private void VisibilityCloseOthers(GameObject onAgeGo)
     {
         foreach (var vis in Visibilities)
         {
-            // Dikkat: Burada onAgeGo.name ile vis.name'i karşılaştırmak, 
-            // objelerin Editor'da doğru adlandırılmasına bağlıdır.
-            if (onAgeGo.name != vis.name)
-            {
-                if (vis) vis.SetActive(false);
-            }
+            if (vis == null) continue;
+            if (vis != onAgeGo)
+                vis.SetActive(false);
         }
     }
 
@@ -130,16 +144,9 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         }
     }
 
-
-
-    [ServerRpc(RequireOwnership = false)]
-    public void SetAgeServerRpc(PlayerAge newAge)
+    public void SetNewAge(PlayerAge newAge)
     {
-        //if (!IsServer) return;
-        //_currentAge.Value = newAge;
-        //UpdateAgeVisuals(); // Server Yetkili olduğu için manuel güncelleme
-        //Debug.Log($"[Server] Age forcefully set to: {newAge}");
-        // --- 1. Başlangıç Logu ve Yetki Kontrolü ---
+
         Debug.Log($"[Manager/RPC] SetAgeServerRpc çağrıldı. İstenen Yaş: {newAge}. Mevcut Yaş: {CurrentAge}.");
 
         if (!IsServer)
@@ -161,15 +168,6 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
         Debug.Log($"[Manager/RPC] NetworkVariable _currentAge.Value değiştiriliyor: {oldAge} → {newAge}");
         _currentAge.Value = newAge;
 
-        // --- 4. Görsel Güncelleme ve Senkronizasyon (Tartışmalı kısım, önceki önerilerde kaldırılması önerilmişti) ---
-        // NOT: _currentAge.OnValueChanged olayı bu noktadan sonra tüm Client'larda tetiklenir.
-        // Ancak Server'da hemen (bu thread içinde) tetiklenmez. Bu yüzden Server, genellikle
-        // görseli manuel güncellemek ister.
-
-        // Eğer UpdateAgeVisuals() metodunuz IsServer/IsClient kontrolü yapmıyorsa,
-        // burada çağrılmalıdır. Aksi takdirde, HandleAgeChanged (OnValueChanged) içindeki
-        // çağrıya güvenmelisiniz.
-
         UpdateAgeVisuals();
         Debug.Log("[Manager/RPC] UpdateAgeVisuals manuel olarak Server'da çağrıldı.");
 
@@ -184,33 +182,32 @@ public class Player_Game_Mode_Manager : NetworkBehaviour
     /// </summary>
     private void UpdateAgeVisuals()
     {
-        // Yalnızca OneVsOne modunda aktif/pasif etme işlemini yap
-        if (CurrentMode != PlayerMode.OneVsOne) return;
+        // Yalnızca OneVsOne modunda çalıştır
+        if (_currentMode.Value != PlayerMode.OneVsOne) return;
 
-        // GÜNCEL: CurrentAge kullanılır.
-        if (CurrentAge == PlayerAge.IceAge)
+        Debug.Log($"[Manager] UpdateAgeVisuals running on {(IsServer ? "Server" : "Client")} - CurrentAge={_currentAge.Value}");
+
+        // kapat hepsini önce (güvenli)
+        foreach (var v in Visibilities) if (v) v.SetActive(false);
+
+        switch (_currentAge.Value)
         {
-            IceAgeVisibility.SetActive(true);
-            Debug.Log("IceAgeVisibility Set Active true");
-            VisibilityCloseOthers(IceAgeVisibility);
-        }
-        else if (CurrentAge == PlayerAge.MediavalAge)
-        {
-            MediavalAgeVisibility.SetActive(true);
-            Debug.Log("MediavalAgeVisibility Set Active true");
-            VisibilityCloseOthers(MediavalAgeVisibility);
-        }
-        else if (CurrentAge == PlayerAge.ModernAge)
-        {
-            ModernAgeVisibility.SetActive(true);
-            Debug.Log("ModernAgeVisibility Set Active true");
-            VisibilityCloseOthers(ModernAgeVisibility);
-        }
-        else if (CurrentAge == PlayerAge.SpaceAge)
-        {
-            SpaceAgeVisibility.SetActive(true);
-            Debug.Log("SpaceAgeVisibility Set Active true");
-            VisibilityCloseOthers(SpaceAgeVisibility);
+            case PlayerAge.IceAge:
+                if (IceAgeVisibility) IceAgeVisibility.SetActive(true);
+                VisibilityCloseOthers(IceAgeVisibility);
+                break;
+            case PlayerAge.MediavalAge:
+                if (MediavalAgeVisibility) MediavalAgeVisibility.SetActive(true);
+                VisibilityCloseOthers(MediavalAgeVisibility);
+                break;
+            case PlayerAge.ModernAge:
+                if (ModernAgeVisibility) ModernAgeVisibility.SetActive(true);
+                VisibilityCloseOthers(ModernAgeVisibility);
+                break;
+            case PlayerAge.SpaceAge:
+                if (SpaceAgeVisibility) SpaceAgeVisibility.SetActive(true);
+                VisibilityCloseOthers(SpaceAgeVisibility);
+                break;
         }
     }
     // ✅ Client sadece "başlamak istiyorum" diye talepte bulunur
