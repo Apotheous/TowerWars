@@ -7,17 +7,19 @@ using UnityEngine.AI;
 public class SoldiersControllerNavMesh : NetworkBehaviour
 {
     // Inspector'dan atanması gereken NavMeshAgent bileşeni
-    [SerializeField] private NavMeshAgent navMesh;
+    private NavMeshAgent navMesh;
 
     // Askerin mevcut hedefini tutar
     private Transform currentEnemyTarget; // İsimlendirme netleştirildi
-    [SerializeField]private Transform baseTarget;
+    private Transform baseTarget;
 
     public override void OnNetworkSpawn()
     {
+        navMesh = GetComponent<NavMeshAgent>();
         if (!IsServer)
         {
             this.enabled = false;
+            
             return;
         }
     }
@@ -35,7 +37,7 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
             {
                 navMesh.isStopped = false;
                 // Saldırı Controller'ı zaten hızı ayarlayacaktır, ama emin olmak için:
-                // navMesh.speed = soldier.MovementSpeed; 
+                // navMesh.speed = soldier.MovementSpeed;
             }
 
             navMesh.SetDestination(currentEnemyTarget.position);
