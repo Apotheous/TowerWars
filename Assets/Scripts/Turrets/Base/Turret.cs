@@ -24,13 +24,17 @@ public class Turret : NetworkBehaviour
 
     [Header("My Comps")]
     private TurretsRotationController soldiersControllerNavMesh;
-    [SerializeField] private TargetDetector targetDetector;
-    private void OnEnable()
+    [SerializeField] private TargetDetectorTurret targetDetector;
+    public override void OnNetworkSpawn()
     {
-
-
-
-
+        if (targetDetector != null)
+        {
+            targetDetector.WhenNetworkSpawn();
+        }
+        else
+        {
+            Debug.LogError("Bu objenin üzerinde TargetDetector component'i bulunamadý!", gameObject);
+        }
 
     }
 

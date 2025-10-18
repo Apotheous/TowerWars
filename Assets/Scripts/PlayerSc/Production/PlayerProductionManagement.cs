@@ -110,6 +110,7 @@ public class PlayerProductionManagement : NetworkBehaviour
             if (unitIdentity != null)
             {
                 unitIdentity.TeamId.Value = (int)order.clientId;
+                obj.name = $"Turret_Team_ID_{order.clientId}";
             }
         }
         isProducingTurret = false;

@@ -9,7 +9,7 @@ using UnityEngine;
 public class SoldiersAttackController : NetworkBehaviour
 {
     [Header("Saldýrý Ayarlarý")]
-    [SerializeField] private float attackRange = 10f;
+    private float attackRange = 9999f;
     [SerializeField] private float fireRate = 1f; // Saniyede kaç atýþ
     [SerializeField] private float damage = 10f;
 

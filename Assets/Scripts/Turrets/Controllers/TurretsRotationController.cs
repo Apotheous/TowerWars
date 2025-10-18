@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -6,153 +6,144 @@ using UnityEngine.AI;
 
 public class TurretsRotationController : NetworkBehaviour
 {
-    [SerializeField] Transform returnX, returnY;
-    // Inspector'dan atanmas� gereken NavMeshAgent bile�eni
-    private NavMeshAgent navMesh;
+    // Yatay (Y ekseni) dönme bileşeni (Genellikle kulenin alt tabanı)
+    [Header("Dönme Bileşenleri")]
+    [SerializeField] Transform returnY;
+    // Dikey (X ekseni) dönme bileşeni (Genellikle top namlusu/silah kısmı)
+    [SerializeField] Transform returnX;
 
-    // Askerin mevcut hedefini tutar
-    private Transform currentEnemyTarget; // �simlendirme netle�tirildi
-    private Transform baseTarget;
+    [Header("Dönme Ayarları")]
+    [SerializeField] private float rotationSpeed = 5f; // Yumuşak dönme hızı
+
+    // Mevcut düşman hedefini tutar
+    private Transform currentEnemyTarget;
+
+    // Turret bileşenleri (NavMeshAgent artık kule için kullanılmıyor)
+    // private NavMeshAgent navMesh; // Kaldırıldı
+    // private Transform baseTarget; // Kaldırıldı
 
     public override void OnNetworkSpawn()
     {
-        
+        Debug.Log("[SERVER/Rotation] OnNetworkSpawn çağrıldı.");
         if (!IsServer)
         {
             this.enabled = false;
-
+            Debug.Log("[SERVER/Rotation] Client: Script kapatıldı.");
             return;
+        }
+        Debug.Log("[SERVER/Rotation] Sunucuda çalışıyor.");
+
+        // Bileşenlerin atanıp atanmadığını kontrol et
+        if (returnY == null || returnX == null)
+        {
+            Debug.LogError("[SERVER/Rotation] returnY veya returnX Transform'ları atanmamış!");
+            this.enabled = false; // Dönme yapamayacağı için kapat
+        }
+        else
+        {
+            Debug.Log("[SERVER/Rotation] returnY ve returnX başarıyla atanmış görünüyor.");
         }
     }
 
     private void Update()
     {
-        if (!IsServer || navMesh == null || !navMesh.isOnNavMesh) return;
+        // Update her kare çağrıldığından, logu sadece önemli durumlarda koymak daha iyidir.
+        if (!IsServer) return; // Sunucu değilse dur
 
-
-        // 1. D��MAN HEDEF� �NCEL���: D��man varsa ona git
-        if (currentEnemyTarget != null)
+        if (currentEnemyTarget == null)
         {
-            // E�er durdurulmu�sa (StopUnit ile), yeniden ba�lat
-            if (navMesh.isStopped)
-            {
-                navMesh.isStopped = false;
-                // Sald�r� Controller'� zaten h�z� ayarlayacakt�r, ama emin olmak i�in:
-                // navMesh.speed = soldier.MovementSpeed;
-            }
+            // Debug.Log("[SERVER/Rotation] Update: Hedef yok, dönme işlemi yapılmıyor.");
+            return; // Hedef yoksa dur
+        }
 
-            navMesh.SetDestination(currentEnemyTarget.position);
-        }
-        else if (baseTarget != null)
-        {
-            // E�er durdurulmu�sa (StopUnit ile), yeniden ba�lat
-            if (navMesh.isStopped)
-            {
-                navMesh.isStopped = false;
-                // navMesh.speed = soldier.MovementSpeed;
-            }
-
-            navMesh.SetDestination(baseTarget.position);
-        }
-        else
-        {
-            // Bu durum, genellikle sadece baseTarget atanmad���nda (Spawner hatas�)
-            // veya GiveMeNewTarget(null) sonras� hareketin durmas� gerekti�inde tetiklenmeli.
-            if (navMesh.hasPath)
-            {
-                navMesh.ResetPath();
-                navMesh.isStopped = true;
-                // navMesh.velocity = Vector3.zero; // ResetPath ve isStopped=true ile genellikle gerek kalmaz
-                Debug.Log($"[SERVER/NavMesh] {gameObject.name} i�in hedef yok, hareket durduruldu.");
-            }
-        }
+        // Debug.Log("[SERVER/Rotation] Update: Hedef mevcut, dönme metodları çağrılıyor.");
+        // Her iki eksen dönme işlemini ayrı metodlarda çalıştır
+        RotateYAxis();
+        RotateXAxis();
     }
-    /// <summary>
-    /// Bir d��man hedefini (TargetDetector'dan gelen) ayarlar.
-    /// E�er null gelirse, birimin ana hedefine (baseTarget) geri d�nmesini sa�lar.
-    /// </summary>
 
+    /// <summary>
+    /// Yatay (Y ekseni) dönme bileşenini hedefe doğru döndürür.
+    /// Kule alt tabanının dönüşünü kontrol eder.
+    /// </summary>
+    private void RotateYAxis()
+    {
+        // Debug.Log("[SERVER/Rotation] RotateYAxis çağrıldı.");
+        // 1. Hedefin yüksekliğini, dönen parçanın yüksekliğiyle eşitliyoruz (Sadece yatay dönme)
+        Vector3 targetPositionFlat = currentEnemyTarget.position;
+        targetPositionFlat.y = returnY.position.y;
+
+        // 2. Hedefe bakmak için gerekli rotasyonu hesapla
+        Vector3 direction = targetPositionFlat - returnY.position;
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            // 3. Yumuşak bir şekilde hedefe doğru dön (Slerp)
+            returnY.rotation = Quaternion.Slerp(
+                returnY.rotation,
+                targetRotation,
+                Time.deltaTime * rotationSpeed
+            );
+            // Debug.Log("[SERVER/Rotation] returnY döndürülüyor.");
+        }
+        // else Debug.Log("[SERVER/Rotation] returnY konumu hedeften farksız (Sıfır vektör).");
+    }
+
+    /// <summary>
+    /// Dikey (X ekseni) dönme bileşenini hedefe doğru döndürür.
+    /// Namlu/silah kısmının yukarı-aşağı hareketini kontrol eder.
+    /// </summary>
+    private void RotateXAxis()
+    {
+        // Debug.Log("[SERVER/Rotation] RotateXAxis çağrıldı.");
+        // 1. Hedefin pozisyonundan namlu pozisyonuna giden yönü hesapla
+        Vector3 direction = currentEnemyTarget.position - returnX.position;
+
+        // 2. Hedefe bakmak için gerekli rotasyonu hesapla
+        // Quaternion.LookRotation(direction) bize hem Y hem X rotasyonu verir.
+        // Biz sadece X eksenindeki eğimi (yukarı-aşağı) istiyoruz.
+        Quaternion fullTargetRotation = Quaternion.LookRotation(direction);
+
+        // 3. Hedef rotasyonun Euler açılarını al
+        Vector3 targetEuler = fullTargetRotation.eulerAngles;
+
+        // 4. Namlunun X rotasyonunu (yukarı-aşağı) hedefin X rotasyonu olarak al
+        // Y ve Z rotasyonlarını mevcut değerlerinde bırak (Çünkü Y'yi zaten returnY kontrol ediyor)
+        Quaternion finalRotation = Quaternion.Euler(
+            targetEuler.x, // Hedefin X açısı
+            returnX.rotation.eulerAngles.y, // returnX'in mevcut Y açısı (değişmemeli)
+            returnX.rotation.eulerAngles.z  // returnX'in mevcut Z açısı (değişmemeli)
+        );
+
+        // 5. Yumuşak bir şekilde hedefe doğru dön (Slerp)
+        returnX.rotation = Quaternion.Slerp(
+            returnX.rotation,
+            finalRotation,
+            Time.deltaTime * rotationSpeed
+        );
+        // Debug.Log("[SERVER/Rotation] returnX döndürülüyor.");
+    }
+
+
+    /// <summary>
+    /// Bir düşman hedefini (TargetDetector'dan gelen) ayarlar.
+    /// </summary>
     public void GiveMeNewTarget(Transform newTarget)
     {
-        if (!IsServer || navMesh == null || !navMesh.isOnNavMesh) return;
-
+        Debug.Log("[SERVER/Rotation] GiveMeNewTarget çağrıldı.");
+        if (!IsServer) return; // Sadece Sunucuda çalışır
 
         currentEnemyTarget = newTarget;
 
         if (currentEnemyTarget != null)
         {
-            navMesh.isStopped = false; // Hareket etmeye ba�la
-            navMesh.SetDestination(currentEnemyTarget.position);
-            Debug.Log($"[SERVER/NavMesh] Yeni D��MAN hedefi al�nd�: ({currentEnemyTarget.name}).");
+            Debug.Log($"[SERVER/Rotation] Yeni DÜŞMAN hedefi alındı: ({currentEnemyTarget.name}).");
         }
-        else // D��man yoksa, baseTarget'a d�nme mant��� Update'e b�rak�lm��t�r.
+        else
         {
-            // E�er currentEnemyTarget null ise, Update d�ng�s� otomatik olarak baseTarget'� hedefler.
-            // Burada sadece loglay�p ��kmak yeterli.
-            Debug.Log("[SERVER/NavMesh] D��man hedefi temizlendi. Birim varsay�lan hedefine d�necek.");
-        }
-    }
-
-    // Harici birimlerin mevcut hedefi almas�n� sa�lar (Opsiyonel)
-    public Transform GetCurrentTarget()
-    {
-        return currentEnemyTarget;
-    }
-    // Harici birimlerin mevcut base hedefi almas�n� sa�lar (Opsiyonel)
-    public Transform GetCurrentBaseTarget()
-    {
-        return baseTarget;
-    }
-
-    public void StopUnit()
-    {
-        if (IsServer && navMesh != null)
-        {
-            // En g�venilir durdurma metodu budur.
-            navMesh.isStopped = true;
-            navMesh.velocity = Vector3.zero;
-            Debug.Log($"[SERVER/NavMesh] {gameObject.name} birimi zorla durduruldu.");
-        }
-    }
-
-    public IEnumerator FindTargetAndSetDestination()
-    {
-
-        var myIdentity = GetComponent<Soldier>();
-
-        if (myIdentity == null)
-        {
-            yield break;
-        }
-
-        int attempts = 0;
-
-        while (baseTarget == null && attempts < 10)
-        {
-
-            attempts++;
-
-            if (myIdentity.TeamId.Value == 1)
-
-            {
-                baseTarget = DevSingletonTransform.instance.player2Transform;
-            }
-
-            else if (myIdentity.TeamId.Value == 2)
-            {
-                baseTarget = DevSingletonTransform.instance.player1Transform;
-            }
-            if (baseTarget == null)
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
-
-        }
-
-� � � � // Hedef atamas� yap�ld�ktan sonra...
-� � � � if (baseTarget != null)
-        {
-            GiveMeNewTarget(baseTarget);
+            Debug.Log("[SERVER/Rotation] Düşman hedefi temizlendi. Kule boşa çıkacak.");
         }
     }
 }

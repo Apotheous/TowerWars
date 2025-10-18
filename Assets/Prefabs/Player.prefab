@@ -293,9 +293,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TeamId:
     m_InternalValue: 0
-  movementSpeedBase: 5
-  myweapon: {fileID: 1428121347879896040}
-  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
   WinnerClientId:
     m_InternalValue: 0
 --- !u!114 &8526755292245196328

@@ -6,119 +6,126 @@ public class TargetDetectorTurret : MonoBehaviour
 {
     private TurretsRotationController controllerNavMesh;
     private TurretsAttackController controllerAttack;
-    private Turret soldier; // Kendi takým bilgimizi tutan referans
+    private Turret TurretMyId; // Kendi takým bilgimizi tutan referans
+    private Soldier soldierId; // Kendi takým bilgimizi tutan referans
 
 
     // Potansiyel düþmanlarý tutan liste
     private List<Transform> detectedTargets = new List<Transform>();
 
+
     public void WhenNetworkSpawn()
     {
+        Debug.Log($"[SERVER DETECTOR Turret] WhenNetworkSpawn çaðrýldý."); // Baþlangýç Debug
+
         //// Yalnýzca Sunucuda gerekli bileþenleri çekme
-        //if (!IsServer) return;
+        //if (!IsServer) return; // Sunucu kontrolü aktif deðilse tümü çalýþýr (Unity Editor Testi)
 
         // SoldiersControllerNavMesh'e ulaþmanýn en saðlam yolu:
         if (controllerNavMesh == null)
         {
             controllerNavMesh = GetComponentInParent<TurretsRotationController>();
+            Debug.Log($"[SERVER DETECTOR Turret] TurretsRotationController çekildi.");
         }
         else
         {
-            Debug.Log($"[SERVER DETECTOR] SoldiersControllerNavMesh zaten atanmýþ");
+            Debug.Log($"[SERVER DETECTOR Turret] TurretsRotationController zaten atanmýþ");
         }
         if (controllerAttack == null)
         {
             controllerAttack = GetComponentInParent<TurretsAttackController>();
+            Debug.Log($"[SERVER DETECTOR Turret] TurretsAttackController çekildi.");
         }
         else
         {
-            Debug.Log($"[SERVER DETECTOR] SoldiersAttackController zaten atanmýþ");
+            Debug.Log($"[SERVER DETECTOR Turret] TurretsAttackController zaten atanmýþ");
         }
         // Kendi UnitIdentity'mizi bul (takým bilgisi için kritik).
-        if (soldier == null)
+        if (TurretMyId == null)
         {
-            soldier = GetComponentInParent<Turret>();
-            if (soldier != null)
+            TurretMyId = GetComponentInParent<Turret>();
+            if (TurretMyId != null)
             {
-                Debug.Log($"[SERVER DETECTOR] Soldier çekildi MyTeamID ===" + soldier.TeamId.Value + "++++");
+                Debug.Log($"[SERVER DETECTOR Turret] Turret çekildi. MyTeamID ==={TurretMyId.TeamId.Value}++++");
             }
             else
             {
-                Debug.LogError("TargetDetector için gerekli olan Soldier bulunamadý!");
+                Debug.LogError("[SERVER DETECTOR Turret] TargetDetector için gerekli olan Turret bulunamadý!");
             }
         }
-
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Transform potentialTargetParent = other.transform.parent;
+        Debug.Log($"[SERVER DETECTOR Turret] OnTriggerEnter tetiklendi. Collider: {other.name}");
+        if (other.gameObject.name == "TargetDetector" || other.gameObject.name == "bullet(Clone)")
+        {
+            Debug.Log($"[SERVER DETECTOR Turret] Tetiklenen Collider bir TargetDetector veya bullet. Yoksayýlýyor.");
+            return;
+        }
+        Transform potentialTargetParent = other.transform;
 
         if (potentialTargetParent != null)
         {
+            Debug.Log($"[SERVER DETECTOR Turret] Potansiyel hedef Parent: {potentialTargetParent.name}");
 
             // Hedef bileþenini almayý dene
             if (potentialTargetParent.TryGetComponent<Soldier>(out var unitIdentity))
             {
-                if (soldier == null)
+                Debug.Log($"[SERVER DETECTOR Turret] Hedefte Soldier (Unit) bileþeni bulundu.");
+                if (TurretMyId == null)
                 {
+                    Debug.LogWarning("[SERVER DETECTOR Turret] TurretMyId (Takým Bilgisi) bulunmadýðý için çýkýlýyor.");
                     return;
                 }
 
                 // Takým ID'lerini karþýlaþtýr ve logla
-                var myTeam = soldier.TeamId.Value;
+                var myTeam = TurretMyId.TeamId.Value;
                 var otherTeam = unitIdentity.TeamId.Value;
+                Debug.Log($"[SERVER DETECTOR Turret] Takým Kontrolü: Benim Takýmým={myTeam}, Diðer Takým={otherTeam}");
 
                 // 3. DÜÞMAN KONTROLÜ
                 if (myTeam != otherTeam)
                 {
+                    Debug.Log($"[SERVER DETECTOR Turret] Takýmlar farklý. Düþman Olarak Deðerlendirildi.");
                     // Listede zaten yoksa listeye ekle
                     if (!detectedTargets.Contains(potentialTargetParent))
                     {
                         detectedTargets.Add(potentialTargetParent);
+                        Debug.Log($"[SERVER DETECTOR Turret] Yeni Düþman listeye eklendi: {potentialTargetParent.name}. Toplam: {detectedTargets.Count}");
 
-                        // Bu noktada, en iyi hedefi seçme ve controller'a atama mantýðý devreye girer.
-                        // Þimdilik sadece yeni giren hedefi seçelim:
                         AssignBestTarget();
-
                     }
+                    else
+                    {
+                        Debug.Log($"[SERVER DETECTOR Turret] Düþman zaten listede.");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"[SERVER DETECTOR Turret] Ayný takým. Yoksayýlýyor.");
                 }
             }
             else if (potentialTargetParent.TryGetComponent<PlayerSC>(out var baseIdentity))
             {
-                // Kendi birim bilgimizin varlýðýný kontrol et (Hata korumasý)
-                if (soldier == null)
-                {
-                    return;
-                }
-
-                // Takým ID'lerini karþýlaþtýr ve logla
-                var myTeam = soldier.TeamId.Value;
-                var otherTeam = baseIdentity.TeamId.Value;
-
-                // 3. DÜÞMAN KONTROLÜ
-                if (myTeam != otherTeam)
-                {
-                    // Listede zaten yoksa listeye ekle
-                    if (!detectedTargets.Contains(potentialTargetParent))
-                    {
-                        detectedTargets.Add(potentialTargetParent);
-                        AssignBestTarget();
-
-                    }
-                }
+                Debug.Log($"[SERVER DETECTOR Turret] Muhtemelen KendiBase ile Triggerlandý");
+                return;
+            }
+            else
+            {
+                Debug.Log($"[SERVER DETECTOR Turret] Hedefte Soldier veya PlayerSC bileþeni bulunamadý.==" + other.name );
             }
         }
         else
         {
-
+            Debug.Log($"[SERVER DETECTOR Turret] Tetiklenen Collider'ýn Parent'ý (potentialTargetParent) null. == " + other.name);
         }
     }
 
     // --- YENÝ LOGIC: HEDEF ÇIKARMA ---
     private void OnTriggerExit(Collider other)
     {
+        Debug.Log($"[SERVER DETECTOR Turret] OnTriggerExit tetiklendi. Collider: {other.name}");
         Transform potentialTargetParent = other.transform.parent;
 
         if (potentialTargetParent != null && potentialTargetParent.TryGetComponent<Soldier>(out _))
@@ -127,11 +134,27 @@ public class TargetDetectorTurret : MonoBehaviour
             if (detectedTargets.Contains(potentialTargetParent))
             {
                 detectedTargets.Remove(potentialTargetParent);
+                Debug.Log($"[SERVER DETECTOR Turret] Hedef listeden çýkarýldý: {potentialTargetParent.name}. Kalan: {detectedTargets.Count}");
+
+                // Eðer çýkan hedef, o anda saldýrýlan hedef ise, yeni bir hedef seç
                 if (controllerAttack.GetCurrentTarget() == potentialTargetParent)
                 {
+                    Debug.Log($"[SERVER DETECTOR Turret] Çýkan hedef mevcut saldýrý hedefiydi. Yeni hedef aranýyor.");
                     AssignBestTarget();
                 }
+                else
+                {
+                    Debug.Log($"[SERVER DETECTOR Turret] Çýkan hedef, mevcut saldýrý hedefi deðildi.");
+                }
             }
+            else
+            {
+                Debug.Log($"[SERVER DETECTOR Turret] Çýkan birim listede deðildi.");
+            }
+        }
+        else
+        {
+            Debug.Log($"[SERVER DETECTOR Turret] Çýkan birim geçerli bir Soldier deðildi.");
         }
     }
 
@@ -142,8 +165,10 @@ public class TargetDetectorTurret : MonoBehaviour
     /// <returns>En yakýn düþmanýn Transform'u; liste boþsa null.</returns>
     private Transform FindClosestTarget(List<Transform> targets)
     {
+        Debug.Log($"[SERVER DETECTOR Turret] FindClosestTarget çaðrýldý. Listede {targets?.Count ?? 0} hedef var.");
         if (targets == null || targets.Count == 0)
         {
+            Debug.Log($"[SERVER DETECTOR Turret] Hedef listesi boþ. Null dönülüyor.");
             return null;
         }
 
@@ -159,7 +184,7 @@ public class TargetDetectorTurret : MonoBehaviour
 
             if (currentTarget == null)
             {
-
+                Debug.LogWarning($"[SERVER DETECTOR Turret] Listedeki bir hedef (indeks {i}) null çýktý. Atlanýyor.");
                 continue;
             }
 
@@ -173,6 +198,7 @@ public class TargetDetectorTurret : MonoBehaviour
             }
         }
 
+        Debug.Log($"[SERVER DETECTOR Turret] En yakýn hedef bulundu: {(closestTarget != null ? closestTarget.name : "Yok")}");
         return closestTarget;
     }
 
@@ -183,7 +209,11 @@ public class TargetDetectorTurret : MonoBehaviour
     /// </summary>
     public void AssignBestTarget()
     {
+        Debug.Log($"[SERVER DETECTOR Turret] AssignBestTarget çaðrýldý. Mevcut Hedef Sayýsý: {detectedTargets.Count}");
+
         detectedTargets.RemoveAll(t => t == null);
+        Debug.Log($"[SERVER DETECTOR Turret] Null hedefler temizlendi. Kalan Hedef Sayýsý: {detectedTargets.Count}");
+
 
         if (detectedTargets.Count > 0)
         {
@@ -192,12 +222,14 @@ public class TargetDetectorTurret : MonoBehaviour
 
             if (newTarget != null)
             {
+                Debug.Log($"[SERVER DETECTOR Turret] Controller'lara yeni hedef atanýyor: {newTarget.name}");
 
                 controllerNavMesh.GiveMeNewTarget(newTarget);
                 controllerAttack.StartAttacking(newTarget);
             }
             else // Temizlik sonrasý listede eleman kalmadýysa (Tüm hedefler null çýktýysa)
             {
+                Debug.Log("[SERVER DETECTOR Turret] Temizlik sonrasý listede geçerli hedef kalmadý (Tümü null çýktý).");
                 // Hiç hedef kalmadýysa
                 controllerNavMesh.GiveMeNewTarget(null); // veya bir sonraki default hedefine gitmesini saðla
                 controllerAttack.StopAttacking();
@@ -206,6 +238,7 @@ public class TargetDetectorTurret : MonoBehaviour
         }
         else
         {
+            Debug.Log("[SERVER DETECTOR Turret] Hedef listesi boþ. Controller'lardan hedef temizleniyor.");
             // Hiç hedef kalmadýysa
             controllerNavMesh.GiveMeNewTarget(null);
             controllerAttack.StopAttacking();
