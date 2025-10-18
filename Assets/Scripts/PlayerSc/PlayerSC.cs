@@ -19,7 +19,6 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     private readonly NetworkVariable<float> mycurrentHealth = new NetworkVariable<float>();
 
     private readonly NetworkVariable<float> myExpPoint = new NetworkVariable<float>(0);
-    private readonly NetworkVariable<float> myEasdadxpPoint = new NetworkVariable<float>(0);
 
     private readonly NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>(999999);
     // Custom eventler
@@ -34,13 +33,6 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
 
     #endregion
-
-
-    [Header("Movement Settings")]
-    [SerializeField] float movementSpeedBase = 5f;
-
-    [SerializeField] Transform myweapon;
-    [SerializeField] GameObject bulletPrefab;
 
     public NetworkVariable<ulong> WinnerClientId = new NetworkVariable<ulong>(0);
 
