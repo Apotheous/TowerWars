@@ -19,7 +19,7 @@ public class TurretsAttackController : NetworkBehaviour
     [SerializeField] private Transform firePoint; // Merminin çýkacaðý yer (namlu ucu vb.)
 
 
-    private Soldier mySoldierInfo;
+    private Soldier mySoldierInfo;//Burada Kaldým
     private TargetDetector myTargetDetector; // YENÝ: TargetDetector referansý
     private Transform myCurrentTarget;
 
