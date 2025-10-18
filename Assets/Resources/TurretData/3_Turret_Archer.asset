@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bcadb6760e901104daa019de996f48d5, type: 3}
-  m_Name: 2-TurretSword
+  m_Name: 3_Turret_Archer
   m_EditorClassIdentifier: 
-  id: 354141
-  age: 1
+  id: 136513
+  age: 2
   trainingTime: 5
   cost: 15
-  prefab: {fileID: 2737073753183690271, guid: 16eb0edcb9cb1794c869c9125a0188a3, type: 3}
-  icon: {fileID: 21300000, guid: 8ca145fc8bcb45e4da2500a9bbf2ea4f, type: 3}
+  prefab: {fileID: 5183784188147805553, guid: 9fade5233d0bcaf48af3517e50627b7f, type: 3}
+  icon: {fileID: 21300000, guid: 940a5e8e00ab848458b037162b41dc22, type: 3}

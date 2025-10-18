@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10fe5cf8eecf4854ab339cf2e166d72a, type: 3}
-  m_Name: TankTwo
+  m_Name: 2_Soldier_Sword
   m_EditorClassIdentifier: 
-  id: 66666666
+  id: 44444444
   age: 1
-  trainingTime: 10
-  cost: 150
-  prefab: {fileID: 1339119858819233629, guid: c9f9f1206f8ccb149821391799bb2ceb, type: 3}
-  icon: {fileID: 21300000, guid: e3536a18115e5a84eb9679af0e44f7fd, type: 3}
+  trainingTime: 5
+  cost: 100
+  prefab: {fileID: 3587595115300533166, guid: d9d209fa32730fe4597011248adbe7ea, type: 3}
+  icon: {fileID: 21300000, guid: 59172886212e8504388b3db991129847, type: 3}

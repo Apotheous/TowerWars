@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bcadb6760e901104daa019de996f48d5, type: 3}
-  m_Name: 1-TurretSword
+  m_Name: 1_Turret_Sword
   m_EditorClassIdentifier: 
   id: 15613
   age: 0

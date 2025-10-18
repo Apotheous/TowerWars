@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10fe5cf8eecf4854ab339cf2e166d72a, type: 3}
+  m_Name: 2_Soldier_Tank
+  m_EditorClassIdentifier: 
+  id: 66666666
+  age: 1
+  trainingTime: 10
+  cost: 150
+  prefab: {fileID: 1339119858819233629, guid: c9f9f1206f8ccb149821391799bb2ceb, type: 3}
+  icon: {fileID: 21300000, guid: e3536a18115e5a84eb9679af0e44f7fd, type: 3}
