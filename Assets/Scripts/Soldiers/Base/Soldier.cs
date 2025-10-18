@@ -26,10 +26,10 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private float myCost;
     [SerializeField] private float myPrizeScrap;
     [SerializeField] private float myPrizeExp;
-    [SerializeField] private Transform myBarrel;
-    [SerializeField] private float myRange;
 
 
+
+    [Header("My Comps")]
     [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
     [SerializeField] private TargetDetector targetDetector;
 

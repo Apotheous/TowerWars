@@ -17,8 +17,7 @@ public class SoldiersAttackController : NetworkBehaviour
     [SerializeField] private GameObject bulletPrefab; // Inspector'dan mermi prefab'ýný sürükle
     [SerializeField] private Transform firePoint; // Merminin çýkacaðý yer (namlu ucu vb.)
 
-    // Diðer component'lere referanslar
-    private SoldiersControllerNavMesh movementController;
+
     private Soldier mySoldierInfo;
     private TargetDetector myTargetDetector; // YENÝ: TargetDetector referansý
     private Transform myCurrentTarget;
@@ -30,7 +29,6 @@ public class SoldiersAttackController : NetworkBehaviour
 
     private void Awake()
     {
-        movementController = GetComponent<SoldiersControllerNavMesh>();
         mySoldierInfo = GetComponent<Soldier>(); // Kendi Soldier script'imizi alýyoruz.
         myTargetDetector = GetComponentInChildren<TargetDetector>();
     }

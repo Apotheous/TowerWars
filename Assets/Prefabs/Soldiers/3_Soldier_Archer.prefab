@@ -176,12 +176,12 @@ GameObject:
   m_Component:
   - component: {fileID: 6612645287355585467}
   - component: {fileID: 8454957887197285233}
+  - component: {fileID: -5013645668071552999}
   - component: {fileID: -249691399742853654}
-  - component: {fileID: 6612645287355585464}
-  - component: {fileID: 2196776996376851835}
   - component: {fileID: 7054680944188205767}
   - component: {fileID: 7591193204476448610}
-  - component: {fileID: -5013645668071552999}
+  - component: {fileID: 6612645287355585464}
+  - component: {fileID: 2196776996376851835}
   - component: {fileID: -7349933436319925749}
   m_Layer: 0
   m_Name: 3_Soldier_Archer
@@ -231,95 +231,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!195 &-249691399742853654
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &6612645287355585464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d59c7b3406d78344bdff3462ebf6c2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  age: 2
-  MaxHealth: 100
-  TeamId:
-    m_InternalValue: 0
-  healthBar: {fileID: 1702172565097953223}
-  myCost: 50
-  myPrizeScrap: 15
-  myPrizeExp: 5
-  myBarrel: {fileID: 3592182118042573096}
-  myRange: 10
-  soldiersControllerNavMesh: {fileID: 2196776996376851835}
-  targetDetector: {fileID: 7708720287917174167}
---- !u!114 &2196776996376851835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 911dd17ef6f9c9944bab0f6f37cc5441, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  navMesh: {fileID: -249691399742853654}
-  baseTarget: {fileID: 0}
---- !u!65 &7054680944188205767
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 2.3851142, z: 1}
-  m_Center: {x: 0, y: 1.669878, z: 0}
---- !u!54 &7591193204476448610
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612645287355585465}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &-5013645668071552999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,6 +262,91 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!195 &-249691399742853654
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!65 &7054680944188205767
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 2.3851142, z: 1}
+  m_Center: {x: 0, y: 1.669878, z: 0}
+--- !u!54 &7591193204476448610
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &6612645287355585464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d59c7b3406d78344bdff3462ebf6c2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  age: 2
+  MaxHealth: 100
+  TeamId:
+    m_InternalValue: 0
+  healthBar: {fileID: 1702172565097953223}
+  myCost: 50
+  myPrizeScrap: 15
+  myPrizeExp: 5
+  soldiersControllerNavMesh: {fileID: 2196776996376851835}
+  targetDetector: {fileID: 7708720287917174167}
+--- !u!114 &2196776996376851835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612645287355585465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 911dd17ef6f9c9944bab0f6f37cc5441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &-7349933436319925749
 MonoBehaviour:
   m_ObjectHideFlags: 0
