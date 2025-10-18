@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcadb6760e901104daa019de996f48d5, type: 3}
+  m_Name: 4_Turret_Sword
+  m_EditorClassIdentifier: 
+  id: 351531
+  age: 3
+  trainingTime: 5
+  cost: 15
+  prefab: {fileID: 2737073753183690271, guid: 2a5dac03aa1d92741a108fcbde9c17f7, type: 3}
+  icon: {fileID: 21300000, guid: e61cb8323a7015043bd8152c20f3ed43, type: 3}

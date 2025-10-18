@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcadb6760e901104daa019de996f48d5, type: 3}
+  m_Name: 4_Turret_Archer
+  m_EditorClassIdentifier: 
+  id: 153151
+  age: 3
+  trainingTime: 5
+  cost: 15
+  prefab: {fileID: 5183784188147805553, guid: e200b1fc47829b949b0fc26e1086c28b, type: 3}
+  icon: {fileID: 21300000, guid: 496e6b5b958e726429f38b5b1718d323, type: 3}

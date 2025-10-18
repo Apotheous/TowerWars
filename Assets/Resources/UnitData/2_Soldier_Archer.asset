@@ -17,4 +17,4 @@ MonoBehaviour:
   trainingTime: 5
   cost: 50
   prefab: {fileID: 6612645287355585465, guid: ab78e36d2e59e7c4c8ff1e528095a79a, type: 3}
-  icon: {fileID: 21300000, guid: 1a86d5936f38f8b419f59c48e2e543a4, type: 3}
+  icon: {fileID: 21300000, guid: 002679747c32b834bac944f12e3d969b, type: 3}
