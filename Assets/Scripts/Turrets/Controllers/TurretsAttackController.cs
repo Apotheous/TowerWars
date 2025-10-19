@@ -19,7 +19,7 @@ public class TurretsAttackController : NetworkBehaviour
     [SerializeField] private Transform firePoint; // Merminin çýkacaðý yer (namlu ucu vb.)
 
 
-    private Soldier mySoldierInfo;//Burada Kaldým
+    private Turret mySoldierInfo;//Burada Kaldým
     private TargetDetector myTargetDetector; // YENÝ: TargetDetector referansý
     private Transform myCurrentTarget;
 
@@ -31,7 +31,7 @@ public class TurretsAttackController : NetworkBehaviour
     private void Awake()
     {
         Debug.Log("[SERVER ATTACK Turret] Awake çaðrýldý.");
-        mySoldierInfo = GetComponent<Soldier>(); // Kendi Soldier script'imizi alýyoruz.
+        mySoldierInfo = GetComponent<Turret>(); // Kendi Soldier script'imizi alýyoruz.
         myTargetDetector = GetComponentInChildren<TargetDetector>();
     }
 
