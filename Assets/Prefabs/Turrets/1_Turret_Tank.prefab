@@ -480,6 +480,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TargetDetector
       objectReference: {fileID: 0}
+    - target: {fileID: 7029821185596300409, guid: 83dc3431c3adb2a4a9c61d0042e249af, type: 3}
+      propertyPath: m_Radius
+      value: 35
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83dc3431c3adb2a4a9c61d0042e249af, type: 3}
 --- !u!4 &6571961864623606232 stripped

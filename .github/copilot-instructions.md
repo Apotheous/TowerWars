@@ -2,7 +2,7 @@
 - Project name: TowerWars
 - Unity version: Unity 2021.3.45f1
 - Active game object:
-  - Name: 1_Soldier_Archer
+  - Name: TargetDetector
   - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
