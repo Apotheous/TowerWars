@@ -1,5 +1,6 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
@@ -9,47 +10,73 @@ using UnityEngine;
 using UnityEngine.UI;
 public class CloudSaveAccountManager : MonoBehaviour
 {
-    // UI alanlarý
+    // UI alanlarÄ±
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI AccountNameText;
+    [SerializeField] private TextMeshProUGUI ScoreTxt;
     [SerializeField] private Button createAccountBtnTmp;
 
-    // Geleneksel giriþ için yeni alanlar (Inspector'dan UI InputField'lere baðlayýn)
+    // Geleneksel giriÅŸ iÃ§in yeni alanlar (Inspector'dan UI InputField'lere baÄŸlayÄ±n)
     [SerializeField] private TMP_InputField accountNameInput;
     [SerializeField] private TMP_InputField playerNameInput;
     [SerializeField] private TMP_InputField passwordInput;
-    [SerializeField] private Button signInButton; // Yeni bir Giriþ butonu ekleyin
+    [SerializeField] private Button signInButton; // Yeni bir GiriÅŸ butonu ekleyin
+    [SerializeField] private Button ScroeUpBtn; // Yeni bir GiriÅŸ butonu ekleyin
 
     private void OnValidate()
     {
-        // Kod çalýþmadan önce, Inspector'da UI bileþenlerini kontrol etmenizi saðlar.
+        // Kod Ã§alÄ±ÅŸmadan Ã¶nce, Inspector'da UI bileÅŸenlerini kontrol etmenizi saÄŸlar.
         if (createAccountBtnTmp == null) Debug.LogError("createAccountBtnTmp is not assigned.");
         if (accountNameInput == null) Debug.LogError("usernameInput is not assigned.");
         if (passwordInput == null) Debug.LogError("passwordInput is not assigned.");
         if (signInButton == null) Debug.LogError("signInButton is not assigned. Consider adding a separate SignIn button.");
     }
-
-    private async void Awake()
+    private void Awake()
     {
-        await UnityServices.InitializeAsync();
-
-        // Bu noktada anonim giriþ yapmayacaðýz, oyuncunun tercihini bekleyeceðiz.
-        // Hata ayýklama amaçlý, servislerin baþlatýldýðýný onaylayalým.
-        Debug.Log("UGS Services Initialized.");
+        _ = InitializeAsync();
     }
+    // InitializeAsync: UnityServices.InitializeAsync ve oturum kontrolÃ¼nÃ¼ yapar
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            await UnityServices.InitializeAsync();
+            Debug.Log("UGS Services Initialized.");
 
+            await CheckForSavedSession();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"InitializeAsync sÄ±rasÄ±nda hata: {ex.Message}");
+        }
+    }
+    private async Task InitializeAsyncCheckForSaved()
+    {
+        try
+        {
+          
+            
+
+            await CheckForSavedSession();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"InitializeAsync sÄ±rasÄ±nda hata: {ex.Message}");
+        }
+    }
     private void Start()
     {
-        // Butonlarý ilgili metotlara baðla
-        // createAccountBtnTmp: KULLANICI OLUÞTURMA (Sign Up) olarak kullanýlsýn
+        // ButonlarÄ± ilgili metotlara baÄŸla
+        // createAccountBtnTmp: KULLANICI OLUÅžTURMA (Sign Up) olarak kullanÄ±lsÄ±n
         createAccountBtnTmp.onClick.AddListener(SignUp);
 
-        // signInButton: GÝRÝÞ YAPMA (Sign In) olarak kullanýlsýn
+        // signInButton: GÄ°RÄ°Åž YAPMA (Sign In) olarak kullanÄ±lsÄ±n
         signInButton.onClick.AddListener(SignIn);
+        ScroeUpBtn.onClick.AddListener(ScoreUp);
     }
 
     //-------------------------------------------------------------
-    // 1. KULLANICI OLUÞTURMA (Sign Up)
+    // 1. KULLANICI OLUÅžTURMA (Sign Up)
     //-------------------------------------------------------------
     public async void SignUp()
     {
@@ -58,28 +85,28 @@ public class CloudSaveAccountManager : MonoBehaviour
 
         try
         {
-            // Yeni bir kullanýcý hesabý oluþtur
+            // Yeni bir kullanÄ±cÄ± hesabÄ± oluÅŸtur
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
 
-            // Baþarýlý olursa, zaten giriþ yapmýþ (Signed In) demektir
-            Debug.Log($"Kayýt Baþarýlý! Player ID: {AuthenticationService.Instance.PlayerId}");
+            // BaÅŸarÄ±lÄ± olursa, zaten giriÅŸ yapmÄ±ÅŸ (Signed In) demektir
+            Debug.Log($"KayÄ±t BaÅŸarÄ±lÄ±! Player ID: {AuthenticationService.Instance.PlayerId}");
 
-            // Kullanýcý adý ve ID'sini ekrana yaz
-            AccountNameText.text = $"Giriþ: {username}\nID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
+            // KullanÄ±cÄ± adÄ± ve ID'sini ekrana yaz
+            AccountNameText.text = $"GiriÅŸ: {username}\nID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
 
-            // Ýlk kayýttan sonra veri kaydetme iþlemini baþlat (isteðe baðlý)
+            // Ä°lk kayÄ±ttan sonra veri kaydetme iÅŸlemini baÅŸlat (isteÄŸe baÄŸlÄ±)
             SaveData();
         }
         catch (AuthenticationException ex)
         {
-            // Örneðin: "Kullanýcý adý zaten kullanýmda" veya "Þifre/Kullanýcý adý çok kýsa" hatalarýný yakala
-            Debug.LogError($"Kayýt Hatasý: {ex.Message}");
-            AccountNameText.text = "Kayýt Hatasý: " + ex.Message.Split('\n')[0];
+            // Ã–rneÄŸin: "KullanÄ±cÄ± adÄ± zaten kullanÄ±mda" veya "Åžifre/KullanÄ±cÄ± adÄ± Ã§ok kÄ±sa" hatalarÄ±nÄ± yakala
+            Debug.LogError($"KayÄ±t HatasÄ±: {ex.Message}");
+            AccountNameText.text = "KayÄ±t HatasÄ±: " + ex.Message.Split('\n')[0];
         }
     }
 
     //-------------------------------------------------------------
-    // 2. GÝRÝÞ YAPMA (Sign In)
+    // 2. GÄ°RÄ°Åž YAPMA (Sign In)
     //-------------------------------------------------------------
     public async void SignIn()
     {
@@ -88,26 +115,26 @@ public class CloudSaveAccountManager : MonoBehaviour
 
         try
         {
-            // Mevcut bir kullanýcý hesabý ile giriþ yap
+            // Mevcut bir kullanÄ±cÄ± hesabÄ± ile giriÅŸ yap
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
 
-            Debug.Log($"Giriþ Baþarýlý! Player ID: {AuthenticationService.Instance.PlayerId}");
+            Debug.Log($"GiriÅŸ BaÅŸarÄ±lÄ±! Player ID: {AuthenticationService.Instance.PlayerId}");
 
-            // Giriþ yaptýktan sonra mutlaka verileri yüklemeyi deneyin
+            // GiriÅŸ yaptÄ±ktan sonra mutlaka verileri yÃ¼klemeyi deneyin
             LoadData();
 
-            AccountNameText.text = $"Giriþ: {username}\nID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
+            AccountNameText.text = $"GiriÅŸ: {username}\nID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
         }
         catch (AuthenticationException ex)
         {
-            // Örneðin: "Yanlýþ kullanýcý adý veya þifre"
-            Debug.LogError($"Giriþ Hatasý: {ex.Message}");
-            AccountNameText.text = "Giriþ Hatasý: " + ex.Message.Split('\n')[0];
+            // Ã–rneÄŸin: "YanlÄ±ÅŸ kullanÄ±cÄ± adÄ± veya ÅŸifre"
+            Debug.LogError($"GiriÅŸ HatasÄ±: {ex.Message}");
+            AccountNameText.text = "GiriÅŸ HatasÄ±: " + ex.Message.Split('\n')[0];
         }
     }
 
     //-------------------------------------------------------------
-    // 3. CLOUD SAVE ÝÞLEMLERÝ (Giriþ yaptýktan sonra kullanýlýr)
+    // 3. CLOUD SAVE Ä°ÅžLEMLERÄ° (GiriÅŸ yaptÄ±ktan sonra kullanÄ±lÄ±r)
     //-------------------------------------------------------------
 
     public async void SaveData()
@@ -116,20 +143,17 @@ public class CloudSaveAccountManager : MonoBehaviour
         {
             AccountName = accountNameInput.text,
             PlayerName = playerNameInput.text,
-            //Level = 1,
             Score = 0,
-            //Coins = 0,
-            //LastLogin = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
 
         try
         {
             await CloudSaveService.Instance.Data.Player.SaveAsync(playerData.ToDictionary());
-            Debug.Log("Veri baþarýyla kaydedildi!");
+            Debug.Log("Veri baÅŸarÄ±yla kaydedildi!");
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Kaydetme hatasý: {ex.Message}");
+            Debug.LogError($"Kaydetme hatasÄ±: {ex.Message}");
         }
     }
 
@@ -141,11 +165,77 @@ public class CloudSaveAccountManager : MonoBehaviour
                 new HashSet<string> { "PlayerName", "Level", "Score", "Coins", "LastLogin" });
 
             var loadedData = PlayerData.FromDictionary(results);
-            Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
+            Debug.Log($"YÃ¼klendi: {loadedData.AccountName}, Score {loadedData.Score}");
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Yükleme hatasý: {ex.Message}");
+            Debug.LogError($"YÃ¼kleme hatasÄ±: {ex.Message}");
+        }
+    }
+    // ðŸ”¹ 1. Mevcut oturumu kontrol et
+    private async Task CheckForSavedSession()
+    {
+        try
+        {
+            // Session token hÃ¢lÃ¢ geÃ§erli mi?
+            if (AuthenticationService.Instance.SessionTokenExists)
+            {
+                Debug.Log("Mevcut oturum bulundu, otomatik giriÅŸ yapÄ±lÄ±yor...");
+                await AuthenticationService.Instance.SignInAnonymouslyAsync(); // Otomatik yeniden baÄŸlanma
+            }
+            else
+            {
+                Debug.Log("KayÄ±tlÄ± oturum yok, kullanÄ±cÄ±dan giriÅŸ bilgisi bekleniyor.");
+            }
+
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                AccountNameText.text = $"Otomatik giriÅŸ baÅŸarÄ±lÄ±! ID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
+                LoadData(); // KullanÄ±cÄ± verilerini yÃ¼kle
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Oturum kontrolÃ¼ sÄ±rasÄ±nda hata: {ex.Message}");
+        }
+    }
+
+    // ðŸ”¹ 7. Oturumdan Ã§Ä±kÄ±ÅŸ (isteÄŸe baÄŸlÄ±)
+    public void SignOut()
+    {
+        AuthenticationService.Instance.SignOut();
+        Debug.Log("KullanÄ±cÄ± Ã§Ä±kÄ±ÅŸ yaptÄ±.");
+        AccountNameText.text = "Ã‡Ä±kÄ±ÅŸ yapÄ±ldÄ±.";
+    }
+    public void ScoreUp()
+    {
+        UpdateScore(5);
+
+        
+    }
+    public async void UpdateScore(int addedScore)
+    {
+        try
+        {
+            // Ã–nce mevcut veriyi yÃ¼kle
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "Score" });
+
+            int currentScore = 0;
+            if (results.TryGetValue("Score", out var score))
+                currentScore = score.Value.GetAs<int>();
+
+            int newScore = currentScore + addedScore;
+
+            // Yeni skoru kaydet
+            await CloudSaveService.Instance.Data.Player.SaveAsync(
+                new Dictionary<string, object> { { "Score", newScore } });
+
+            Debug.Log($"Skor gÃ¼ncellendi! Yeni skor: {newScore}");
+            ScoreTxt.text = $"Score: {newScore}";
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Skor gÃ¼ncelleme hatasÄ±: {ex.Message}");
         }
     }
 }
