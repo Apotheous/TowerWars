@@ -7,7 +7,7 @@ public class PlayerData : MonoBehaviour
 {
     public string AccountName;
     public string PlayerName;
-    public int Score;
+    public float Score;
 
     public Dictionary<string, object> ToDictionary()
     {

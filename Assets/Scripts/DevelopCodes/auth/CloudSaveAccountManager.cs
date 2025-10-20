@@ -50,20 +50,7 @@ public class CloudSaveAccountManager : MonoBehaviour
             Debug.LogError($"InitializeAsync sırasında hata: {ex.Message}");
         }
     }
-    private async Task InitializeAsyncCheckForSaved()
-    {
-        try
-        {
-          
-            
 
-            await CheckForSavedSession();
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"InitializeAsync sırasında hata: {ex.Message}");
-        }
-    }
     private void Start()
     {
         // Butonları ilgili metotlara bağla
@@ -172,6 +159,8 @@ public class CloudSaveAccountManager : MonoBehaviour
             Debug.LogError($"Yükleme hatası: {ex.Message}");
         }
     }
+
+
     // 🔹 1. Mevcut oturumu kontrol et
     private async Task CheckForSavedSession()
     {
@@ -213,29 +202,33 @@ public class CloudSaveAccountManager : MonoBehaviour
 
         
     }
-    public async void UpdateScore(int addedScore)
+    public async void UpdateScore(float addedScore)
     {
         try
         {
             // Önce mevcut veriyi yükle
             var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "Score" });
 
-            int currentScore = 0;
+            float currentScore = 0;
             if (results.TryGetValue("Score", out var score))
                 currentScore = score.Value.GetAs<int>();
 
-            int newScore = currentScore + addedScore;
+            float newScore = currentScore + addedScore;
 
             // Yeni skoru kaydet
             await CloudSaveService.Instance.Data.Player.SaveAsync(
                 new Dictionary<string, object> { { "Score", newScore } });
 
             Debug.Log($"Skor güncellendi! Yeni skor: {newScore}");
-            ScoreTxt.text = $"Score: {newScore}";
+            ScoreWrite(newScore);
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Skor güncelleme hatası: {ex.Message}");
         }
+    }
+    private void ScoreWrite(float newScore)
+    {
+        ScoreTxt.text = $"Score: {newScore}";
     }
 }
