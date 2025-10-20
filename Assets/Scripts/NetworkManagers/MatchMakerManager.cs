@@ -48,7 +48,7 @@ public class MatchMakerManager : NetworkBehaviour
         {
             // Ýstemci/Host Tarafý Baþlatma
             await UnityServices.InitializeAsync();
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            //await AuthenticationService.Instance.SignInAnonymouslyAsync();
             ServicesInitialized = true; // Bayraðý ayarla
         }
         else
