@@ -160,7 +160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   age: 1
-  MaxHealth: 100
+  MaxHealth: 300
   TeamId:
     m_InternalValue: 0
   healthBar: {fileID: 7547361602274862805}
@@ -193,9 +193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2aa841b76bbf584fb2f581d1ce3eb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 150
   fireRate: 1
-  damage: 10
+  damage: 60
   bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
   firePoint: {fileID: 7354300825308693779}
 --- !u!1 &1339119859717018566

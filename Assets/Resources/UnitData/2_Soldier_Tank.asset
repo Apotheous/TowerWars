@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 66666666
   age: 1
-  trainingTime: 10
-  cost: 150
+  trainingTime: 3
+  cost: 500
   prefab: {fileID: 1339119858819233629, guid: c9f9f1206f8ccb149821391799bb2ceb, type: 3}
   icon: {fileID: 21300000, guid: e998dd63250cc6d488821774a5fb3eb7, type: 3}

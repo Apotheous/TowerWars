@@ -15,6 +15,6 @@ MonoBehaviour:
   id: 222222
   age: 0
   trainingTime: 5
-  cost: 50
+  cost: 15
   prefab: {fileID: 6612645287355585465, guid: 72f0688a8b3f6c945aeb6b09e923f756, type: 3}
   icon: {fileID: 21300000, guid: 2f22faf3579529441ae31854e7ed1383, type: 3}
