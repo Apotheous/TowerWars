@@ -15,13 +15,16 @@ public class CloudSaveAccountManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI AccountNameText;
     [SerializeField] private TextMeshProUGUI ScoreTxt;
     [SerializeField] private Button createAccountBtnTmp;
+    [SerializeField] private GameObject accounManagementPanel;
+
 
     // Geleneksel giriş için yeni alanlar (Inspector'dan UI InputField'lere bağlayın)
     [SerializeField] private TMP_InputField accountNameInput;
     [SerializeField] private TMP_InputField playerNameInput;
     [SerializeField] private TMP_InputField passwordInput;
     [SerializeField] private Button signInButton; // Yeni bir Giriş butonu ekleyin
-    [SerializeField] private Button ScroeUpBtn; // Yeni bir Giriş butonu ekleyin
+    [SerializeField] private Button ScroeUpBtn; // score denemek için 
+    [SerializeField] private Button signOutBtn; // Yeni bir Giriş butonu ekleyin
 
     private void OnValidate()
     {
@@ -60,6 +63,7 @@ public class CloudSaveAccountManager : MonoBehaviour
         // signInButton: GİRİŞ YAPMA (Sign In) olarak kullanılsın
         signInButton.onClick.AddListener(SignIn);
         ScroeUpBtn.onClick.AddListener(ScoreUp);
+        signOutBtn.onClick.AddListener(SignOut);
     }
 
     //-------------------------------------------------------------
@@ -174,12 +178,20 @@ public class CloudSaveAccountManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Kayıtlı oturum yok, kullanıcıdan giriş bilgisi bekleniyor.");
+                Debug.Log("Kayıtlı oturum yok, kullanıcıdan giriş bilgisi bekleniyor.Lütfen hesap açın");
+                if (!accounManagementPanel.activeSelf)
+                {
+                    accounManagementPanel.SetActive(true);
+                }
             }
 
             if (AuthenticationService.Instance.IsSignedIn)
             {
                 AccountNameText.text = $"Otomatik giriş başarılı! ID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...";
+                if (accounManagementPanel.activeSelf)
+                {
+                    accounManagementPanel.SetActive(false);
+                }
                 LoadData(); // Kullanıcı verilerini yükle
             }
         }
