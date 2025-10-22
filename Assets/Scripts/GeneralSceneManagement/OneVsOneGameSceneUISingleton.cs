@@ -20,6 +20,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerCurrenthHealth;
     [SerializeField] private TextMeshProUGUI myScrapTexter;
     [SerializeField] private TextMeshProUGUI myExpTexter;
+    [SerializeField] private TextMeshProUGUI myTempPointTexter;
 
     [SerializeField] private GameObject WinPanel;
     [SerializeField] private GameObject LosePanel;
@@ -255,6 +256,10 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     public void PlayerExpWrite(float exp)
     {
         myExpTexter.text = exp.ToString();
+    }
+    public void PlayerTempporaryPointWrite(int exp)
+    {
+        myTempPointTexter.text = exp.ToString();
     }
 
     public void ShowGameOver(string message, bool iWon)

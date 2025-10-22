@@ -302,7 +302,7 @@ public class CloudSaveAccountManager : MonoBehaviour
 
             if (results.TryGetValue("Score", out var scoreItem))
             {
-                float playerScore = scoreItem.Value.GetAs<float>();
+                float playerScore = scoreItem.Value.GetAs<int>();
                 Debug.Log($"Cloud'dan çekilen skor: {playerScore}");
                 WriteScore(playerScore);
             }
