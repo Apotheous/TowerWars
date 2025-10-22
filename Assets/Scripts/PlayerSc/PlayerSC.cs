@@ -27,9 +27,9 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     public event Action OnLevelUp;
 
     private const float LEVEL_UP_IceAge = 0f;
-    private const float LEVEL_UP_MediavelAge = 500f;
-    private const float LEVEL_UP_ModernAge = 1000f;
-    private const float LEVEL_UP_SpaceAge = 1500f;
+    private const float LEVEL_UP_MediavelAge = 4000f;
+    private const float LEVEL_UP_ModernAge = 14000f;
+    private const float LEVEL_UP_SpaceAge = 80000f;
 
 
     #endregion

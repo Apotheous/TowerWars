@@ -247,8 +247,8 @@ MonoBehaviour:
   TeamId:
     m_InternalValue: 0
   healthBar: {fileID: 1702172565097953223}
-  myCost: 50
-  myPrizeScrap: 15
+  myCost: 75
+  myPrizeScrap: 100
   myPrizeExp: 5
   soldiersControllerNavMesh: {fileID: 2196776996376851835}
   targetDetector: {fileID: 490888070335283615}
