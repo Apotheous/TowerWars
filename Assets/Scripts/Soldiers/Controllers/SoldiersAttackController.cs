@@ -31,6 +31,7 @@ public class SoldiersAttackController : NetworkBehaviour
     {
         mySoldierInfo = GetComponent<Soldier>(); // Kendi Soldier script'imizi alýyoruz.
         myTargetDetector = GetComponentInChildren<TargetDetector>();
+        attackRange= myTargetDetector.GetComponent<SphereCollider>().radius;
     }
 
     public override void OnNetworkSpawn()

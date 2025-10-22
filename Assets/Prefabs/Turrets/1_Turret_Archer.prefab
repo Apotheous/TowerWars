@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 1981741392}
   - component: {fileID: -257321099560465359}
   - component: {fileID: 1981741393}
-  - component: {fileID: 1814994013727779678}
   - component: {fileID: 5614114065659942353}
+  - component: {fileID: 1814994013727779678}
   m_Layer: 0
   m_Name: 1_Turret_Archer
   m_TagString: Untagged
@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1753712875
+  GlobalObjectIdHash: 1392170842
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -110,22 +110,6 @@ MonoBehaviour:
   myPrizeScrap: 50
   myPrizeExp: 50
   targetDetector: {fileID: 5814315731193087783}
---- !u!114 &1814994013727779678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5183784188147805553}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0da8f560f4eba2843b00a68c865ee9b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fireRate: 0.2
-  damage: 10
-  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
-  firePoint: {fileID: 3424790338009361287}
 --- !u!114 &5614114065659942353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +125,22 @@ MonoBehaviour:
   returnY: {fileID: 5183784189388296830}
   returnX: {fileID: 5183784189437594685}
   rotationSpeed: 5
+--- !u!114 &1814994013727779678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5183784188147805553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0da8f560f4eba2843b00a68c865ee9b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireRate: 1
+  damage: 8
+  bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
+  firePoint: {fileID: 3424790338009361287}
 --- !u!1 &5183784188661732383
 GameObject:
   m_ObjectHideFlags: 0

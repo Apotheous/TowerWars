@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 1
-  damage: 50
+  damage: 300
   bulletPrefab: {fileID: 4355775281887716596, guid: 0c437ba3432030e40b3ecdc21caa3ed5, type: 3}
   firePoint: {fileID: 1740303490991713908}
 --- !u!1 &5457178074990050499
@@ -556,7 +556,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7029821185596300409, guid: 83dc3431c3adb2a4a9c61d0042e249af, type: 3}
       propertyPath: m_Radius
-      value: 30
+      value: 35
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83dc3431c3adb2a4a9c61d0042e249af, type: 3}
