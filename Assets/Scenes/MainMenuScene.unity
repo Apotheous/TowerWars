@@ -312,6 +312,8 @@ MonoBehaviour:
   signInButton: {fileID: 718294067}
   ScroeUpBtn: {fileID: 58990271}
   signOutBtn: {fileID: 900074495}
+  playerNameTexter: {fileID: 330367755}
+  playerScoreTexter: {fileID: 2117264429}
 --- !u!114 &19679064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1942,7 +1944,7 @@ GameObject:
   - component: {fileID: 330367756}
   - component: {fileID: 330367755}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerNickNameText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10077,7 +10079,7 @@ GameObject:
   - component: {fileID: 1966018960}
   - component: {fileID: 1966018959}
   m_Layer: 5
-  m_Name: Image
+  m_Name: PlayerProfileImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10640,7 +10642,7 @@ GameObject:
   - component: {fileID: 2117264430}
   - component: {fileID: 2117264429}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerScoreText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

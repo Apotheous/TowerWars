@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening.Core.Easing;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -10,6 +11,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class CloudSaveAccountManager : MonoBehaviour
 {
+    // 1. Statik referans: Dışarıdan erişim için
+    public static CloudSaveAccountManager Instance { get; private set; }
     // UI alanları
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI AccountNameText;
@@ -26,6 +29,9 @@ public class CloudSaveAccountManager : MonoBehaviour
     [SerializeField] private Button ScroeUpBtn; // score denemek için 
     [SerializeField] private Button signOutBtn; // Yeni bir Giriş butonu ekleyin
 
+    [SerializeField] private TextMeshProUGUI playerNameTexter;
+    [SerializeField] private TextMeshProUGUI playerScoreTexter;
+
     private void OnValidate()
     {
         // Kod çalışmadan önce, Inspector'da UI bileşenlerini kontrol etmenizi sağlar.
@@ -34,8 +40,24 @@ public class CloudSaveAccountManager : MonoBehaviour
         if (passwordInput == null) Debug.LogError("passwordInput is not assigned.");
         if (signInButton == null) Debug.LogError("signInButton is not assigned. Consider adding a separate SignIn button.");
     }
+
     private void Awake()
     {
+        // 2. Kontrol Mekanizması:
+        if (Instance == null)
+        {
+            // Eğer daha önce bir örnek yoksa, bu örneği tekil örnek olarak ayarla.
+            Instance = this;
+
+            // (Opsiyonel) Sahneler arası yok edilmesini engelle
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // Eğer zaten bir örnek varsa (yani bu ikinci örnek), kendini yok et.
+            Debug.LogWarning("Sahneye ikinci bir GameManager eklendi. Fazlalık olan yok ediliyor.");
+            Destroy(gameObject);
+        }
         _ = InitializeAsync();
     }
     // InitializeAsync: UnityServices.InitializeAsync ve oturum kontrolünü yapar
@@ -56,11 +78,7 @@ public class CloudSaveAccountManager : MonoBehaviour
 
     private void Start()
     {
-        // Butonları ilgili metotlara bağla
-        // createAccountBtnTmp: KULLANICI OLUŞTURMA (Sign Up) olarak kullanılsın
         createAccountBtnTmp.onClick.AddListener(SignUp);
-
-        // signInButton: GİRİŞ YAPMA (Sign In) olarak kullanılsın
         signInButton.onClick.AddListener(SignIn);
         ScroeUpBtn.onClick.AddListener(ScoreUp);
         signOutBtn.onClick.AddListener(SignOut);
@@ -191,6 +209,8 @@ public class CloudSaveAccountManager : MonoBehaviour
                 if (accounManagementPanel.activeSelf)
                 {
                     accounManagementPanel.SetActive(false);
+                    await LoadPlayerNameFromCloud();
+                    await LoadPlayerScoreFromCloud();
                 }
                 LoadData(); // Kullanıcı verilerini yükle
             }
@@ -232,15 +252,68 @@ public class CloudSaveAccountManager : MonoBehaviour
                 new Dictionary<string, object> { { "Score", newScore } });
 
             Debug.Log($"Skor güncellendi! Yeni skor: {newScore}");
-            ScoreWrite(newScore);
+            //WriteScore(newScore);
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Skor güncelleme hatası: {ex.Message}");
         }
     }
-    private void ScoreWrite(float newScore)
+    private void WriteScore(float newScore)
     {
-        ScoreTxt.text = $"Score: {newScore}";
+        playerScoreTexter.text = $"Score: {newScore}";
+    }
+    private void WritePlayerNickName(string playerName)
+    {
+        playerNameTexter.text = playerName;
+    }
+
+    // 🔹 Cloud Save'den sadece PlayerName verisini çeker
+    public async Task LoadPlayerNameFromCloud()
+    {
+        try
+        {
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(
+                new HashSet<string> { "PlayerName" });
+
+            if (results.TryGetValue("PlayerName", out var playerNameItem))
+            {
+                string playerName = playerNameItem.Value.GetAs<string>();
+                Debug.Log($"Cloud'dan çekilen oyuncu ismi: {playerName}");
+                WritePlayerNickName(playerName);
+            }
+            else
+            {
+                Debug.LogWarning("Cloud Save'de 'PlayerName' verisi bulunamadı.");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"PlayerName yükleme hatası: {ex.Message}");
+        }
+    }
+    // 🔹 Cloud Save'den sadece Score verisini çeker
+    public async Task LoadPlayerScoreFromCloud()
+    {
+        try
+        {
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(
+                new HashSet<string> { "Score" });
+
+            if (results.TryGetValue("Score", out var scoreItem))
+            {
+                float playerScore = scoreItem.Value.GetAs<float>();
+                Debug.Log($"Cloud'dan çekilen skor: {playerScore}");
+                WriteScore(playerScore);
+            }
+            else
+            {
+                Debug.LogWarning("Cloud Save'de 'Score' verisi bulunamadı.");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Score yükleme hatası: {ex.Message}");
+        }
     }
 }
