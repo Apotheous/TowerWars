@@ -332,7 +332,7 @@ MonoBehaviour:
   healthBar: {fileID: 1702172565097953223}
   myCost: 400
   myPrizeScrap: 530
-  myPrizeExp: 5
+  myPrizeExp: 1060
   soldiersControllerNavMesh: {fileID: 2196776996376851835}
   targetDetector: {fileID: 7708720287917174167}
 --- !u!114 &2196776996376851835
