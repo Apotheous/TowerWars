@@ -239,8 +239,6 @@ public class CloudSaveAccountManagerMainScene : MonoBehaviour
     public void ScoreUp()
     {
         UpdateScore(5);
-
-        
     }
     public async void UpdateScore(int addedScore)
     {

@@ -12,8 +12,9 @@ using UnityEngine.UI;
 public class CloudSaveAccountManagerGameScene : MonoBehaviour
 {
     public static CloudSaveAccountManagerGameScene Instance;
-    [SerializeField] private TextMeshProUGUI playerScoreTexter;
-    [SerializeField] public Button ButtonScore;
+    //[SerializeField] private TextMeshProUGUI playerScoreTexter;
+    [SerializeField] private TextMeshProUGUI playerNameTexter;
+
     private void Awake()
     {
         // 🚫 Önce server kontrolü
@@ -54,10 +55,6 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
         }
     }
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private async Task CheckForSavedSession()
     {
@@ -100,6 +97,7 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
             var loadedData = PlayerData.FromDictionary(results);
             Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
             WriteScore(loadedData.Score);
+            WritePlayerNickName(loadedData.PlayerName);
         }
         catch (System.Exception ex)
         {
@@ -107,10 +105,40 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
         }
     }
 
+    private void WritePlayerNickName(string playerName)
+    {
+        playerNameTexter.text = playerName;
+    }
+
+    // 🔹 Cloud Save'den sadece PlayerName verisini çeker
+    public async Task LoadPlayerNameFromCloud()
+    {
+        try
+        {
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(
+                new HashSet<string> { "PlayerName" });
+
+            if (results.TryGetValue("PlayerName", out var playerNameItem))
+            {
+                string playerName = playerNameItem.Value.GetAs<string>();
+                Debug.Log($"Cloud'dan çekilen oyuncu ismi: {playerName}");
+                WritePlayerNickName(playerName);
+            }
+            else
+            {
+                Debug.LogWarning("Cloud Save'de 'PlayerName' verisi bulunamadı.");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"PlayerName yükleme hatası: {ex.Message}");
+        }
+    }
+
     private void WriteScore(int newScore)
     {
         Debug.Log("Skor yazılıyor: " + newScore);
-        playerScoreTexter.text = $"Score: {newScore}";
+        //playerScoreTexter.text = $"Score: {newScore}";
     }
 
     public async void UpdateScore(int addedScore)
@@ -138,4 +166,6 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
             Debug.LogError($"Skor güncelleme hatası: {ex.Message}");
         }
     }
+
+
 }
