@@ -20,7 +20,8 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerCurrenthHealth;
     [SerializeField] private TextMeshProUGUI myScrapTexter;
     [SerializeField] private TextMeshProUGUI myExpTexter;
-    [SerializeField] private TextMeshProUGUI myTempPointTexter;
+    [SerializeField] private TextMeshProUGUI myTempPointTexterWinner;
+    [SerializeField] private TextMeshProUGUI myTempPointTexterLoser;
 
     [SerializeField] private GameObject WinPanel;
     [SerializeField] private GameObject LosePanel;
@@ -239,11 +240,6 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
 
     }
-    
-
-
-
-
     public void PlayerCurrentHealthWrite(float health)
     {
         playerCurrenthHealth.text = health.ToString();
@@ -257,9 +253,13 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
     {
         myExpTexter.text = exp.ToString();
     }
-    public void PlayerTempporaryPointWrite(int exp)
+    public void PlayerTempporaryPointWriteWinner(int exp)
     {
-        myTempPointTexter.text = exp.ToString();
+        myTempPointTexterWinner.text = exp.ToString();
+    }
+    public void PlayerTempporaryPointWriteLoser(int exp)
+    {
+        myTempPointTexterLoser.text = exp.ToString();
     }
 
     public void ShowGameOver(string message, bool iWon)
@@ -270,21 +270,21 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         // Her ihtimale karþý ikisini de kapat
         WinPanel.SetActive(false);
         LosePanel.SetActive(false);
-
+        var playerSc = myPlayerLocalObject.GetComponent<PlayerSC>();
         if (iWon)
         {
             WinPanel.SetActive(true);
             Debug.Log("GAME OVER - KAZANDIN: " + message);
-            
+            PlayerTempporaryPointWriteWinner(playerSc.myTempPoint.Value);
         }
         else
         {
             LosePanel.SetActive(true);
             Debug.Log("GAME OVER - KAYBETTÝN: " + message);
-            
+            PlayerTempporaryPointWriteLoser(playerSc.myTempPoint.Value);
         }
         // Skoru Cloud Save'e gönder
-        var playerSc = myPlayerLocalObject.GetComponent<PlayerSC>();
+        //var playerSc = myPlayerLocalObject.GetComponent<PlayerSC>();
         if (playerSc != null)
         {
             CloudSaveAccountManagerGameScene.Instance.UpdateScore(playerSc.myTempPoint.Value);
