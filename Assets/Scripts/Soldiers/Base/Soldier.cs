@@ -114,6 +114,7 @@ public class Soldier : NetworkBehaviour, IDamageable
         {
             enemyPlayerSC.UpdateMyScrap(myPrizeScrap);
             enemyPlayerSC.UpdateExpPointIncrease(myPrizeExp);
+            enemyPlayerSC.AddTempPoint();
 
             Debug.Log($"[Server] Manager: Team {killingPlayerTeamId} gained {myPrizeScrap} scrap.");
         }

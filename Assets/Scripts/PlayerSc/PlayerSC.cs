@@ -247,12 +247,10 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         if (IsServer)
         {
             myCurrentScrap.Value += amount;
-            AddTempPoint();
         }
         else
         {
             RequestUpdateScrapServerRpc(amount);
-            Debug.Log("asdasdsadasd");
         }
     }
     public void AddTempPoint()
