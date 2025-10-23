@@ -9,10 +9,10 @@ using Unity.Services.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-public class CloudSaveAccountManager : MonoBehaviour
+public class CloudSaveAccountManagerMainScene : MonoBehaviour
 {
     // 1. Statik referans: Dışarıdan erişim için
-    public static CloudSaveAccountManager Instance { get; private set; }
+    public static CloudSaveAccountManagerMainScene Instance { get; private set; }
     // UI alanları
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI AccountNameText;
@@ -50,7 +50,7 @@ public class CloudSaveAccountManager : MonoBehaviour
             Instance = this;
 
             // (Opsiyonel) Sahneler arası yok edilmesini engelle
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -171,7 +171,7 @@ public class CloudSaveAccountManager : MonoBehaviour
         try
         {
             var results = await CloudSaveService.Instance.Data.Player.LoadAsync(
-                new HashSet<string> { "PlayerName", "Level", "Score", "Coins", "LastLogin" });
+                new HashSet<string> { "AccountName", "PlayerName", "Score" });
 
             var loadedData = PlayerData.FromDictionary(results);
             Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
@@ -234,18 +234,18 @@ public class CloudSaveAccountManager : MonoBehaviour
 
         
     }
-    public async void UpdateScore(float addedScore)
+    public async void UpdateScore(int addedScore)
     {
         try
         {
             // Önce mevcut veriyi yükle
             var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "Score" });
 
-            float currentScore = 0;
+            int currentScore = 0;
             if (results.TryGetValue("Score", out var score))
                 currentScore = score.Value.GetAs<int>();
 
-            float newScore = currentScore + addedScore;
+            int newScore = currentScore + addedScore;
 
             // Yeni skoru kaydet
             await CloudSaveService.Instance.Data.Player.SaveAsync(
@@ -259,7 +259,7 @@ public class CloudSaveAccountManager : MonoBehaviour
             Debug.LogError($"Skor güncelleme hatası: {ex.Message}");
         }
     }
-    private void WriteScore(float newScore)
+    private void WriteScore(int newScore)
     {
         playerScoreTexter.text = $"Score: {newScore}";
     }
@@ -302,7 +302,7 @@ public class CloudSaveAccountManager : MonoBehaviour
 
             if (results.TryGetValue("Score", out var scoreItem))
             {
-                float playerScore = scoreItem.Value.GetAs<int>();
+                int playerScore = scoreItem.Value.GetAs<int>();
                 Debug.Log($"Cloud'dan çekilen skor: {playerScore}");
                 WriteScore(playerScore);
             }
@@ -316,4 +316,6 @@ public class CloudSaveAccountManager : MonoBehaviour
             Debug.LogError($"Score yükleme hatası: {ex.Message}");
         }
     }
+
+
 }

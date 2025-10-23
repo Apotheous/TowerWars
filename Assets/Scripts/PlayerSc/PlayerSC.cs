@@ -21,6 +21,9 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     private readonly NetworkVariable<float> myExpPoint = new NetworkVariable<float>(0);
 
     private readonly NetworkVariable<float> myCurrentScrap = new NetworkVariable<float>(999999);
+    public NetworkVariable<int> myTempPoint = new NetworkVariable<int>(0,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server);
     // Custom eventler
     public event Action<float, float> OnScrapChanged;
 
@@ -227,6 +230,16 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         return myCurrentScrap.Value;
     }
 
+    public void AddTempPoint()
+    {
+        if (IsServer)
+        {
+            myTempPoint.Value += 1;
+            OneVsOneGameSceneUISingleton.Instance.PlayerTempporaryPointWrite(myTempPoint.Value);
+            CloudSaveAccountManagerMainScene.Instance.UpdateScore(myTempPoint.Value);
+            Debug.Log($"[Server] myTempPoint updated to {myTempPoint.Value}");
+        }
+    }
     /// <summary>
     /// Playerın scrap değerini değiştirir
     /// </summary>
@@ -236,6 +249,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         if (IsServer)
         {
             myCurrentScrap.Value += amount;
+            AddTempPoint();
         }
         else
         {
