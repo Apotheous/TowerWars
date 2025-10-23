@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
@@ -43,6 +44,13 @@ public class CloudSaveAccountManagerMainScene : MonoBehaviour
 
     private void Awake()
     {
+        // 🚫 Önce server kontrolü
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            Debug.Log("CloudSaveAccountManagerMainScene serverda devre dışı bırakıldı.");
+            enabled = false;
+            return;
+        }
         // 2. Kontrol Mekanizması:
         if (Instance == null)
         {

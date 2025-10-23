@@ -43,6 +43,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
     public override void OnNetworkSpawn()
     {
+
         mycurrentHealth.Value = initalHealth.Value;
         if (player_Game_Mode_Manager == null &&IsServer)
         {
@@ -122,6 +123,11 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         Debug.Log($"[PlayerSC-{OwnerClientId}] Abonelikler sonlandırıldı ve Network Despawn oldu.");
     }
 
+
+    private void Update()
+    {
+        Debug.Log("My Temp Point Değeri : " + myTempPoint.Value);
+    }
     private void OnWinnerDeclared(ulong previousValue, ulong newValue)
     {
         if (newValue != 0) // 0 = kimse kazanmadı varsayalım
@@ -230,22 +236,14 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         return myCurrentScrap.Value;
     }
 
-    public void AddTempPoint()
-    {
-        if (IsServer)
-        {
-            myTempPoint.Value += 1;
-            OneVsOneGameSceneUISingleton.Instance.PlayerTempporaryPointWrite(myTempPoint.Value);
-            CloudSaveAccountManagerMainScene.Instance.UpdateScore(myTempPoint.Value);
-            Debug.Log($"[Server] myTempPoint updated to {myTempPoint.Value}");
-        }
-    }
+
     /// <summary>
     /// Playerın scrap değerini değiştirir
     /// </summary>
     /// <param name="damage"></param>
     public void UpdateMyScrap(float amount)
     {
+
         if (IsServer)
         {
             myCurrentScrap.Value += amount;
@@ -254,13 +252,22 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
         else
         {
             RequestUpdateScrapServerRpc(amount);
+            Debug.Log("asdasdsadasd");
         }
     }
+    public void AddTempPoint()
+    {
+        if (IsServer)
+        {
+            myTempPoint.Value += 1;
+        }
 
+    }
     [ServerRpc]
     private void RequestUpdateScrapServerRpc(float amount)
     {
         myCurrentScrap.Value += amount;
+
     }
     #endregion
 

@@ -275,11 +275,24 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         {
             WinPanel.SetActive(true);
             Debug.Log("GAME OVER - KAZANDIN: " + message);
+            
         }
         else
         {
             LosePanel.SetActive(true);
             Debug.Log("GAME OVER - KAYBETTÝN: " + message);
+            
+        }
+        // Skoru Cloud Save'e gönder
+        var playerSc = myPlayerLocalObject.GetComponent<PlayerSC>();
+        if (playerSc != null)
+        {
+            CloudSaveAccountManagerGameScene.Instance.UpdateScore(playerSc.myTempPoint.Value);
+            Debug.Log($"[CloudSave] Oyuncu skoru güncellendi: {playerSc.myTempPoint.Value}");
+        }
+        else
+        {
+            Debug.LogWarning("[ShowGameOver] PlayerSC referansý bulunamadý, skor kaydedilemedi!");
         }
     }
 

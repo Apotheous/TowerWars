@@ -1,33 +1,42 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CloudSaveAccountManagerGameScene : MonoBehaviour
 {
     public static CloudSaveAccountManagerGameScene Instance;
     [SerializeField] private TextMeshProUGUI playerScoreTexter;
+    [SerializeField] public Button ButtonScore;
     private void Awake()
     {
-        // 2. Kontrol Mekanizmasý:
+        // ðŸš« Ã–nce server kontrolÃ¼
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            Debug.Log("CloudSaveAccountManagerGameScene serverda devre dÄ±ÅŸÄ± bÄ±rakÄ±ldÄ±.");
+            enabled = false;
+            return;
+        }
+        
+        // âœ… Singleton kontrolÃ¼
         if (Instance == null)
         {
-            // Eðer daha önce bir örnek yoksa, bu örneði tekil örnek olarak ayarla.
             Instance = this;
-
-            // (Opsiyonel) Sahneler arasý yok edilmesini engelle
-            //DontDestroyOnLoad(gameObject);
         }
         else
         {
-            // Eðer zaten bir örnek varsa (yani bu ikinci örnek), kendini yok et.
-            Debug.LogWarning("Sahneye ikinci bir GameManager eklendi. Fazlalýk olan yok ediliyor.");
+            Debug.LogWarning("Ä°kinci bir CloudSaveAccountManagerGameScene bulundu, yok ediliyor.");
             Destroy(gameObject);
+            return;
         }
+
+        // Client baÅŸlatma
         _ = InitializeAsync();
     }
     private async Task InitializeAsync()
@@ -41,7 +50,7 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"InitializeAsync sýrasýnda hata: {ex.Message}");
+            Debug.LogError($"InitializeAsync sÄ±rasÄ±nda hata: {ex.Message}");
         }
     }
     // Update is called once per frame
@@ -54,30 +63,30 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
     {
         try
         {
-            // Eðer zaten giriþ yapýlmýþsa tekrar giriþ yapma
+            // EÄŸer zaten giriÅŸ yapÄ±lmÄ±ÅŸsa tekrar giriÅŸ yapma
             if (AuthenticationService.Instance.IsSignedIn)
             {
-                Debug.Log("Zaten giriþ yapýlmýþ, yeniden giriþ yapýlmayacak.");
+                Debug.Log("Zaten giriÅŸ yapÄ±lmÄ±ÅŸ, yeniden giriÅŸ yapÄ±lmayacak.");
             }
             else if (AuthenticationService.Instance.SessionTokenExists)
             {
-                Debug.Log("Mevcut oturum bulundu, otomatik giriþ yapýlýyor...");
+                Debug.Log("Mevcut oturum bulundu, otomatik giriÅŸ yapÄ±lÄ±yor...");
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
             }
             else
             {
-                Debug.Log("Kayýtlý oturum yok, kullanýcýdan giriþ bilgisi bekleniyor.");
+                Debug.Log("KayÄ±tlÄ± oturum yok, kullanÄ±cÄ±dan giriÅŸ bilgisi bekleniyor.");
             }
 
             if (AuthenticationService.Instance.IsSignedIn)
             {
-                Debug.Log($"Giriþ baþarýlý! ID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...");
-                LoadData(); // Kullanýcý verilerini yükle
+                Debug.Log($"GiriÅŸ baÅŸarÄ±lÄ±! ID: {AuthenticationService.Instance.PlayerId.Substring(0, 8)}...");
+                LoadData(); // KullanÄ±cÄ± verilerini yÃ¼kle
             }
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Oturum kontrolü sýrasýnda hata: {ex.Message}");
+            Debug.LogError($"Oturum kontrolÃ¼ sÄ±rasÄ±nda hata: {ex.Message}");
         }
     }
 
@@ -89,18 +98,44 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
                 new HashSet<string> { "AccountName", "PlayerName", "Score" });
 
             var loadedData = PlayerData.FromDictionary(results);
-            Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
+            Debug.Log($"YÃ¼klendi: {loadedData.AccountName}, Score {loadedData.Score}");
             WriteScore(loadedData.Score);
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Yükleme hatasý: {ex.Message}");
+            Debug.LogError($"YÃ¼kleme hatasÄ±: {ex.Message}");
         }
     }
 
     private void WriteScore(int newScore)
     {
-        Debug.Log("Skor yazýlýyor: " + newScore);
+        Debug.Log("Skor yazÄ±lÄ±yor: " + newScore);
         playerScoreTexter.text = $"Score: {newScore}";
+    }
+
+    public async void UpdateScore(int addedScore)
+    {
+        try
+        {
+            // Ã–nce mevcut veriyi yÃ¼kle
+            var results = await CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { "Score" });
+
+            int currentScore = 0;
+            if (results.TryGetValue("Score", out var score))
+                currentScore = score.Value.GetAs<int>();
+
+            int newScore = currentScore + addedScore;
+
+            // Yeni skoru kaydet
+            await CloudSaveService.Instance.Data.Player.SaveAsync(
+                new Dictionary<string, object> { { "Score", newScore } });
+
+            Debug.Log($"Skor gÃ¼ncellendi! Yeni skor: {newScore}");
+            //WriteScore(newScore);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Skor gÃ¼ncelleme hatasÄ±: {ex.Message}");
+        }
     }
 }
