@@ -33,6 +33,8 @@ public class CloudSaveAccountManagerMainScene : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerNameTexter;
     [SerializeField] private TextMeshProUGUI playerScoreTexter;
 
+
+    public string myPlayerName;
     private void OnValidate()
     {
         // Kod çalışmadan önce, Inspector'da UI bileşenlerini kontrol etmenizi sağlar.
@@ -183,6 +185,7 @@ public class CloudSaveAccountManagerMainScene : MonoBehaviour
 
             var loadedData = PlayerData.FromDictionary(results);
             Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
+            myPlayerName = loadedData.PlayerName;
         }
         catch (System.Exception ex)
         {
@@ -190,7 +193,10 @@ public class CloudSaveAccountManagerMainScene : MonoBehaviour
         }
     }
 
-
+    public string GetMyPlayerName()
+    {
+        return myPlayerName;
+    }
     // 🔹 1. Mevcut oturumu kontrol et
     private async Task CheckForSavedSession()
     {

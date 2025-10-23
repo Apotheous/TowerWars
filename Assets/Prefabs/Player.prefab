@@ -293,6 +293,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TeamId:
     m_InternalValue: 0
+  myTempPoint:
+    m_InternalValue: 0
   WinnerClientId:
     m_InternalValue: 0
 --- !u!114 &8526755292245196328
@@ -714,7 +716,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 13.14}
-  m_SizeDelta: {x: 68.1, y: 10}
+  m_SizeDelta: {x: 68.1, y: 17.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5712643535116914968
 Canvas:
@@ -760,7 +762,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7409495492912862903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2445,10 +2447,10 @@ MonoBehaviour:
   maXrot: 359
   EnableZoom: 1
   EnableMousewheelZoom: 1
-  zoomSpeed: 14
+  zoomSpeed: 28
   limitZoom: 1
   zoomMin: 1
-  zoomMax: 100
+  zoomMax: 400
   panSpeedBoost: 1
   slowSpeed: 2.5
   fastSpeed: 40

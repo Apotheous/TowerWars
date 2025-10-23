@@ -14,6 +14,7 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
     public static CloudSaveAccountManagerGameScene Instance;
     //[SerializeField] private TextMeshProUGUI playerScoreTexter;
     [SerializeField] private TextMeshProUGUI playerNameTexter;
+    public string myPlayerName;
 
     private void Awake()
     {
@@ -96,6 +97,7 @@ public class CloudSaveAccountManagerGameScene : MonoBehaviour
 
             var loadedData = PlayerData.FromDictionary(results);
             Debug.Log($"Yüklendi: {loadedData.AccountName}, Score {loadedData.Score}");
+            myPlayerName = loadedData.PlayerName;
             WriteScore(loadedData.Score);
             WritePlayerNickName(loadedData.PlayerName);
         }

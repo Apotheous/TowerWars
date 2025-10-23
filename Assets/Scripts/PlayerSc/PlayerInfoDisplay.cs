@@ -30,5 +30,10 @@ public class PlayerInfoDisplay : NetworkBehaviour
 
         // TextMeshPro bileþeninin metnini güncelle.
         playerInfoText.text = "Player " + playerNumber;
+        if (CloudSaveAccountManagerGameScene.Instance!=null)
+        {
+            var cloudName = CloudSaveAccountManagerMainScene.Instance.GetMyPlayerName();
+            playerInfoText.text = "Player_Number_" + playerNumber+"_AccountName_"+ cloudName; 
+        }
     }
 }
