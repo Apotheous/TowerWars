@@ -11,6 +11,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
 
     [SerializeField] private Button soldierMenuBtn;
     [SerializeField] private Button turretMenuBtn;
+    [SerializeField] private Button levelUpBtn;
 
     [SerializeField] private GameObject unitMenuPanel;
 
@@ -68,7 +69,7 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         allTurrets = Resources.LoadAll<TurretData>("TurretData");
         Debug.Log($"Found {allTurrets.Length} Turrets");
         // Kullanýmý:
-    
+        levelUpBtn.onClick.AddListener(LevelUpBtnCliecked);
     }
 
     private void Update()
@@ -217,6 +218,16 @@ public class OneVsOneGameSceneUISingleton : MonoBehaviour
         }
     }
 
+
+    private void LevelUpBtnCliecked( )
+    {
+        Debug.Log("Clieant Level Up a Tikladi  " );
+        // YENÝ HALÝ: Komutu kendi PlayerController'ýmýza gönderiyoruz.
+        if (myPlayerController != null)
+        {
+            myPlayerController.RequestPlayerLevelUp();
+        }
+    }
     /// <summary>
     /// Soldierlerin üretilmesi amacýyla basýlan buton
     /// </summary>

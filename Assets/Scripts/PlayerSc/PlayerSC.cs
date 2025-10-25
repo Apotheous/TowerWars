@@ -159,7 +159,7 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
     {
         if (IsServer)
         {
-            HandleTechPointChanged(previous, current);
+            HandleTechPointChanged();
             Debug.Log($"[OnExpPointChanged]Isowner - Player Current Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal =" + previous + "NewExpVal = " + current);
         }
         // UI Güncellemesini sadece Owner Client yapsın
@@ -271,30 +271,30 @@ public class PlayerSC : NetworkBehaviour ,IDamageable
 
 
     #region TechPoint Logic
-    private void HandleTechPointChanged(float oldValue, float newValue)
+    private void HandleTechPointChanged()
     {
         if (IsServer)
         {
             if (player_Game_Mode_Manager != null)
             {
-                Debug.Log(" HandleTechPointChanged = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --"+TeamId.Value+"--");
+                Debug.Log(" HandleTechPointChanged = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" +  " -- NewExpVal -- " + myExpPoint.Value + " -- Player ID = --"+TeamId.Value+"--");
                 // Yaş yükseltme işlemini Server'da yetkili olarak yönet
-                if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.IceAge && newValue >= LEVEL_UP_MediavelAge)
+                if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.IceAge && myExpPoint.Value >= LEVEL_UP_MediavelAge)
                 {
                     Debug.Log("[PlayerSC] RPC CALL: SetAgeServerRpc MediavalAge."+ " --Player ID = --"+TeamId.Value+"--" ); 
                     player_Game_Mode_Manager.SetNewAge(Player_Game_Mode_Manager.PlayerAge.MediavalAge);
-                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" +  " -- NewExpVal -- " + myExpPoint.Value + " -- Player ID = --" + TeamId.Value + "--");
                 }
-                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && newValue >= LEVEL_UP_ModernAge)
+                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.MediavalAge && myExpPoint.Value >= LEVEL_UP_ModernAge)
                 {
                     Debug.Log("[PlayerSC] RPC CALL: SetAgeServerRpc ModernAge." + " --Player ID = --" + TeamId.Value + "--");
                     player_Game_Mode_Manager.SetNewAge(Player_Game_Mode_Manager.PlayerAge.ModernAge);
-                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" +  " -- NewExpVal -- " + myExpPoint.Value + " -- Player ID = --" + TeamId.Value + "--");
                 }
-                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && newValue >= LEVEL_UP_SpaceAge)
+                else if (player_Game_Mode_Manager.CurrentAge == Player_Game_Mode_Manager.PlayerAge.ModernAge && myExpPoint.Value >= LEVEL_UP_SpaceAge)
                 {
                     player_Game_Mode_Manager.SetNewAge(Player_Game_Mode_Manager.PlayerAge.SpaceAge);
-                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" + oldValue + " -- NewExpVal -- " + newValue + " -- Player ID = --" + TeamId.Value + "--");
+                    Debug.Log(" [PlayerSC] RPC CALL:  = playerCurrent Age = " + player_Game_Mode_Manager.CurrentAge + " oldExpVal --" +  " -- NewExpVal -- " + myExpPoint.Value + " -- Player ID = --" + TeamId.Value + "--");
                 }
             }
             else
