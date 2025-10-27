@@ -33,6 +33,8 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
     [SerializeField] private TargetDetector targetDetector;
 
+
+
     public override void OnNetworkSpawn()
     {
         // NetworkVariable'larýn senkronizasyonu tamamlandýðýnda bu metot çalýþýr.
