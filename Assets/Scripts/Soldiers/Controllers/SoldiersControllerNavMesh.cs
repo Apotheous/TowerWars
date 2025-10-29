@@ -13,6 +13,8 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
     private Transform currentEnemyTarget; // İsimlendirme netleştirildi
     private Transform baseTarget;
 
+    // Bu değişkeni 3 script'e de ekle (Soldier, SoldiersControllerNavMesh, SoldiersAttackController)
+    [SerializeField] private Animator modelAnimator;
     public override void OnNetworkSpawn()
     {
         navMesh = GetComponent<NavMeshAgent>();
@@ -22,13 +24,29 @@ public class SoldiersControllerNavMesh : NetworkBehaviour
             
             return;
         }
+
+        // Kendi objemizdeki değil, "child" objelerdeki Animator'ü bul
+        //modelAnimator = GetComponentInChildren<Animator>();
+
+        if (modelAnimator == null)
+        {
+            Debug.LogError("Child objede Animator component'i bulunamadı!", gameObject);
+        }
     }
 
     private void Update()
     {
         if (!IsServer || navMesh == null || !navMesh.isOnNavMesh) return;
 
+        // Animator referansı yoksa veya NavMesh çalışmıyorsa çık
+        if (!IsServer || navMesh == null || !navMesh.isOnNavMesh || modelAnimator == null) return;
 
+        // --- YENİ EKLENEN KISIM ---
+        // NavMeshAgent'in mevcut hızını alıp 'Speed' parametresine ata.
+        // NetworkAnimator bu 'Speed' değerini tüm client'lara gönderecek.
+        modelAnimator.SetFloat("Speed", navMesh.velocity.magnitude);
+        Debug.Log($"[SERVER/NavMesh] {gameObject.name} için Speed parametresi güncellendi: {navMesh.velocity.magnitude}");
+        // --- BİTTİ ---
         // 1. DÜŞMAN HEDEFİ ÖNCELİĞİ: Düşman varsa ona git
         if (currentEnemyTarget != null)
         {

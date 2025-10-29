@@ -314,6 +314,7 @@ MonoBehaviour:
   signOutBtn: {fileID: 900074495}
   playerNameTexter: {fileID: 330367755}
   playerScoreTexter: {fileID: 2117264429}
+  myPlayerName: 
 --- !u!114 &19679064
 MonoBehaviour:
   m_ObjectHideFlags: 0

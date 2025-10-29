@@ -33,7 +33,8 @@ public class Soldier : NetworkBehaviour, IDamageable
     [SerializeField] private SoldiersControllerNavMesh soldiersControllerNavMesh;
     [SerializeField] private TargetDetector targetDetector;
 
-
+    // Bu deðiþkeni 3 script'e de ekle (Soldier, SoldiersControllerNavMesh, SoldiersAttackController)
+    [SerializeField] private Animator modelAnimator;
 
     public override void OnNetworkSpawn()
     {
@@ -106,6 +107,22 @@ public class Soldier : NetworkBehaviour, IDamageable
     {
         // YALNIZCA SUNUCUDA ÇALIÞTIR!
         if (!IsServer) return;
+      
+
+
+        // 2. Collider'ý kapat (ölü birime çarpmasýnlar/ateþ etmesinler)
+        // Eðer ana objede bir Collider varsa:
+        var collider = GetComponent<Collider>();
+        if (collider != null) collider.enabled = false;
+
+
+        // 3. Ölüm animasyonunu tetikle
+        if (modelAnimator != null)
+        {
+            modelAnimator.SetTrigger("Die");
+            Debug.Log($"[SERVER] {gameObject.name} için Die animasyonu tetiklendi.");
+        }
+ 
         // Ölen askerin düþman takým ID'sini bul
         int killingPlayerTeamId = (TeamId.Value == 1) ? 2 : 1;
 
@@ -121,9 +138,22 @@ public class Soldier : NetworkBehaviour, IDamageable
             Debug.Log($"[Server] Manager: Team {killingPlayerTeamId} gained {myPrizeScrap} scrap.");
         }
 
-        GetComponent<NetworkObject>().Despawn();
-
+        //GetComponent<NetworkObject>().Despawn();
+        // YENÝ KOD: Animasyonun bitmesi için bekle ve sonra Despawn et
+        StartCoroutine(DespawnAfterDelay(2.5f)); // Animasyon sürene göre ayarla (örn: 2.5 saniye)
     }
 
 
+        // Bu yeni coroutine'i Soldier.cs sýnýfýnýn içine ekle
+    private IEnumerator DespawnAfterDelay(float delay)
+    {
+        // Animasyonun oynamasý için belirlenen süre kadar bekle
+        yield return new WaitForSeconds(delay);
+
+        // Süre dolduktan sonra objeyi network'ten kaldýr
+        if (NetworkObject != null && NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn();
+        }
+    }
 }

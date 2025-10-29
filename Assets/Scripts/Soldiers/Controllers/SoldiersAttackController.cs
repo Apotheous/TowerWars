@@ -26,13 +26,22 @@ public class SoldiersAttackController : NetworkBehaviour
 
     // Gecikme hesaplamasý için önceden tanýmlanmýþ bir WaitForSeconds objesi
     private WaitForSeconds attackDelay ;
-
+    // Bu deðiþkeni 3 script'e de ekle (Soldier, SoldiersControllerNavMesh, SoldiersAttackController)
+    [SerializeField]private Animator modelAnimator;
     private void Awake()
     {
         mySoldierInfo = GetComponent<Soldier>(); // Kendi Soldier script'imizi alýyoruz.
         myTargetDetector = GetComponentInChildren<TargetDetector>();
         attackRange= myTargetDetector.GetComponent<SphereCollider>().radius;
+        // Kendi objemizdeki deðil, "child" objelerdeki Animator'ü bul
+        //modelAnimator = GetComponentInChildren<Animator>();
+
+        if (modelAnimator == null)
+        {
+            Debug.LogError("Child objede Animator component'i bulunamadý!", gameObject);
+        }
     }
+
 
     public override void OnNetworkSpawn()
     {
@@ -133,6 +142,14 @@ public class SoldiersAttackController : NetworkBehaviour
     /// </summary>
     private void Attack()
     {
+        // --- YENÝ EKLENEN KISIM ---
+        if (modelAnimator != null)
+        {
+            // 'Attack' trigger'ýný ateþle.
+            // NetworkAnimator bu tetiklemeyi tüm client'lara gönderecek.
+            modelAnimator.SetTrigger("Attack");
+            Debug.Log("[SERVER ATTACK] Attack animasyonu tetiklendi.");
+        }
         if (bulletPrefab == null || firePoint == null)
         {
             Debug.LogError("Bullet Prefab veya Fire Point atanmamýþ!");
