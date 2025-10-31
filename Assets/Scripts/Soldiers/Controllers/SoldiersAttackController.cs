@@ -54,7 +54,7 @@ public class SoldiersAttackController : NetworkBehaviour
         if (fireRate > 0)
         {
             // Örn: fireRate 2 ise (saniyede 2 atýþ), bekleme süresi 1 / 2 = 0.5 saniye olmalý.
-            float delayTime = 1f / fireRate;
+            float delayTime = fireRate;
             attackDelay = new WaitForSeconds(delayTime);
             Debug.Log($"[SERVER ATTACK] Saldýrý Gecikmesi Ayarlandý: {delayTime} saniye.");
         }

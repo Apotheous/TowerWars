@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargetDetector : MonoBehaviour
+public class TargetDetector : MonoBehaviour, IIgnoreCollision
 {
     private SoldiersControllerNavMesh controllerNavMesh;
     private SoldiersAttackController controllerAttack;
@@ -50,7 +50,10 @@ public class TargetDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Transform potentialTargetParent = other.transform.parent;
+
+        if (other.TryGetComponent<IIgnoreCollision>(out _))
+            return;
+        Transform potentialTargetParent = other.transform;
 
         if (potentialTargetParent != null)
         {

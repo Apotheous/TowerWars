@@ -4,7 +4,7 @@ using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TestBullet : NetworkBehaviour
+public class TestBullet : NetworkBehaviour, IIgnoreCollision
 {
     [SerializeField] private float speed = 20f;
     [SerializeField] private float lifetime = 3f;
@@ -71,10 +71,9 @@ public class TestBullet : NetworkBehaviour
                 return;
             }
 
-            if (other.gameObject.name == "TargetDetector" || other.gameObject.name == "bullet(Clone)")
-            {
+            if (other.TryGetComponent<IIgnoreCollision>(out _))
                 return;
-            }
+
             // Çarptýðýmýz objenin kimlik bilgisi var mý?
             var targetIdentity = other.GetComponent<Soldier>();
             if (targetIdentity != null)
@@ -98,4 +97,6 @@ public class TestBullet : NetworkBehaviour
             DestroyBullet();
         }
     }
+
+
 }

@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Turret : NetworkBehaviour
+public class Turret : NetworkBehaviour , IIgnoreCollision
 {
     public Player_Game_Mode_Manager.PlayerAge age;
 

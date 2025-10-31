@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargetDetectorTurret : MonoBehaviour
+public class TargetDetectorTurret : MonoBehaviour, IIgnoreCollision
 {
     private TurretsRotationController controllerNavMesh;
     private TurretsAttackController controllerAttack;
